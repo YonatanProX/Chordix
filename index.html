@@ -749,10 +749,9 @@ html.a11y-zoomed .brand-mark{width:52px;height:52px}
 /* ---------- סרגל התחברות ---------- */
 .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
 #authBar{margin-top:20px;display:flex;flex-direction:column;align-items:center;gap:8px}
-#authOut,#authCode,#authIn{display:flex;gap:8px;align-items:center;flex-wrap:wrap;justify-content:center}
+#authOut,#authIn{display:flex;gap:8px;align-items:center;flex-wrap:wrap;justify-content:center}
 #authBar input{font-family:var(--body);font-size:13.5px;background:var(--bg-deep2);color:var(--text-main);
   border:1px solid var(--panel-edge);border-radius:9px;padding:8px 14px;min-width:230px}
-#codeIn{min-width:120px;letter-spacing:4px;text-align:center;font-family:var(--mono);font-size:16px}
 #authBar button.link-btn{background:none;border:none;color:var(--text-dim);text-decoration:underline;
   font-size:12px;padding:4px 6px;cursor:pointer}
 #authBar button.link-btn:hover{color:var(--text-main)}
@@ -847,8 +846,7 @@ img,svg,video,canvas{max-width:100%}
   .tagline{font-size:13.5px}
 
   #authBar input{min-width:0;width:100%;max-width:320px}
-  #authOut,#authCode{width:100%;max-width:320px}
-  #authOut button.primary,#authCode button.primary{flex:1 1 auto}
+  #authOut{width:100%;max-width:320px}
   #authIn{gap:7px}
 
   .drop{padding:32px 16px}
@@ -1175,11 +1173,10 @@ button.primary.big{font-size:15px;padding:14px 34px;border-radius:13px}
 
 /* ---------- מודאל התחברות ---------- */
 #loginModal .modal{max-width:430px}
-#authOut,#authCode{display:flex;flex-direction:column;gap:10px}
+#authOut{display:flex;flex-direction:column;gap:10px}
 #authBar input,#loginModal input{width:100%;min-width:0;font-family:var(--body);font-size:14.5px;
   background:var(--bg-sunken);color:var(--text-main);border:1px solid var(--panel-edge);
   border-radius:11px;padding:12px 15px}
-#codeIn{letter-spacing:6px;text-align:center;font-family:var(--mono);font-size:19px}
 #loginModal .primary{width:100%;justify-content:center;padding:12px 16px;border-radius:11px;font-size:14.5px}
 .login-hint{margin:0 0 4px;font-size:13.5px;line-height:1.7;color:var(--text-dim)}
 #authMsg{margin:6px 0 0;font-size:12.5px;color:var(--text-dim);min-height:1.2em;text-align:center}
@@ -1204,15 +1201,40 @@ button.primary.big{font-size:15px;padding:14px 34px;border-radius:13px}
 .google-btn .g-mark{width:18px;height:18px;flex-shrink:0}
 html.a11y-reduced-motion .google-btn{transition:none}
 
-/* מפריד „או במייל” — קו מכל צד של הטקסט.
-   align-self:stretch נחוץ כי המכל (#authOut) מיושר למרכז, ובלעדיו
-   השורה מתכווצת לרוחב הטקסט ושני הקווים מקבלים רוחב 0. */
-.auth-or{
-  display:flex;align-items:center;gap:12px;align-self:stretch;
-  margin:6px 0 2px;font-size:12.5px;color:var(--text-faint);
-}
-.auth-or::before,.auth-or::after{
-  content:'';flex:1;height:1px;background:var(--panel-edge)}
+/* הערות מתחת לכפתור הכניסה */
+.login-note{
+  margin:10px 0 0;font-size:12.5px;line-height:1.7;color:var(--text-dim);text-align:center}
+.login-note b{color:var(--text-main);font-weight:600}
+.login-legal{
+  margin:8px 0 0;font-size:12px;line-height:1.7;color:var(--text-faint);text-align:center}
+.login-legal .link-btn{
+  background:none;border:0;padding:0;cursor:pointer;font:inherit;
+  color:var(--brass-soft);text-decoration:underline}
+.login-legal .link-btn:hover{color:var(--brass)}
+
+/* ---------- זהות המשתמש מגוגל ----------
+   השם והתמונה נקראים מ-user_metadata של הסשן ולא נשמרים אצלנו,
+   ולכן אין כאן שום תלות בטבלה במסד. */
+.acct-avatar{
+  width:26px;height:26px;border-radius:50%;object-fit:cover;display:block;
+  border:1px solid var(--panel-edge)}
+.acct-btn:has(.acct-avatar:not([hidden])){padding:0;overflow:hidden}
+.acct-id{
+  display:flex;align-items:center;gap:10px;
+  padding:4px 10px 12px;margin-bottom:6px;
+  border-bottom:1px solid var(--panel-edge)}
+.acct-avatar-lg{
+  width:38px;height:38px;border-radius:50%;object-fit:cover;flex-shrink:0;
+  border:1px solid var(--panel-edge)}
+.acct-id-txt{display:flex;flex-direction:column;gap:1px;min-width:0}
+.acct-name{
+  font-size:13.5px;font-weight:700;color:var(--text-main);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.acct-name:empty{display:none}
+/* .acct-mail הוגדר לשורה עצמאית בתפריט; בתוך בלוק הזהות הוא
+   צמוד לשם, ולכן מאפסים את השוליים שלו כאן. */
+.acct-id .acct-mail{margin:0;font-size:11.5px}
+.acct-menu{min-width:242px}
 
 /* ---------- כותרות מודאל: ניגודיות ---------- */
 .modal-header h2{color:var(--text-main)}
@@ -1606,12 +1628,21 @@ html.a11y-reduced-motion .coupon-btn:hover{transform:none}
           <div class="acct-wrap">
             <button type="button" class="icon-btn acct-btn" id="acctBtn" aria-haspopup="menu"
                     aria-expanded="false" aria-controls="acctMenu" aria-label="החשבון שלי">
-              <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round">
+              <img id="acctAvatar" class="acct-avatar" alt="" hidden
+                   width="26" height="26" referrerpolicy="no-referrer" decoding="async">
+              <svg id="acctAvatarFallback" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round">
                 <circle cx="12" cy="8.4" r="3.6"/><path d="M4.8 20a7.2 7.2 0 0 1 14.4 0"/>
               </svg>
             </button>
             <div class="acct-menu hidden" id="acctMenu" role="menu">
-              <p class="acct-mail" id="userEmail"></p>
+              <div class="acct-id">
+                <img id="acctAvatarBig" class="acct-avatar-lg" alt="" hidden
+                     width="38" height="38" referrerpolicy="no-referrer" decoding="async">
+                <span class="acct-id-txt">
+                  <b class="acct-name" id="userName"></b>
+                  <span class="acct-mail" id="userEmail"></span>
+                </span>
+              </div>
               <button type="button" role="menuitem" id="historyBtn">היסטוריית ניתוחים</button>
               <button type="button" role="menuitem" id="buyCreditsBtn2">קניית קרדיטים</button>
               <button type="button" role="menuitem" id="logoutBtn">יציאה</button>
@@ -1854,7 +1885,7 @@ html.a11y-reduced-motion .coupon-btn:hover{transform:none}
 <section class="band how" id="how" data-marketing aria-labelledby="howH">
   <div class="wrap">
     <p class="sec-eyebrow" data-i18n="main.10">התהליך</p>
-    <h2 id="howH" class="sec-title" data-i18n="main.11">שלושה שלבים, בלי להירשם לשום מאגר</h2>
+    <h2 id="howH" class="sec-title" data-i18n="main.11">שלושה שלבים, בלי לחפש בשום מאגר שירים</h2>
     <ol class="steps">
       <li class="step-card">
         <span class="step-num" aria-hidden="true">1</span>
@@ -2209,6 +2240,7 @@ html.a11y-reduced-motion .coupon-btn:hover{transform:none}
     </div>
     <div class="modal-body">
       <div id="authOut">
+        <p class="login-hint">הכניסה היא עם חשבון Google בלבד — בלי סיסמה לנהל ובלי טופס למלא.</p>
         <button type="button" class="google-btn" id="googleBtn">
           <svg class="g-mark" viewBox="0 0 18 18" aria-hidden="true" focusable="false">
             <path fill="#4285F4" d="M17.64 9.2c0-.64-.06-1.25-.16-1.84H9v3.48h4.84a4.14 4.14 0 0 1-1.8 2.72v2.26h2.92c1.7-1.57 2.68-3.88 2.68-6.62z"/>
@@ -2218,18 +2250,16 @@ html.a11y-reduced-motion .coupon-btn:hover{transform:none}
           </svg>
           <span>התחברות עם Google</span>
         </button>
-        <p class="auth-or"><span>או במייל</span></p>
-        <p class="login-hint">מזינים כתובת מייל ומקבלים קוד חד‑פעמי בן שש ספרות. בלי סיסמה ובלי טופס הרשמה.</p>
-        <label class="sr-only" for="emailIn">כתובת מייל</label>
-        <input id="emailIn" type="email" inputmode="email" autocomplete="email" placeholder="המייל שלך">
-        <button type="button" class="primary" id="loginBtn">שליחת קוד אימות</button>
-      </div>
-      <div id="authCode" hidden>
-        <p class="login-hint">הזינו את הקוד שקיבלתם במייל. אם הוא לא מגיע — כדאי לבדוק בתיקיית הספאם.</p>
-        <label class="sr-only" for="codeIn">קוד בן 6 ספרות</label>
-        <input id="codeIn" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="••••••">
-        <button type="button" class="primary" id="verifyBtn">אימות</button>
-        <button type="button" class="link-btn" id="resendBtn">שליחת קוד מחדש</button>
+        <p class="login-note">
+          מגוגל מגיעים אלינו <b>השם, כתובת המייל ותמונת הפרופיל</b> בלבד. אין לנו גישה
+          לסיסמה שלך, לתיבת הדואר או לכל דבר אחר בחשבון.
+        </p>
+        <p class="login-legal">
+          בכניסה אתה מאשר את
+          <button type="button" class="link-btn" data-legal="terms">תנאי השימוש</button>
+          ואת
+          <button type="button" class="link-btn" data-legal="privacy">מדיניות הפרטיות</button>.
+        </p>
       </div>
       <p id="authMsg" role="status" aria-live="polite"></p>
     </div>
@@ -2319,6 +2349,7 @@ html.a11y-reduced-motion .coupon-btn:hover{transform:none}
       <p>לפני שמתחילים — קריאה קצרה ואישור:</p>
       <ul class="cg-list">
         <li><b>קובץ השמע לא עוזב את המכשיר.</b> כל הפענוח רץ בדפדפן שלכם. אנחנו לא מקבלים את השיר ולא שומעים אותו.</li>
+        <li><b>הכניסה לחשבון היא עם Google בלבד.</b> מגוגל מגיעים אלינו השם, המייל ותמונת הפרופיל — ותו לא. תוצאת הניתוח (לא ההקלטה) נשמרת בחשבון שלכם.</li>
         <li><b>התוצאה אוטומטית ועלולה לטעות.</b> אין להסתמך עליה בלי בדיקה באוזן.</li>
         <li><b>זכויות יוצרים באחריותכם.</b> השימוש בדפי אקורדים של יצירות מוגנות הוא באחריות המשתמש.</li>
       </ul>
@@ -2342,17 +2373,28 @@ html.a11y-reduced-motion .coupon-btn:hover{transform:none}
 <div id="legalSources" hidden>
 
 <div id="legal-terms" data-title="תנאי שימוש">
-  <p class="legal-meta">עודכן לאחרונה: 30 ביולי 2026</p>
+  <p class="legal-meta">עודכן לאחרונה: 31 ביולי 2026</p>
 
   <h3>1. כללי</h3>
   <p>אתר ושירות „Chordix” (להלן: <b>„השירות”</b>) מופעלים על ידי <span class="fill">יונתן צמח</span> (להלן: <b>„המפעיל”</b>). תנאים אלה מהווים הסכם מחייב בינך לבין המפעיל. עצם הכניסה לשירות והשימוש בו מהווים הסכמה מלאה לתנאים. אם אינך מסכים לתנאי כלשהו — אינך רשאי לעשות שימוש בשירות.</p>
   <p>התנאים מנוסחים בלשון זכר מטעמי נוחות בלבד ומופנים לכל המגדרים.</p>
 
   <h3>2. מהות השירות</h3>
-  <p>השירות הוא כלי טכנולוגי המנתח קובץ שמע שהמשתמש בוחר, ומפיק ממנו הערכה אוטומטית של סולם, קצב, מבנה ורצף אקורדים בדמות „דף אקורדים”. הניתוח מתבצע במלואו בדפדפן שבמכשיר המשתמש; קובץ השמע אינו נשלח לשרתי המפעיל ואינו נשמר על ידו.</p>
+  <p>השירות הוא כלי טכנולוגי המנתח קובץ שמע שהמשתמש בוחר, ומפיק ממנו הערכה אוטומטית של סולם, קצב, מבנה ורצף אקורדים בדמות „דף אקורדים”. הניתוח מתבצע במלואו בדפדפן שבמכשיר המשתמש; <b>קובץ השמע אינו נשלח לשרתי המפעיל ואינו נשמר על ידו</b>.</p>
+  <p>לעומת זאת, ניהול החשבון והקרדיטים מחייב שמירת מידע בשרת, וכן נשמרת בחשבונך תוצאת הניתוח — לא ההקלטה. הפירוט המלא נמצא ב<b>מדיניות הפרטיות</b>, המהווה חלק בלתי נפרד מתנאים אלה.</p>
 
   <h3>3. כשירות להשתמש</h3>
   <p>השימוש מותר למי שמלאו לו 18 שנים, או לקטין באישור אחראי עליו. שימוש בשירות מהווה הצהרה כי אתה עומד בתנאי זה.</p>
+
+  <h3>3א. חשבון משתמש והתחברות</h3>
+  <p>חלק מיכולות השירות — ניהול קרדיטים, ניתוח שיר ושמירת היסטוריה — מחייבות חשבון. <b>ההתחברות אפשרית אך ורק באמצעות חשבון Google</b>, ואין בשירות סיסמה נפרדת. השימוש בהתחברות זו כפוף גם לתנאי השימוש של Google.</p>
+  <p>אתה אחראי לשמירה על חשבון ה‑Google שלך ולכל פעולה שתיעשה בשירות באמצעותו. חשבון אחד מיועד לאדם אחד; אין להעביר, למכור או לשתף חשבון. המפעיל רשאי להשעות או לסגור חשבון שנעשה בו שימוש לרעה, שימוש בניגוד לתנאים אלה או שימוש בלתי חוקי.</p>
+  <p>אתה רשאי לבקש את מחיקת חשבונך בכל עת בפנייה ל‑<a href="mailto:chordix.business@gmail.com">chordix.business@gmail.com</a>. מחיקת החשבון מוחקת גם את יתרת הקרדיטים ואת היסטוריית הניתוחים, ואינה מזכה בהחזר כספי.</p>
+
+  <h3>3ב. קרדיטים וקודי קופון</h3>
+  <p>ניתוח שיר צורך קרדיטים מיתרת החשבון, לפי התעריף המוצג בממשק בעת הפעולה. אם הניתוח נכשל מסיבה טכנית, הקרדיטים מוחזרים אוטומטית. פעולות שאינן ניתוח מחדש — תיקוני אקורדים, כוונון, טרנספוזיציה, הדפסה וייצוא — אינן צורכות קרדיטים.</p>
+  <p><b>נכון למועד עדכון תנאים אלה, הסליקה המקוונת אינה פעילה ולא ניתן לרכוש קרדיטים בתשלום.</b> קרדיטים ניתנים כמענק הצטרפות או באמצעות קוד קופון. קוד קופון הוא אישי, אינו ניתן להמרה בכסף, וקוד חד‑פעמי פוקע עם מימושו הראשון. המפעיל רשאי לבטל קוד שהופץ שלא כדין.</p>
+  <p>קרדיטים אינם מטבע, אין להם ערך כספי מחוץ לשירות, ואינם ניתנים להעברה בין חשבונות. עם הפעלת הסליקה יתעדכנו תנאים אלה ויחולו עליהם, בין היתר, הוראות חוק הגנת הצרכן, התשמ"א‑1981, לרבות זכות הביטול הקבועה בו.</p>
 
   <h3>4. רישיון השימוש והגבלותיו</h3>
   <p>ניתן לך רישיון אישי, מוגבל, בלתי בלעדי ובלתי עביר להשתמש בשירות למטרותיך. אלא אם ניתן אישור בכתב מהמפעיל, אין:</p>
@@ -2380,7 +2422,7 @@ html.a11y-reduced-motion .coupon-btn:hover{transform:none}
 
   <h3>9. הגבלת אחריות</h3>
   <p>במידה המרבית המותרת לפי דין: השירות מסופק ללא כל אחריות, מפורשת או משתמעת, לרבות אחריות להתאמה לצורך מסוים, לאיכות, לדיוק או לאי‑הפרה. המפעיל לא יישא באחריות לנזק עקיף, תוצאתי, מיוחד או עונשי, לרבות אובדן רווח, אובדן נתונים, פגיעה במוניטין או נזק הנובע מהסתמכות על תוצאות הניתוח או משימוש בהן.</p>
-  <p>אחריותו המצטברת של המפעיל בגין כל עילה שהיא לא תעלה על הסכום ששולם על ידך בפועל בעד השירות בשנים‑עשר החודשים שקדמו לאירוע, ובהיעדר תשלום — על סך <span class="fill">[₪ סכום]</span>.</p>
+  <p>אחריותו המצטברת של המפעיל בגין כל עילה שהיא לא תעלה על הסכום ששולם על ידך בפועל בעד השירות בשנים‑עשר החודשים שקדמו לאירוע, ובהיעדר תשלום — על סך 500 ש"ח.</p>
   <p>אין באמור כדי לגרוע מזכויות שאינן ניתנות להתניה לפי דין, לרבות לפי חוק הגנת הצרכן, התשמ"א‑1981.</p>
 
   <h3>10. שיפוי</h3>
@@ -2390,42 +2432,86 @@ html.a11y-reduced-motion .coupon-btn:hover{transform:none}
   <p>המפעיל רשאי לעדכן תנאים אלה מעת לעת. הנוסח המעודכן יפורסם בעמוד זה בצירוף תאריך עדכון, ויחול על שימוש שייעשה לאחר פרסומו.</p>
 
   <h3>12. דין וסמכות שיפוט</h3>
-  <p>על תנאים אלה יחולו דיני מדינת ישראל בלבד. סמכות השיפוט הבלעדית מוקנית לבתי המשפט המוסמכים במחוז <span class="fill">[תל אביב–יפו]</span>.</p>
+  <p>על תנאים אלה יחולו דיני מדינת ישראל בלבד. סמכות השיפוט הבלעדית מוקנית לבתי המשפט המוסמכים במחוז תל אביב–יפו.</p>
 
   <h3>13. יצירת קשר</h3>
   <p>לשאלות בנוגע לתנאים: <a href="mailto:chordix.business@gmail.com">chordix.business@gmail.com</a>.</p>
 </div>
 
 <div id="legal-privacy" data-title="מדיניות פרטיות">
-  <p class="legal-meta">עודכן לאחרונה: 30 ביולי 2026</p>
+  <p class="legal-meta">עודכן לאחרונה: 31 ביולי 2026</p>
 
-  <h3>1. העיקרון: הכול נשאר אצלך</h3>
-  <p>השירות אינו דורש הרשמה, אינו יוצר חשבון משתמש ואינו מנהל מאגר מידע של משתמשים. קובץ השמע שאתה בוחר נקרא ומנותח <b>בתוך הדפדפן שלך בלבד</b>, באמצעות Web Audio ומודל זיהוי שרץ מקומית. הקובץ, האקורדים והתיקונים שביצעת אינם נשלחים למפעיל ואינם נשמרים אצלו.</p>
+  <h3>1. מי אנחנו ומה המסמך הזה</h3>
+  <p>השירות „Chordix” מופעל על ידי <b>יונתן צמח</b> (להלן: „המפעיל”), שהוא בעל השליטה במידע לפי חוק הגנת הפרטיות, התשמ"א‑1981. מסמך זה מתאר איזה מידע נאסף, למה, היכן הוא נשמר ומה הזכויות שלך. לפניות בנושאי פרטיות: <a href="mailto:chordix.business@gmail.com">chordix.business@gmail.com</a>.</p>
 
-  <h3>2. מידע שנשמר במכשיר שלך</h3>
-  <p>לצורך נוחות השימוש נשמרים באחסון המקומי של הדפדפן (localStorage), במכשירך בלבד: העדפות הנגישות שבחרת ואישור קריאת תנאי השימוש. מידע זה אינו נשלח לשום גורם, וניתן למחוק אותו בכל עת בכפתור „איפוס הגדרות נגישות” או בניקוי נתוני האתר בדפדפן.</p>
+  <h3>2. ההפרדה החשובה: קובץ השמע לעומת החשבון</h3>
+  <p><b>קובץ השמע שלך לא עוזב את המכשיר.</b> הניתוח כולו — קריאת הקובץ, מודל הזיהוי וחישוב האקורדים — רץ בדפדפן שלך. הקובץ אינו מועלה לשום שרת, לא של המפעיל ולא של אף ספק, ולכן אין לנו אפשרות טכנית לשמוע אותו, לשמור אותו או להעביר אותו לאחר.</p>
+  <p><b>החשבון והתוצאה כן נשמרים בשרת.</b> כדי לנהל קרדיטים ולשמור היסטוריה, המפעיל מנהל מאגר מידע. נוסח קודם של מדיניות זו טען שאין מאגר כלל — הדבר נכון היה לגרסה שלא כללה חשבונות, ואינו נכון עוד. הפירוט המלא בסעיף 3.</p>
 
-  <h3>3. שירותי צד שלישי הנטענים בדף</h3>
-  <p>לשם הצגת הגופנים והפעלת מנוע ההרצה, הדף טוען משאבים משרתים חיצוניים: גופנים מ‑Google Fonts וספריית ONNX Runtime Web מרשת ההפצה jsDelivr. בעת טעינה כזו נחשפים לספקים אלה, כמקובל בכל בקשת רשת, כתובת ה‑IP שלך ופרטי דפדפן בסיסיים, בהתאם למדיניות הפרטיות שלהם. המפעיל אינו מקבל מידע זה. <span class="fill">[אם תארחו את הגופנים והספרייה מקומית — יש למחוק סעיף זה.]</span></p>
+  <h3>3. איזה מידע נאסף בפועל</h3>
+  <p><b>א. פרטי הזהות מגוגל.</b> הכניסה לשירות אפשרית אך ורק באמצעות חשבון Google. בעת ההתחברות גוגל מוסרת לנו את <b>שמך, כתובת הדוא"ל, כתובת תמונת הפרופיל ומזהה החשבון בגוגל</b>. אין לנו גישה לסיסמתך, לתיבת הדואר שלך או לכל מידע אחר בחשבון Google. השם והתמונה מוצגים לך בממשק ונקראים מתוך אסימון ההתחברות; הם אינם נשמרים בטבלאות שלנו.</p>
+  <p><b>ב. ארנק הקרדיטים.</b> נשמרים מזהה המשתמש, כתובת הדוא"ל, יתרת הקרדיטים ומועד ההצטרפות, וכן רישום של חיובים והחזרים בגין ניתוחים.</p>
+  <p><b>ג. היסטוריית הניתוחים.</b> בסיום ניתוח מוצלח, וכשאתה מחובר, נשמרים בחשבונך <b>שם הקובץ שבחרת, הסולם, הקצב, מספר התיבות, אורך השיר, חלוקת המקטעים ורצף האקורדים שהופק</b>. כלומר: תוצאת הניתוח נשמרת, ההקלטה עצמה לא.</p>
+  <p><b>ד. מימוש קופונים.</b> אם מימשת קוד קופון, נשמר רישום של הקוד, המשתמש שמימש והמועד.</p>
+  <p><b>ה. רשימת המתנה.</b> אם בחרת להשאיר כתובת דוא"ל לעדכון על פתיחת הסליקה, הכתובת והחבילה שסימנת נשמרות לצורך זה בלבד.</p>
+  <p>מסירת המידע נעשית מרצונך. אינך חייב על פי דין למסור אותו, אך בלעדיו לא ניתן לפתוח חשבון, לנהל קרדיטים או לשמור היסטוריה.</p>
 
-  <h3>4. קובצי Cookie ומדידה</h3>
-  <p>השירות אינו עושה שימוש בקובצי Cookie למעקב, אינו מפעיל כלי אנליטיקה ואינו משתף מידע עם מפרסמים. ככל שיתווספו כלים כאלה בעתיד, מדיניות זו תעודכן והדבר יוצג למשתמשים.</p>
+  <h3>4. למה המידע משמש</h3>
+  <ul>
+    <li>לזהות אותך ולאפשר כניסה לחשבון;</li>
+    <li>לנהל את יתרת הקרדיטים, לחייב בגין ניתוח ולהחזיר קרדיטים כשניתוח נכשל;</li>
+    <li>להציג לך את היסטוריית הניתוחים שלך ולאפשר לפתוח אותם מחדש;</li>
+    <li>לאמת קודי קופון ולמנוע מימוש כפול של קוד חד‑פעמי;</li>
+    <li>לעדכן אותך בפתיחת הסליקה, אם ביקשת זאת במפורש.</li>
+  </ul>
+  <p>המידע אינו נמכר, אינו מושכר ואינו מועבר לצדדים שלישיים לצורכי שיווק. אין פרסום באתר ואין שיתוף מידע עם מפרסמים.</p>
 
-  <h3>5. זכויותיך</h3>
-  <p>מאחר שאין מאגר מידע המנוהל על ידי המפעיל, אין מידע אישי אודותיך שניתן לעיין בו או לתקנו. אם בכל זאת פנית אלינו בדוא"ל, נשמור את פנייתך לצורך הטיפול בה בלבד. לפי חוק הגנת הפרטיות, התשמ"א‑1981, לרבות לאחר תיקון 13 לחוק, אתה זכאי לפנות אלינו בבקשה לעיין במידע שנמסר בפנייתך, לתקנו או למחקו, בכתובת <a href="mailto:chordix.business@gmail.com">chordix.business@gmail.com</a>.</p>
+  <h3>5. היכן המידע נשמר ומי הספקים</h3>
+  <p>המפעיל אינו מחזיק שרתים משלו ונשען על ספקי תשתית מוכרים. לכל אחד מהם מדיניות פרטיות ואבטחה משלו, ואלה חלות על המידע המוחזק אצלו:</p>
+  <ul>
+    <li><b>Supabase, Inc.</b> — בסיס הנתונים ומערכת ההתחברות. כאן נשמרים החשבון, הקרדיטים, ההיסטוריה והקופונים. פרויקט השירות ממוקם ב<b>אזור באיחוד האירופי</b>. <a href="https://supabase.com/privacy" target="_blank" rel="noopener noreferrer">מדיניות הפרטיות של Supabase</a>.</li>
+    <li><b>Cloudflare, Inc.</b> — אירוח האתר והגשתו (Cloudflare Pages), לרבות הגנה מפני תעבורה זדונית. דרך הספק עוברות בקשות הרשת שלך, ובכלל זה כתובת ה‑IP ופרטי דפדפן בסיסיים, כמקובל בכל אתר. <a href="https://www.cloudflare.com/privacypolicy/" target="_blank" rel="noopener noreferrer">מדיניות הפרטיות של Cloudflare</a>.</li>
+    <li><b>Google</b> — שירות ההתחברות („Sign in with Google”) והגופנים המוצגים בדף. בעת התחברות או טעינת גופן נחשפים לגוגל כתובת ה‑IP ופרטי דפדפן בסיסיים. <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer">מדיניות הפרטיות של Google</a>.</li>
+    <li><b>jsDelivr</b> — רשת הפצה שממנה נטענות שתי ספריות קוד פתוח (מנוע ההרצה של המודל וספריית ההתחברות). לספק נחשפת כתובת ה‑IP בעת הטעינה. הוא אינו מקבל מידע על תוכן השימוש שלך.</li>
+    <li><b>GitHub, Inc.</b> — מאגר קוד המקור של האתר ותהליך הפרסום. <b>לא נשמר שם שום מידע על משתמשים</b>; מדובר בקוד התוכנה בלבד.</li>
+  </ul>
 
-  <h3>6. אבטחת מידע</h3>
-  <p>העיבוד המקומי מצמצם מהותית את סיכוני האבטחה, שכן אין העברה או אחסון של תוכן המשתמש בשרתים. עם זאת, אין באפשרות המפעיל להבטיח את אבטחת המכשיר או הרשת שבהם אתה משתמש.</p>
+  <h3>6. העברת מידע אל מחוץ לישראל</h3>
+  <p>ספקי התשתית שלעיל הם חברות זרות, ולכן המידע נשמר ומעובד מחוץ לגבולות ישראל. מסד הנתונים, שבו נשמר כל המידע האישי, ממוקם ב<b>אזור באיחוד האירופי</b> — כלומר במדינות שדיני הגנת המידע בהן מעניקים רמת הגנה המוכרת כנאותה, בהתאם לתקנות הגנת הפרטיות (העברת מידע אל מאגרי מידע שמחוץ לגבולות המדינה), התשס"א‑2001. השימוש בשירות מהווה הסכמה להעברה זו.</p>
 
-  <h3>7. קטינים</h3>
-  <p>השירות אינו מיועד לאיסוף מידע מקטינים ואינו אוסף מידע כזה בפועל.</p>
+  <h3>7. אחסון במכשיר שלך, Cookie ומדידה</h3>
+  <p>באחסון המקומי של הדפדפן (localStorage), במכשירך בלבד, נשמרים: העדפות הנגישות והתצוגה שבחרת, אישור קריאת תנאי השימוש, ואסימון ההתחברות שמאפשר להישאר מחובר בין ביקורים. ניתן למחוק את כולם בכל עת בניקוי נתוני האתר בדפדפן, ומחיקת אסימון ההתחברות משמעה יציאה מהחשבון.</p>
+  <p>המפעיל <b>אינו מציב קובצי Cookie למעקב, אינו מפעיל כלי מדידה או אנליטיקה משלו ואינו בונה פרופיל התנהגות</b>. עם זאת, ספקי התשתית עשויים להציב קובצי Cookie טכניים ולנהל יומני שרת (log) לצורכי אבטחה, איתור תקלות ומניעת שימוש לרעה — מנגנון שקיים בכל אתר ואינו בשליטת המפעיל, ואינו משמש אותו לזיהוי אישי שלך.</p>
 
-  <h3>8. שינויים ויצירת קשר</h3>
-  <p>מדיניות זו עשויה להתעדכן; הנוסח העדכני יוצג תמיד בעמוד זה. לפניות בנושאי פרטיות: <a href="mailto:chordix.business@gmail.com">chordix.business@gmail.com</a>.</p>
+  <h3>8. משך שמירת המידע</h3>
+  <p>המידע נשמר כל עוד החשבון פעיל. עם מחיקת החשבון נמחקים איתו, אוטומטית, גם ארנק הקרדיטים והיסטוריית הניתוחים. כתובת שנרשמה לרשימת ההמתנה נשמרת עד לפתיחת הסליקה או עד לבקשת הסרה, לפי המוקדם. רישומי חיוב ומימוש קופונים עשויים להישמר לתקופה נוספת ככל שהדבר נדרש לפי דין או לצורך בירור מחלוקת.</p>
+
+  <h3>9. אבטחת מידע</h3>
+  <p>המפעיל פועל לאבטחת המידע בהתאם לתקנות הגנת הפרטיות (אבטחת מידע), התשע"ז‑2017, ובכלל זה: התעבורה אל השרתים ומהם מוצפנת (HTTPS); הגישה למידע מוגבלת ברמת בסיס הנתונים כך שכל משתמש יכול לקרוא את הרשומות שלו בלבד; יתרת הקרדיטים אינה ניתנת לשינוי מצד הדפדפן אלא דרך פעולות מבוקרות בשרת; והמפעיל אינו מחזיק סיסמאות משתמשים כלל, שכן האימות נעשה אצל גוגל.</p>
+  <p>עם זאת, אין מערכת חסינה לחלוטין. המפעיל אינו יכול להתחייב שלא יתרחש אירוע אבטחה, ואינו אחראי לאבטחת המכשיר או הרשת שבהם אתה משתמש. בקרות אירוע אבטחה חמור יפעל המפעיל כנדרש לפי דין.</p>
+
+  <h3>10. הזכויות שלך</h3>
+  <p>לפי חוק הגנת הפרטיות, התשמ"א‑1981, לרבות לאחר תיקון 13 לחוק, אתה זכאי:</p>
+  <ul>
+    <li><b>לעיין</b> במידע אודותיך המוחזק במאגר;</li>
+    <li><b>לבקש תיקון</b> של מידע שאינו נכון, שלם, ברור או מעודכן;</li>
+    <li><b>לבקש מחיקה</b> של המידע ושל החשבון.</li>
+  </ul>
+  <p>לממש כל אחת מהזכויות האלה אפשר בפנייה ל‑<a href="mailto:chordix.business@gmail.com">chordix.business@gmail.com</a>. נשיב לפנייה בתוך פרק זמן סביר וכנדרש בדין. אם בקשתך נדחתה, אתה רשאי לפנות לבית משפט השלום בדרך שנקבעה בחוק. כמו כן ניתן לפנות אל <b>הרשות להגנת הפרטיות</b> במשרד המשפטים.</p>
+  <p>ביטול ההרשאה שנתת לאפליקציה בחשבון Google שלך מונע התחברות עתידית, אך אינו מוחק כשלעצמו את המידע שכבר נשמר אצלנו — לשם כך יש לשלוח בקשת מחיקה.</p>
+
+  <h3>11. דיוור</h3>
+  <p>המפעיל אינו שולח דיוור פרסומי. הודעת עדכון תישלח רק אם ביקשת זאת במפורש בטופס רשימת ההמתנה, ותכלול אפשרות הסרה, בהתאם לסעיף 30א לחוק התקשורת (בזק ושידורים), התשמ"ב‑1982.</p>
+
+  <h3>12. קטינים</h3>
+  <p>השירות מיועד למשתמשים שמלאו להם 18, או לקטינים באישור האחראי עליהם, בהתאם לתנאי השימוש. המפעיל אינו אוסף במכוון מידע על קטינים מתחת לגיל זה ללא אישור כאמור. אם נודע לך שקטין מסר מידע ללא הסכמת האחראי עליו, פנה אלינו והמידע יימחק.</p>
+
+  <h3>13. שינויים במדיניות</h3>
+  <p>מדיניות זו עשויה להתעדכן, בין היתר עם הוספת יכולות לשירות. הנוסח העדכני יוצג תמיד במסך זה בצירוף תאריך עדכון. שינוי מהותי באופן השימוש במידע יוצג למשתמשים באופן בולט.</p>
 </div>
 
 <div id="legal-accessibility" data-title="הצהרת נגישות">
-  <p class="legal-meta">עודכן לאחרונה: 30 ביולי 2026</p>
+  <p class="legal-meta">עודכן לאחרונה: 31 ביולי 2026</p>
 
   <h3>המחויבות שלנו</h3>
   <p>אנו רואים בנגישות השירות לכלל המשתמשים, לרבות אנשים עם מוגבלות, ערך מרכזי. האתר נבנה בשאיפה לעמוד בהוראות תקנות שוויון זכויות לאנשים עם מוגבלות (התאמות נגישות לשירות), התשע"ג‑2013, בתקן הישראלי ת"י 5568 ובהנחיות WCAG 2.1 ברמה AA.</p>
@@ -2449,7 +2535,7 @@ html.a11y-reduced-motion .coupon-btn:hover{transform:none}
 </div>
 
 <div id="legal-licenses" data-title="רישיונות צד שלישי">
-  <p class="legal-meta">עודכן לאחרונה: 30 ביולי 2026</p>
+  <p class="legal-meta">עודכן לאחרונה: 31 ביולי 2026</p>
   <p>השירות עושה שימוש ברכיבי קוד פתוח הבאים. השימוש בהם כפוף לתנאי הרישיון המצוינים, והודעות זכויות היוצרים מובאות כאן כנדרש.</p>
 
   <h3>1. מודל זיהוי אקורדים — BTC (Bi‑directional Transformer for Chord Recognition)</h3>
@@ -2482,10 +2568,12 @@ SOFTWARE.</pre>
   <h3>3. גופנים</h3>
   <p>Heebo, Rubik ו‑Assistant — מופצים ברישיון <span dir="ltr">SIL Open Font License 1.1</span> דרך Google Fonts, ומותרים לשימוש מסחרי בהתאם לתנאי הרישיון.</p>
 
-  <h3>4. הערה על נתוני האימון של המודל</h3>
+  <h3>4. Supabase JavaScript Client</h3>
+  <p>ספריית ההתחברות והגישה לבסיס הנתונים, מבית Supabase, מופצת ברישיון MIT: <span dir="ltr">Copyright (c) 2020 Supabase</span>. נוסח הרישיון זהה לנוסח שלעיל, בשינוי שם בעל הזכויות.</p>
+
+  <h3>5. הערה על נתוני האימון של המודל</h3>
   <p>המודל אומן על ידי יוצריו על מאגרי אנוטציות אקדמיים של אקורדים. הודעה זו מובאת לשם שקיפות; אין בה משום מצג של המפעיל בדבר מקור נתוני האימון או מעמדם.</p>
 
-  <p style="margin-top:16px"><span class="fill">[מומלץ להשוות מול קובץ ה‑LICENSE המקורי של כל רכיב ולעדכן שם בעל הזכויות ושנה במדויק לפני העלאה לאוויר.]</span></p>
 </div>
 
 </div>
@@ -7370,8 +7458,6 @@ const SUPABASE_ANON_KEY = 'sb_publishable_o_OZ0MF9F3eN-7727-cQkA_oihPH1pH';
   });
   const msg = $('authMsg');
 
-  let pendingEmail = '';
-
   /* ============================================================
      תרגום שגיאות רשת להודעה שאפשר לפעול לפיה
      ------------------------------------------------------------
@@ -7405,9 +7491,9 @@ const SUPABASE_ANON_KEY = 'sb_publishable_o_OZ0MF9F3eN-7727-cQkA_oihPH1pH';
       return 'החיבור נחסם בדרך. בדקו חוסם פרסומות או תוסף פרטיות, ונסו שוב.';
     }
     if(/provider is not enabled|unsupported provider/i.test(m))
-      return 'ההתחברות עם Google לא מופעלת עדיין בצד השרת. אפשר להיכנס עם קוד למייל בינתיים.';
+      return 'ההתחברות עם Google לא מופעלת עדיין בצד השרת. פנו אלינו ונפעיל אותה.';
     if(/redirect_to|redirect url|not allowed/i.test(m))
-      return 'כתובת החזרה מגוגל לא מאושרת בהגדרות הפרויקט. אפשר להיכנס עם קוד למייל בינתיים.';
+      return 'כתובת החזרה מגוגל לא מאושרת בהגדרות הפרויקט. פנו אלינו ונתקן.';
     if(/rate limit|too many/i.test(m))
       return 'יותר מדי ניסיונות בזמן קצר. נסו שוב בעוד כמה דקות.';
     if(/invalid api key|no api key|jwt/i.test(m))
@@ -7446,51 +7532,17 @@ const SUPABASE_ANON_KEY = 'sb_publishable_o_OZ0MF9F3eN-7727-cQkA_oihPH1pH';
     authErrText(err, 'ההתחברות עם Google נכשלה').then(t=>{ msg.textContent = t; });
   }, 0);
 
-  /* כל קריאת auth עטופה ב-try/catch ולא רק בודקת את error.
-     תקלת רשת אמיתית לפעמים *נזרקת* במקום לחזור כאובייקט, ואז
-     בלי catch הכפתור נשאר disabled לנצח והמשתמש תקוע. */
-  async function sendCode(){
-    const email = $('emailIn').value.trim();
-    if(!email || email.indexOf('@') < 1){ msg.textContent = 'צריך להזין כתובת מייל תקינה.'; return; }
-    $('loginBtn').disabled = true;
-    msg.textContent = 'שולח קוד…';
-    try{
-      const { error } = await sb.auth.signInWithOtp({
-        email,
-        options: { shouldCreateUser: true, emailRedirectTo: redirectTarget() }
-      });
-      if(error) throw error;
-      pendingEmail = email;
-      $('authOut').hidden = true;
-      $('authCode').hidden = false;
-      $('codeIn').value = '';
-      $('codeIn').focus();
-      msg.textContent = 'שלחנו קוד בן 6 ספרות ל־' + email + '. אם הוא לא מגיע — בדקו בספאם.';
-    }catch(e){
-      msg.textContent = await authErrText(e, 'לא הצלחנו לשלוח');
-    }finally{
-      $('loginBtn').disabled = false;
-    }
-  }
-
-  async function verifyCode(){
-    const token = $('codeIn').value.trim();
-    if(!token){ msg.textContent = 'צריך להזין את הקוד שקיבלת במייל.'; return; }
-    $('verifyBtn').disabled = true;
-    msg.textContent = 'מאמת…';
-    try{
-      const { error } = await sb.auth.verifyOtp({ email: pendingEmail, token, type: 'email' });
-      if(error) throw error;
-      // render() ירוץ אוטומטית דרך onAuthStateChange ברגע שהסשן נקבע
-    }catch(e){
-      msg.textContent = await authErrText(e, 'קוד שגוי או שפג תוקפו');
-    }finally{
-      $('verifyBtn').disabled = false;
-    }
-  }
-
   /* ============================================================
-     התחברות עם Google
+     התחברות עם Google — מסלול הכניסה היחיד
+     ------------------------------------------------------------
+     ההתחברות בקוד למייל (signInWithOtp / verifyOtp) הוסרה לבקשת
+     המפעיל. שימו לב: זו הסרה בצד הלקוח בלבד. ספק ה-Email עדיין
+     פעיל בהגדרות Supabase, וכדי לסגור את המסלול לגמרי כדאי לכבות
+     אותו שם (Authentication ← Providers ← Email). זה לא דורש SQL.
+
+     כל קריאת auth עטופה ב-try/catch ולא רק בודקת את error: תקלת
+     רשת אמיתית לפעמים *נזרקת* במקום לחזור כאובייקט, ואז בלי catch
+     הכפתור נשאר disabled לנצח והמשתמש תקוע.
      ------------------------------------------------------------
      כתובת החזרה נגזרת מ-window.location ולא מוקשחת בקוד, כדי
      שאותו קובץ יעבוד גם בדומיין הראשי, גם בסביבת התצוגה המקדימה
@@ -7535,8 +7587,7 @@ const SUPABASE_ANON_KEY = 'sb_publishable_o_OZ0MF9F3eN-7727-cQkA_oihPH1pH';
   function openLogin(){
     msg.textContent = '';
     loginModal.classList.remove('hidden');
-    const f = $('authCode').hidden ? $('emailIn') : $('codeIn');
-    setTimeout(()=>f && f.focus(), 40);
+    setTimeout(()=>{ const g = $('googleBtn'); if(g) g.focus(); }, 40);
   }
   function closeLogin(){ loginModal.classList.add('hidden'); }
   window.__openLogin = openLogin;
@@ -7547,11 +7598,6 @@ const SUPABASE_ANON_KEY = 'sb_publishable_o_OZ0MF9F3eN-7727-cQkA_oihPH1pH';
     if(e.key === 'Escape' && !loginModal.classList.contains('hidden')) closeLogin();
   });
 
-  $('loginBtn').addEventListener('click', sendCode);
-  $('emailIn').addEventListener('keydown', e => { if(e.key === 'Enter') sendCode(); });
-  $('verifyBtn').addEventListener('click', verifyCode);
-  $('codeIn').addEventListener('keydown', e => { if(e.key === 'Enter') verifyCode(); });
-  $('resendBtn').addEventListener('click', sendCode);
   $('googleBtn').addEventListener('click', signInWithGoogle);
   $('logoutBtn').addEventListener('click', async () => {
     try{ await sb.auth.signOut(); }
@@ -7561,19 +7607,74 @@ const SUPABASE_ANON_KEY = 'sb_publishable_o_OZ0MF9F3eN-7727-cQkA_oihPH1pH';
   let currentSession = null;
   let lastKnownCredits = null;
 
+  /* ============================================================
+     זהות המשתמש מגוגל
+     ------------------------------------------------------------
+     השם והתמונה מגיעים מ-user_metadata של הסשן — כלומר ישירות
+     מגוגל, דרך הטוקן. הם *לא* נשמרים אצלנו בשום טבלה, ולכן
+     התצוגה הזו לא דורשת שום שינוי במסד.
+
+     גוגל לא עקבית בשמות השדות: לפעמים full_name ולפעמים name,
+     לפעמים avatar_url ולפעמים picture. בודקים את שניהם.
+     ============================================================ */
+  function identityOf(session){
+    const u = session.user || {};
+    const m = u.user_metadata || {};
+    return {
+      name  : m.full_name || m.name || m.user_name || '',
+      email : u.email || m.email || '',
+      avatar: m.avatar_url || m.picture || ''
+    };
+  }
+
+  function paintIdentity(session){
+    const id     = identityOf(session);
+    const small  = $('acctAvatar');
+    const big    = $('acctAvatarBig');
+    const fallbk = $('acctAvatarFallback');
+    const nameEl = $('userName');
+
+    if(nameEl) nameEl.textContent = id.name;
+    $('userEmail').textContent = id.email;
+
+    const btn = $('acctBtn');
+    if(btn) btn.setAttribute('aria-label', id.name ? 'החשבון של ' + id.name : 'החשבון שלי');
+
+    /* תמונת פרופיל מגוגל היא URL חיצוני שיכול להיכשל — חשבון בלי
+       תמונה, חסימה של הדומיין, או משתמש בלי רשת. בכל אחד מהמקרים
+       חוזרים לאייקון הכללי במקום ריבוע שבור. */
+    function showFallback(){
+      [small, big].forEach(el=>{ if(el){ el.hidden = true; el.removeAttribute('src'); } });
+      if(fallbk) fallbk.style.display = '';
+    }
+    if(!id.avatar){ showFallback(); return; }
+
+    let pending = 2;
+    [small, big].forEach(el=>{
+      if(!el){ pending--; return; }
+      el.onerror = showFallback;
+      el.onload  = ()=>{
+        el.hidden = false;
+        if(--pending === 0 && fallbk) fallbk.style.display = 'none';
+      };
+      el.alt = id.name ? 'תמונת הפרופיל של ' + id.name : '';
+      el.src = id.avatar;
+    });
+  }
+
   async function render(session){
     currentSession = session || null;
     if(!session){
-      if(!pendingEmail){ $('authOut').hidden = false; $('authCode').hidden = true; }
+      $('authOut').hidden = false;
       $('authIn').hidden = true;
       $('loginOpen').hidden = false;
       return;
     }
-    pendingEmail = '';
-    $('authOut').hidden = true; $('authCode').hidden = true; $('authIn').hidden = false;
+    $('authOut').hidden = true;
+    $('authIn').hidden = false;
     $('loginOpen').hidden = true;
     $('loginModal').classList.add('hidden');
-    $('userEmail').textContent = session.user.email;
+    paintIdentity(session);
     msg.textContent = '';
     const { data, error } = await sb.from('profiles')
       .select('credits').eq('id', session.user.id).maybeSingle();
