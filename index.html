@@ -1185,6 +1185,35 @@ button.primary.big{font-size:15px;padding:14px 34px;border-radius:13px}
 #authMsg{margin:6px 0 0;font-size:12.5px;color:var(--text-dim);min-height:1.2em;text-align:center}
 #authBar button.link-btn{color:var(--text-dim);font-size:12.5px}
 
+/* ---------- התחברות עם Google ----------
+   הכפתור לבן עם הלוגו הצבעוני בשתי הערכות ולא נצבע לפי הערכה,
+   כי הנחיות המותג של Google מחייבות את הסמל על רקע לבן או כהה
+   מלא — גרסה סגלגלה „שמתאימה לאתר” היא הפרה, וגם פוגעת בזיהוי
+   המיידי שבגללו אנשים לוחצים על הכפתור הזה מלכתחילה. */
+.google-btn{
+  display:flex;align-items:center;justify-content:center;gap:11px;
+  width:100%;min-height:46px;padding:12px 16px;cursor:pointer;
+  background:#fff;color:#1f1f1f;border:1px solid #dadce0;border-radius:11px;
+  font-family:var(--body);font-size:14.5px;font-weight:600;
+  transition:box-shadow .18s,background-color .18s;
+}
+.google-btn:hover{background:#f7f8f8;box-shadow:0 2px 8px rgba(60,64,67,.25)}
+.google-btn:active{background:#f1f3f4}
+.google-btn[disabled]{opacity:.65;cursor:progress}
+.google-btn:focus-visible{outline:3px solid var(--focus-ring);outline-offset:2px}
+.google-btn .g-mark{width:18px;height:18px;flex-shrink:0}
+html.a11y-reduced-motion .google-btn{transition:none}
+
+/* מפריד „או במייל” — קו מכל צד של הטקסט.
+   align-self:stretch נחוץ כי המכל (#authOut) מיושר למרכז, ובלעדיו
+   השורה מתכווצת לרוחב הטקסט ושני הקווים מקבלים רוחב 0. */
+.auth-or{
+  display:flex;align-items:center;gap:12px;align-self:stretch;
+  margin:6px 0 2px;font-size:12.5px;color:var(--text-faint);
+}
+.auth-or::before,.auth-or::after{
+  content:'';flex:1;height:1px;background:var(--panel-edge)}
+
 /* ---------- כותרות מודאל: ניגודיות ---------- */
 .modal-header h2{color:var(--text-main)}
 
@@ -2180,6 +2209,16 @@ html.a11y-reduced-motion .coupon-btn:hover{transform:none}
     </div>
     <div class="modal-body">
       <div id="authOut">
+        <button type="button" class="google-btn" id="googleBtn">
+          <svg class="g-mark" viewBox="0 0 18 18" aria-hidden="true" focusable="false">
+            <path fill="#4285F4" d="M17.64 9.2c0-.64-.06-1.25-.16-1.84H9v3.48h4.84a4.14 4.14 0 0 1-1.8 2.72v2.26h2.92c1.7-1.57 2.68-3.88 2.68-6.62z"/>
+            <path fill="#34A853" d="M9 18c2.43 0 4.47-.8 5.96-2.18l-2.92-2.26c-.81.54-1.84.86-3.04.86-2.34 0-4.32-1.58-5.03-3.7H.96v2.33A9 9 0 0 0 9 18z"/>
+            <path fill="#FBBC05" d="M3.97 10.72a5.41 5.41 0 0 1 0-3.44V4.95H.96a9 9 0 0 0 0 8.1l3.01-2.33z"/>
+            <path fill="#EA4335" d="M9 3.58c1.32 0 2.5.45 3.44 1.35l2.58-2.59C13.46.89 11.43 0 9 0A9 9 0 0 0 .96 4.95l3.01 2.33C4.68 5.16 6.66 3.58 9 3.58z"/>
+          </svg>
+          <span>התחברות עם Google</span>
+        </button>
+        <p class="auth-or"><span>או במייל</span></p>
         <p class="login-hint">מזינים כתובת מייל ומקבלים קוד חד‑פעמי בן שש ספרות. בלי סיסמה ובלי טופס הרשמה.</p>
         <label class="sr-only" for="emailIn">כתובת מייל</label>
         <input id="emailIn" type="email" inputmode="email" autocomplete="email" placeholder="המייל שלך">
@@ -7289,10 +7328,22 @@ renderBundles();
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 /* =========================================================
-   הדבק כאן את שני הערכים מ-Supabase (Project Settings ← API)
+   חיבור ל-Supabase (Project Settings ← API Keys)
+   ---------------------------------------------------------
+   שני הערכים כאן הם *ציבוריים בכוונה*. ה-publishable key נועד
+   לרוץ בדפדפן, הוא נשלח בכל בקשה, וכל אחד יכול לקרוא אותו
+   מקוד המקור של הדף. מה שמגן על הנתונים הוא ה-RLS בטבלאות,
+   לא הסתרת המפתח.
+
+   ⚠ מה שאסור להיות כאן, בשום מצב:
+     · secret key    (sb_secret_…)
+     · service_role  (ה-JWT הישן שמתחיל ב-eyJ… עם role=service_role)
+   מפתחות כאלה עוקפים RLS לחלוטין. מי שמדביק אותם בקוד צד-לקוח
+   נותן לכל מבקר גישת אדמין למסד. הם שייכים לשרת בלבד (Edge
+   Function / Worker), ולעולם לא לקובץ הזה.
    ========================================================= */
-const SUPABASE_URL      = 'https://ilbxfwprjajnulybgdjr.supabase.co';
-const SUPABASE_ANON_KEY = 'sb_publishable_Rx51qIjP5VscSlg9JH9OvQ_gMZVPUqq';
+const SUPABASE_URL      = 'https://qksqaqpgmvrpxonpzgxc.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_o_OZ0MF9F3eN-7727-cQkA_oihPH1pH';
 
 (function(){
   const $ = id => document.getElementById(id);
@@ -7300,26 +7351,126 @@ const SUPABASE_ANON_KEY = 'sb_publishable_Rx51qIjP5VscSlg9JH9OvQ_gMZVPUqq';
   if(!bar) return;
   if(SUPABASE_URL.indexOf('PASTE') === 0 || !window.supabase) return;
 
+  /* בדיקת שפיות על המפתח עצמו. אם מישהו מדביק בטעות מפתח סודי,
+     עדיף שזה ייעצר כאן ברעש ולא ידלוף בשקט לכל מבקר באתר. */
+  if(/^sb_secret_/.test(SUPABASE_ANON_KEY) ||
+     /service_role/.test(SUPABASE_ANON_KEY)){
+    console.error('[Chordix] מפתח סודי בקוד צד-לקוח. החליפו ל-publishable key מיד.');
+    return;
+  }
+
   bar.hidden = false;
-  const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+    auth: {
+      persistSession   : true,   // הסשן שורד רענון של הדף
+      autoRefreshToken : true,   // חידוש טוקן לפני שפג, בלי להעיף את המשתמש
+      detectSessionInUrl: true,  // קולט את החזרה מגוגל (?code=…) ומסיים את ההתחברות
+      flowType         : 'pkce'  // חובה ל-OAuth בדפדפן: הטוקן לא עובר ב-URL
+    }
+  });
   const msg = $('authMsg');
 
   let pendingEmail = '';
 
+  /* ============================================================
+     תרגום שגיאות רשת להודעה שאפשר לפעול לפיה
+     ------------------------------------------------------------
+     „Failed to fetch” הוא מה שהדפדפן אומר כשהבקשה לא יצאה בכלל:
+     הדומיין לא נפתר, החיבור נחסם, או שה-CORS דחה. הוא *לא* אומר
+     „סיסמה שגויה”. זו בדיוק הייתה התקלה כאן — הפרויקט הישן
+     (ilbxfwprjajnulybgdjr) כבר לא קיים, ולכן הדפדפן לא מצא לאן
+     לפנות. במקום להראות למשתמש את המחרוזת הזו, אנחנו בודקים מה
+     באמת קרה ומדווחים בהתאם.
+     ============================================================ */
+  const NET_RE = /failed to fetch|networkerror|load failed|err_name_not_resolved|fetch failed|network request failed/i;
+
+  async function reachable(){
+    try{
+      const r = await fetch(SUPABASE_URL + '/auth/v1/health',
+                            { headers:{ apikey: SUPABASE_ANON_KEY }, cache:'no-store' });
+      return r.ok || r.status === 401 || r.status === 404;
+    }catch(_){ return false; }
+  }
+
+  async function authErrText(err, fallback){
+    const m = String((err && (err.message || err.error_description)) || err || '');
+
+    if(NET_RE.test(m)){
+      const up = await reachable();
+      if(!up){
+        console.error('[Chordix] אין תקשורת עם', SUPABASE_URL,
+                      '— בדקו שהפרויקט פעיל ושהכתובת נכונה.');
+        return 'שרת ההתחברות לא זמין כרגע. אם זה נמשך — כנראה שכתובת הפרויקט ב-Supabase השתנתה או שהפרויקט מושהה.';
+      }
+      return 'החיבור נחסם בדרך. בדקו חוסם פרסומות או תוסף פרטיות, ונסו שוב.';
+    }
+    if(/provider is not enabled|unsupported provider/i.test(m))
+      return 'ההתחברות עם Google לא מופעלת עדיין בצד השרת. אפשר להיכנס עם קוד למייל בינתיים.';
+    if(/redirect_to|redirect url|not allowed/i.test(m))
+      return 'כתובת החזרה מגוגל לא מאושרת בהגדרות הפרויקט. אפשר להיכנס עם קוד למייל בינתיים.';
+    if(/rate limit|too many/i.test(m))
+      return 'יותר מדי ניסיונות בזמן קצר. נסו שוב בעוד כמה דקות.';
+    if(/invalid api key|no api key|jwt/i.test(m))
+      return 'מפתח ההתחברות של האתר לא תקין. פנו אלינו ונתקן.';
+    return (fallback || 'משהו השתבש') + ': ' + m;
+  }
+
+  /* אחרי חזרה מגוגל נשארים ב-URL פרמטרים של האימות. supabase-js
+     צורך אותם, אבל לא תמיד מנקה — ואז רענון של הדף מנסה לממש
+     קוד שכבר נוצל ומקבל שגיאה. מנקים בעצמנו. */
+  function cleanAuthUrl(){
+    try{
+      const u = new URL(window.location.href);
+      let dirty = false;
+      ['code','state','error','error_code','error_description'].forEach(k=>{
+        if(u.searchParams.has(k)){ u.searchParams.delete(k); dirty = true; }
+      });
+      if(u.hash && /access_token=|error=/.test(u.hash)){ u.hash = ''; dirty = true; }
+      if(dirty) history.replaceState({}, '', u.pathname + u.search + u.hash);
+    }catch(_){}
+  }
+
+  /* גוגל מחזירה שגיאות כפרמטרים ב-URL, לא כחריגה בקוד. בלי
+     הבלוק הזה משתמש שההתחברות שלו נדחתה פשוט חוזר לדף הבית
+     בלי שום הסבר.
+     ה-setTimeout מכוון: openLogin מוגדר בהמשך אותו IIFE, ולכן
+     קריאה מיידית כאן הייתה מוצאת undefined. */
+  setTimeout(function reportOAuthReturn(){
+    const q = new URLSearchParams(window.location.search);
+    const h = new URLSearchParams((window.location.hash || '').replace(/^#/, ''));
+    const err = q.get('error_description') || q.get('error') ||
+                h.get('error_description') || h.get('error');
+    if(!err) return;
+    cleanAuthUrl();
+    if(window.__openLogin) window.__openLogin();
+    authErrText(err, 'ההתחברות עם Google נכשלה').then(t=>{ msg.textContent = t; });
+  }, 0);
+
+  /* כל קריאת auth עטופה ב-try/catch ולא רק בודקת את error.
+     תקלת רשת אמיתית לפעמים *נזרקת* במקום לחזור כאובייקט, ואז
+     בלי catch הכפתור נשאר disabled לנצח והמשתמש תקוע. */
   async function sendCode(){
     const email = $('emailIn').value.trim();
-    if(!email){ msg.textContent = 'צריך להזין כתובת מייל.'; return; }
+    if(!email || email.indexOf('@') < 1){ msg.textContent = 'צריך להזין כתובת מייל תקינה.'; return; }
     $('loginBtn').disabled = true;
     msg.textContent = 'שולח קוד…';
-    const { error } = await sb.auth.signInWithOtp({ email });
-    $('loginBtn').disabled = false;
-    if(error){ msg.textContent = 'לא הצלחנו לשלוח: ' + error.message; return; }
-    pendingEmail = email;
-    $('authOut').hidden = true;
-    $('authCode').hidden = false;
-    $('codeIn').value = '';
-    $('codeIn').focus();
-    msg.textContent = 'שלחנו קוד בן 6 ספרות ל־' + email + '. אם הוא לא מגיע — בדקו בספאם.';
+    try{
+      const { error } = await sb.auth.signInWithOtp({
+        email,
+        options: { shouldCreateUser: true, emailRedirectTo: redirectTarget() }
+      });
+      if(error) throw error;
+      pendingEmail = email;
+      $('authOut').hidden = true;
+      $('authCode').hidden = false;
+      $('codeIn').value = '';
+      $('codeIn').focus();
+      msg.textContent = 'שלחנו קוד בן 6 ספרות ל־' + email + '. אם הוא לא מגיע — בדקו בספאם.';
+    }catch(e){
+      msg.textContent = await authErrText(e, 'לא הצלחנו לשלוח');
+    }finally{
+      $('loginBtn').disabled = false;
+    }
   }
 
   async function verifyCode(){
@@ -7327,10 +7478,55 @@ const SUPABASE_ANON_KEY = 'sb_publishable_Rx51qIjP5VscSlg9JH9OvQ_gMZVPUqq';
     if(!token){ msg.textContent = 'צריך להזין את הקוד שקיבלת במייל.'; return; }
     $('verifyBtn').disabled = true;
     msg.textContent = 'מאמת…';
-    const { error } = await sb.auth.verifyOtp({ email: pendingEmail, token, type: 'email' });
-    $('verifyBtn').disabled = false;
-    if(error){ msg.textContent = 'קוד שגוי או שפג תוקפו: ' + error.message; return; }
-    // render() will run automatically via onAuthStateChange once the session is set
+    try{
+      const { error } = await sb.auth.verifyOtp({ email: pendingEmail, token, type: 'email' });
+      if(error) throw error;
+      // render() ירוץ אוטומטית דרך onAuthStateChange ברגע שהסשן נקבע
+    }catch(e){
+      msg.textContent = await authErrText(e, 'קוד שגוי או שפג תוקפו');
+    }finally{
+      $('verifyBtn').disabled = false;
+    }
+  }
+
+  /* ============================================================
+     התחברות עם Google
+     ------------------------------------------------------------
+     כתובת החזרה נגזרת מ-window.location ולא מוקשחת בקוד, כדי
+     שאותו קובץ יעבוד גם בדומיין הראשי, גם בסביבת התצוגה המקדימה
+     של Cloudflare (*.pages.dev) וגם מקומית. חשוב: כל origin כזה
+     חייב להופיע ב-Authentication ← URL Configuration ← Redirect URLs
+     בפרויקט Supabase, אחרת גוגל תחזיר את המשתמש עם שגיאה.
+
+     זהו מסלול redirect מלא ולא חלון קופץ — וזה מכוון. הכותרת
+     Cross-Origin-Opener-Policy: same-origin שמוגדרת ב-_headers
+     מנתקת window.opener, ולכן זרימת popup הייתה נתקעת אחרי
+     האישור בגוגל בלי שום הודעת שגיאה.
+     ============================================================ */
+  function redirectTarget(){
+    return window.location.origin + window.location.pathname;
+  }
+
+  async function signInWithGoogle(){
+    const btn = $('googleBtn');
+    btn.disabled = true;
+    msg.textContent = 'מעביר לגוגל…';
+    try{
+      const { error } = await sb.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: redirectTarget(),
+          queryParams: { prompt: 'select_account' }
+        }
+      });
+      if(error) throw error;
+      /* הצלחה = הדפדפן עוזב את הדף. אם הוא עדיין כאן אחרי שנייה,
+         משהו חסם את ההפניה ועדיף להחזיר את הכפתור לפעולה. */
+      setTimeout(()=>{ btn.disabled = false; }, 4000);
+    }catch(e){
+      btn.disabled = false;
+      msg.textContent = await authErrText(e, 'ההתחברות עם Google נכשלה');
+    }
   }
 
   /* ההתחברות עברה ממלבן פתוח בכותרת למודאל ייעודי — הכותרת
@@ -7356,7 +7552,11 @@ const SUPABASE_ANON_KEY = 'sb_publishable_Rx51qIjP5VscSlg9JH9OvQ_gMZVPUqq';
   $('verifyBtn').addEventListener('click', verifyCode);
   $('codeIn').addEventListener('keydown', e => { if(e.key === 'Enter') verifyCode(); });
   $('resendBtn').addEventListener('click', sendCode);
-  $('logoutBtn').addEventListener('click', () => sb.auth.signOut());
+  $('googleBtn').addEventListener('click', signInWithGoogle);
+  $('logoutBtn').addEventListener('click', async () => {
+    try{ await sb.auth.signOut(); }
+    catch(e){ msg.textContent = await authErrText(e, 'היציאה נכשלה'); }
+  });
 
   let currentSession = null;
   let lastKnownCredits = null;
@@ -7624,8 +7824,36 @@ const SUPABASE_ANON_KEY = 'sb_publishable_Rx51qIjP5VscSlg9JH9OvQ_gMZVPUqq';
     }catch(e){ /* שקט — לא נכשיל את התוצאה של המשתמש בגלל שמירת היסטוריה */ }
   };
 
-  sb.auth.onAuthStateChange((_e, session) => render(session));
-  sb.auth.getSession().then(({ data }) => render(data.session));
+  sb.auth.onAuthStateChange((event, session) => {
+    if(event === 'SIGNED_IN') cleanAuthUrl();   // מנקה את ?code= שגוגל השאירה
+    const g = $('googleBtn'); if(g) g.disabled = false;
+    render(session);
+  });
+
+  /* getSession נכשל בשקט כשאין תקשורת, ואז אזור החשבון פשוט
+     נשאר ריק בלי שאף אחד יידע למה. עדיף להגיד את זה בקול.
+     getSession ממתין לאתחול המלא של הלקוח, כולל מימוש ה-?code=
+     שגוגל החזירה, ולכן זו הנקודה הנכונה לבדוק אם זה הצליח. */
+  sb.auth.getSession()
+    .then(({ data }) => {
+      render(data.session);
+      if(new URLSearchParams(window.location.search).has('code')){
+        /* הקוד חד-פעמי. אם הוא נשאר ב-URL אחרי מימוש כושל, כל
+           רענון ינסה לממש אותו שוב וייכשל שוב — לולאה שקטה
+           שנראית למשתמש כמו „ההתחברות פשוט לא עובדת”. */
+        cleanAuthUrl();
+        if(!data.session){
+          if(window.__openLogin) window.__openLogin();
+          msg.textContent = 'ההתחברות לא הושלמה — הקישור מגוגל פג או שכבר נוצל. נסו שוב.';
+        }
+      }
+    })
+    .catch(async e => {
+      render(null);
+      cleanAuthUrl();
+      const t = await authErrText(e, 'לא הצלחנו לבדוק את מצב ההתחברות');
+      console.error('[Chordix] getSession נכשל —', t);
+    });
 })();
 </script>
 </body>
