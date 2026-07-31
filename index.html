@@ -174,38 +174,42 @@ const CX_ICON = { i192:"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMAAAADACA
 /* ============================================================
    ערכת נושא בהירה
    ------------------------------------------------------------
-   הרקע הוקהה בכוונה מ-#f5f3fc ל-#e9e5f6: לבן כמעט-טהור על מסך
-   מלא בטקסט קטן מסנוור, ובעיקר הוא משטח את ההיררכיה — כרטיס לבן
-   על רקע לבן פשוט נעלם. עכשיו הרקע לילכי-רך והכרטיסים נשארים
-   בהירים, ולכן הם *צפים* מעליו במקום להיבלע בו.
-   הצבעוניות הוגברה בארבעת המבטאים (a1..a4), שמהם נגזרים
-   האייקונים, המסגרות והכפתורים — ראו „צבעוניות” בסוף הגיליון.
+   הרקע הועמק בשלושה שלבים: #f5f3fc → #e9e5f6 → #c7b6e9. לבן
+   כמעט-טהור על מסך מלא בטקסט קטן מסנוור, וגם משטח את ההיררכיה —
+   כרטיס לבן על רקע לבן נעלם. עכשיו הרקע סגול ממש, הכרטיסים
+   בגוון לילך בהיר, ולכן הם *צפים* מעליו במקום להיבלע בו.
+   כל ערך כאן נבדק מול חמישה משטחים (רקע, כרטיס, שקע, לוח, נייר)
+   עם חישוב שקיפות דרך שרשרת ההורים; אין אף צמד שנופל מתחת ל-3:1,
+   והטקסט הרגיל עומד ב-4.5 בכל מקום.
+   שיפור נלווה: מסגרת הכרטיסים (panel-edge) עלתה מ-1.36:1 — כלומר
+   כמעט בלתי נראית — ל-3.04:1 מול הרקע, ולכן גבולות הכרטיסים
+   נקראים עכשיו כגבולות.
    ============================================================ */
 html.theme-light{
-  --bg-deep:#e9e5f6;
-  --bg-deep2:#faf8ff;
-  --bg-panel:#fffdfff5;
-  --bg-sunken:#ded9f1;
-  --panel-edge:#cbc3e6;
-  --brass:#6134cf;
-  --brass-soft:#2050c6;
-  --text-main:#191631;
-  --text-dim:#4b4668;
-  --text-faint:#615c80;
-  --success:#0f7a4a;
-  --error:#b8371a;
-  --focus-ring:#6134cf;
-  --paper:#ffffff;
-  --paper-line:#ddd6f2;
-  --staff:#2a2450;
-  --ink:#191631;
-  --panel-2:#efeafc;
-  /* ארבעת המבטאים בערכה הבהירה נבחרו כך שכל אחד עומד ב-AA גם
-     כטקסט (הם צובעים את סימני ה-✓ ברשימות), ולא רק ככתם צבע:
-     a1 6.5 / a2 5.9 / a3 5.6 / a4 6.2 מול כרטיס לבן. ורוד וטורקיז
-     בהירים יותר נראו יפה אבל נפלו מתחת ל-3:1, ולכן כאן הם כהים
-     יותר מאשר בערכה הכהה. */
-  --a1:#6b34e0; --a2:#1f5ad6; --a3:#c31f5f; --a4:#016d61;
+  --bg-deep:#c7b6e9;
+  --bg-deep2:#ded5f6;
+  --bg-panel:#f4eefef2;
+  --bg-sunken:#bcabe3;
+  --panel-edge:#7554bb;
+  --brass:#582cbd;
+  --brass-soft:#1c45ac;
+  --text-main:#171330;
+  --text-dim:#453f63;
+  --text-faint:#464263;
+  --success:#0d6b42;
+  --error:#ab3117;
+  --focus-ring:#582cbd;
+  --paper:#fdfcff;
+  --paper-line:#c9bcec;
+  --staff:#241d48;
+  --ink:#171330;
+  --panel-2:#ddd3f5;
+  /* ארבעת המבטאים נשארו רוויים במכוון. הם משמשים כטקסט כמעט רק
+     בתוך כרטיסים (סימני ה-✓ ברשימות החבילות, חצי ה-FAQ, כותרות),
+     ושם כולם עומדים ב-AA מלא; על רקע הדף ובתוך שקעים הם צבע
+     ולא טקסט, ושם הרף הוא 3:1. דרישה של 4.5 מול השקע הכהה ביותר
+     שיטחה אותם קודם לאותה בהירות בדיוק והפכה אותם לבוציים. */
+  --a1:#6429db; --a2:#1a51cf; --a3:#b41956; --a4:#01695d;
 }
 *{box-sizing:border-box}
 html{color-scheme:dark}
@@ -499,8 +503,14 @@ button.n:hover::after{content:' ✂'}
 .toggle.on::after{background:var(--brass-soft);inset-inline-end:20px}
 
 /* ---------- legal modal ---------- */
+/* באג שתוקן: שער ההסכמה יושב ב-z-index 2000, והמודאלים ישבו ב-120.
+   לכן לחיצה על „תנאי שימוש” בשער פתחה את המסמך *מתחת* לשער, ורקע
+   השער (86% אטימות + blur) הסתיר אותו — נראה כאילו הדף קפץ למקום
+   מטושטש. המודאלים חייבים לשבת מעל השער, כי הם נפתחים ממנו.
+   2100 גם מעביר אותם מעל הכותרת הדביקה (120), שקודם חלקה איתם
+   אותה רמת ערימה. */
 .modal-backdrop{
-  position:fixed;inset:0;background:#0b0819cc;z-index:120;
+  position:fixed;inset:0;background:#0b0819cc;z-index:2100;
   display:flex;align-items:center;justify-content:center;padding:20px;
   backdrop-filter:blur(3px);
 }
@@ -7014,13 +7024,40 @@ function setMarketingVisible(on){
   document.querySelectorAll('[data-marketing]').forEach(el=>{ el.hidden = !on; });
   const g = $('readGuide'); if(g) g.hidden = on;
 }
-$('reset').addEventListener('click', ()=>{
-  $('result').hidden=true;
+/* יציאה מדף האקורדים בחזרה לדף הבית.
+   ------------------------------------------------------------
+   שני מקומות מובילים לכאן — „שיר חדש” והלוגו שבכותרת — ולכן
+   הלוגיקה יושבת בפונקציה אחת. ההבדל היחיד הוא לאן גוללים:
+   „שיר חדש” מחזיר לאזור ההעלאה כדי שאפשר יהיה מיד לבחור שיר,
+   והלוגו מחזיר לראש הדף, כי זו הציפייה מלוגו בכל אתר. */
+function exitSheet(scrollTo){
+  $('result').hidden = true;
   setMarketingVisible(true);
-  fileInput.value=''; $('player').pause(); $('player').removeAttribute('src');
-  const app = $('app');
-  if(app) app.scrollIntoView({block:'center'});
-  else window.scrollTo({top:0});
+  fileInput.value = '';
+  const pl = $('player');
+  if(pl){ pl.pause(); pl.removeAttribute('src'); }
+  if(scrollTo === 'top'){
+    window.scrollTo({ top:0, behavior:'smooth' });
+  }else{
+    const app = $('app');
+    if(app) app.scrollIntoView({ block:'center' });
+    else window.scrollTo({ top:0 });
+  }
+}
+window.__exitSheet = exitSheet;
+/* האם דף אקורדים מוצג כרגע */
+window.__sheetOpen = () => { const r = $('result'); return !!r && !r.hidden; };
+
+$('reset').addEventListener('click', ()=> exitSheet('app'));
+
+/* הלוגו: כשדף אקורדים פתוח הוא מבטל אותו וחוזר לדף הבית, ולא רק
+   גולל לראש עמוד שמוסתר ממילא. כשאין דף אקורדים — התנהגות עוגן רגילה. */
+document.querySelectorAll('a.brand').forEach(a=>{
+  a.addEventListener('click', e=>{
+    if(!window.__sheetOpen || !window.__sheetOpen()) return;   // ניווט רגיל
+    e.preventDefault();
+    exitSheet('top');
+  });
 });
 $('copy').addEventListener('click', async ()=>{
   try{
@@ -7060,6 +7097,10 @@ renderBundles();
   // מלכודת מיקוד: Tab לא יוצא מהחלון עד שמחליטים
   gate.addEventListener('keydown', e=>{
     if(e.key!=='Tab') return;
+    /* כשמסמך משפטי פתוח מעל השער, המיקוד שייך לו — אחרת Tab היה
+       נשאר כלוא בשער שמתחת ומשאיר את המסמך בלתי נגיש למקלדת. */
+    const lm = document.getElementById('legalModal');
+    if(lm && !lm.classList.contains('hidden')) return;
     const f=[...gate.querySelectorAll('button:not([disabled]),input')];
     if(!f.length) return;
     const first=f[0], last=f[f.length-1];
@@ -7293,7 +7334,11 @@ renderBundles();
   function closeLegal(){
     currentLegal = null;
     modal.classList.add('hidden');
-    document.body.style.overflow = '';
+    /* אם שער ההסכמה עדיין פתוח, הגלילה חייבת להישאר נעולה —
+       אחרת סגירת המסמך הייתה משחררת את הדף שמאחורי השער. */
+    const gate = document.getElementById('consentGate');
+    const gateOpen = gate && !gate.classList.contains('hidden');
+    document.body.style.overflow = gateOpen ? 'hidden' : '';
     if(lastFocus && lastFocus.focus) lastFocus.focus();
   }
   $id('legalClose').addEventListener('click', closeLegal);
