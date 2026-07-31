@@ -1,0 +1,9 @@
+# Chordix — robots.txt
+User-agent: *
+Allow: /
+
+# המודל הוא נכס בינארי של 2.8MB, אין טעם שסורקים ימשכו אותו
+Disallow: /chordix-model.bin
+Disallow: /i18n-keys.json
+
+Sitemap: https://chordix.netlify.app/sitemap.xml
