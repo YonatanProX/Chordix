@@ -4252,250 +4252,277 @@ function clusterByHarmony(H, thresh){
 }
 
 /* ------------------------------------------------------------
-   מתן שמות — מודל מוזיקולוגי של תפקידים, לא היוריסטיקה נקודתית.
+   מתן שמות — דינמיקה קודם, עוגנים קודם.
 
-   הרעיון: אחרי האשכול יש בידנו רצף אנונימי "p1 p2 p3 p2 p3".
-   התרגום שלו לתפקידים אמיתיים הוא בעיית חיפוש, ומדרגים אותה
-   בשלושה גורמים — כמה כל אשכול *נשמע* כמו התפקיד, כמה הרצף
-   שיוצא סביר מוזיקלית, וכמה המונים סבירים.
+   מה היה קודם: כל תיוג אפשרי של האשכולות נוקד מול מטריצת מעברים
+   ומול טווחי מונים, ונבחר הניקוד הגבוה. זה מודל יפה, אבל הוא
+   נכשל בדיוק במקום שבו זה חשוב — הוא לא ידע *מה* פזמון נשמע
+   כמוהו, רק איפה הוא יושב ברצף. במדידה על מאגר הבדיקה הוא צדק
+   ב-67% מהתיבות, וייחס לפזמון חומר שאינו פזמון בכל חמישית מהזמן.
 
-   (Paulus & Klapuri 2009 מדרגים את רצף התוויות במודל מרקוב;
-   Goto/RefraiD ו-Eronen נותנים את היוריסטיקות לפזמון — המקטע
-   החוזר והחזק, שנוטה לחזור פעמיים ברצף ולהופיע סביב רבע
-   ושלושה-רבעים מהשיר; המונים מבוססים על Harmonix Set, 912 שירי
-   פופ מתויגים ידנית: כ-10 מקטעים לשיר, 6-7 תוויות ייחודיות,
-   888 מתוך 912 השירים מכילים פזמון, מעל 3100 פזמונים בסך הכול —
-   41% יותר מבתים.)
+   מה יש כאן: קודם מזהים את הפזמון לפי מה שהוא באמת — הדבר החזק
+   ביותר שחוזר — ואז שמים את כל השאר ביחס אליו. אחר כך, ורק אחר
+   כך, מתקנים רצפים שאינם אפשריים. הסדר הזה הוא כל ההבדל: ברגע
+   שהעוגן נכון, כל היתר נגזר ממנו כמעט לבד.
+
+   שלוש עובדות שמזינות את הזיהוי, וכולן נמדדות מהאודיו ולא מהרצף:
+     · עוצמה יחסית  — פזמון הוא השיא הדינמי של השיר.
+     · חזרתיות      — פזמון חוזר יותר מכל דבר אחר.
+     · צפיפות הרמונית — פרה‑פזמון מחליף אקורדים מהר יותר מבית.
+
+   ההבדל המבני החשוב: התפקיד נקבע *למקטע* ולא לאשכול. אינטרו
+   שמנגן את לולאת הפזמון בעוצמה נמוכה יושב באשכול הפזמון, ובמודל
+   הישן לא הייתה שום דרך לקרוא לו אינטרו — הוא ראה אשכולות בלבד.
+   כאן העוגן מגיע מהאשכול, אבל המיקום והדינמיקה יכולים לגבור עליו.
+
+   (Goto/RefraiD ו-Eronen לפזמון כמקטע החוזר והחזק; Paulus &
+   Klapuri לתיקון הרצף. המונים עצמם — 912 שירי פופ מתויגים ידנית
+   ב-Harmonix Set — כבר לא נדרשים כאן, כי אין חיפוש למסנן.)
    ------------------------------------------------------------ */
 const RID = { INTRO:0, VERSE:1, PRE:2, CHORUS:3, POST:4, CPART:5, SOLO:6, OUTRO:7 };
 const ROLE_NAME = ['אינטרו','בית','פרה‑פזמון','פזמון','פוסט‑פזמון','C‑part','סולו / מעבר','סיום'];
 
-/* [טווח טבעי מלמטה, טווח טבעי מלמעלה, תקרה]. זה הכלל שאומר
-   ש-90% מהשירים בנויים מ-2-3 בתים, 2-4 פזמונים, C‑part אחד
-   לכל היותר, ולפעמים פתיחה וסיום. */
-const ROLE_COUNT = [
-  [1,1,2],   // אינטרו
-  [2,3,4],   // בית
-  [1,2,3],   // פרה‑פזמון
-  [2,4,6],   // פזמון
-  [1,2,3],   // פוסט‑פזמון
-  [1,1,1],   // C‑part
-  [1,1,2],   // סולו / מעבר
-  [1,1,1]    // סיום
-];
-function countCost(r, k){
-  if(!k) return 0;
-  const c = ROLE_COUNT[r];
-  if(k < c[0]) return 0.55*(c[0]-k);
-  if(k <= c[1]) return 0;
-  if(k <= c[2]) return 0.45*(k-c[1]);
-  return 0.45*(c[2]-c[1]) + 1.5*(k-c[2]);
-}
+const roleNorm = arr => {
+  const mn=Math.min(...arr), mx=Math.max(...arr), rg=(mx-mn)||1;
+  return arr.map(v=>(v-mn)/rg);
+};
+const roleMedian = a => { const s=a.slice().sort((x,y)=>x-y); return s[s.length>>1]||1; };
 
-/* מטריצת מעברים בין תפקידים: בית->פזמון סביר, פזמון->אינטרו לא */
-/* פזמון→פזמון שלילי בכוונה. שני פזמונים ברצף אינם דבר קיים: או
-   שזה פזמון אחד שהחלוקה חתכה באמצע, או שאחד מהשניים אינו פזמון
-   כלל. קודם עמד כאן +0.45, כלומר הרצף הזה *תוגמל*, ובפועל יצאו
-   שלושה פזמונים ברצף.
-   בית→בית נשאר חיובי במתינות — בית 1 ואז בית 2 בלי פזמון ביניהם
-   הוא מבנה נפוץ לגמרי, ולא הייתה סיבה לאסור אותו. */
-const ROLE_BI = [
-  /*         אינ    בית    פרה   פזמון  פוסט   C     סולו   סיום  */
-  /*אינטרו*/[-1.60, 0.95, 0.35, 0.35,-1.60,-1.40, 0.15,-2.00],
-  /*בית   */[-2.20, 0.20, 0.95, 0.90,-1.20,-0.20, 0.10,-0.70],
-  /*פרה   */[-2.40,-0.90,-1.00, 1.25,-1.40,-1.00,-0.40,-1.40],
-  /*פזמון */[-2.40, 0.90, 0.05,-1.30, 0.85, 0.65, 0.40, 0.85],
-  /*פוסט  */[-2.40, 0.75, 0.05, 0.15,-0.60, 0.45, 0.25, 0.70],
-  /*C‑part*/[-2.40, 0.35, 0.55, 1.05,-0.40,-1.60, 0.30,-0.20],
-  /*סולו  */[-2.40, 0.55, 0.45, 0.85,-0.30, 0.25,-1.00, 0.25],
-  /*סיום  */[-3.00,-2.20,-2.20,-2.20,-2.20,-2.20,-2.20,-1.20]
-];
-const ROLE_START = [ 1.05, 0.55,-1.20,-0.15,-1.80,-1.80,-0.30,-2.50];
-const ROLE_END   = [-2.20, 0.05,-1.60, 0.60, 0.55,-0.70,-0.20, 0.95];
-const FORM_W = { ac:1.0, seq:0.85, cnt:1.0, len:1.25 };
+/* פרופיל דינמי לכל מקטע: עוצמה, פעילות מלודית, וצפיפות הרמונית.
+   הכול נקרא מחדש מהתיבות ומהפריימים ולא מאובייקט שנבנה קודם —
+   הפונקציה הזאת נקראת שוב אחרי שההשלמה המבנית מאמצת ומפצלת
+   מקטעים, ואז כל מערך שמאונדקס לפי מקטע כבר אינו מיושר.
 
-/* מאפייני אשכול שמהם נגזר התפקיד */
-function clusterStats(segs, groups, T, P){
-  const N = segs.length;
-  const total = segs.reduce((a,s)=>a+(s.to-s.from),0) || 1;
-  const lens = P.map(p=>p.bars).sort((a,b)=>a-b);
-  const medLen = lens[lens.length>>1] || 8;
-  const st = groups.map((g,ci)=>{
-    let tim=0, c=0;
-    for(let i=0;i<g.length;i++) for(let j=i+1;j<g.length;j++){ tim+=T[g[i]][g[j]]; c++; }
-    const mean = k => g.reduce((a,i)=>a+P[i][k],0)/g.length;
-    const pos  = g.map(i => N>1 ? i/(N-1) : 0);
-    const bars = mean('bars');
-    const near = (x,t) => Math.max(0, 1-Math.abs(x-t)/0.22);
-    return {
-      ci, idx:g, count:g.length,
-      tim: c ? clamp(tim/c,0,1) : 0.5,
-      energy: mean('energy'), act: mean('act'), bars,
-      e:0, a:0,
-      first: Math.min(...pos), last: Math.max(...pos),
-      posMean: pos.reduce((x,y)=>x+y,0)/pos.length,
-      /* פזמון נוטה לחזור על עצמו מיד (RefraiD) */
-      dbl: g.filter(i => segs[i+1] && segs[i+1].c===ci).length / g.length,
-      /* ולהופיע סביב רבע ושלושה-רבעים מהשיר (Eronen) */
-      qtr: 0.5*Math.max(...pos.map(p=>near(p,0.25))) + 0.5*Math.max(...pos.map(p=>near(p,0.75))),
-      span: (g.length*bars)/total,
-      short: clamp(1-(bars/medLen), 0, 1),
-      long:  clamp((bars/medLen)-1, 0, 1)
-    };
-  });
-  const rng = arr => { const mn=Math.min(...arr); return {mn, rg:(Math.max(...arr)-mn)||1}; };
-  const eR = rng(st.map(v=>v.energy)), aR = rng(st.map(v=>v.act));
-  st.forEach(v=>{ v.e=(v.energy-eR.mn)/eR.rg; v.a=(v.act-aR.mn)/aR.rg; });
-  return st;
-}
-
-/* כמה כל אשכול נשמע כמו כל תפקיד — רק מאפיינים פנימיים.
-   השכנויות ("פרה‑פזמון תמיד לפני פזמון") נופלות על מודל הרצף. */
-function roleAcoustic(v){
-  const s = new Float64Array(8);
-  const rep = Math.min(1,(v.count-1)/2);
-  const one = v.count===1 ? 1 : 0;
-  const mid = Math.max(0, 1-Math.abs(v.posMean-0.68)/0.30);
-  s[RID.CHORUS] = 1.00*v.tim + 0.85*v.e + 0.60*rep + 0.35*v.last
-                + 0.30*v.span + 0.35*v.dbl + 0.25*v.qtr - 1.40*one;
-  s[RID.VERSE]  = 0.80*(1-v.tim) + 0.60*rep + 0.45*(1-v.e) + 0.45*(1-v.first)
-                + 0.25*v.span - 1.10*one;
-  s[RID.PRE]    = 0.75*v.short + 0.50*rep - 0.60*v.span - 0.90*one;
-  s[RID.POST]   = 0.60*rep + 0.55*v.e + 0.65*v.short - 0.40*v.span - 0.90*one;
-  /* גשר ששרים בו יש בו פעילות מלודית; קטע כלי אין בו — וזה ההבדל
-     היחיד המהימן בין C‑part לסולו/מעבר באותו מקום בשיר */
-  s[RID.CPART]  = 1.00*one + 0.90*mid - 0.45*v.long - 0.45*(1-v.a);
-  s[RID.INTRO]  = 1.30*(v.first<0.08?1:0) + 0.55*(1-v.a) + 0.45*(1-v.e)
-                + 0.40*v.short - 0.60*rep;
-  s[RID.OUTRO]  = 1.30*(v.last>0.93?1:0) + 0.45*(1-v.a) + 0.35*v.short - 0.60*rep;
-  s[RID.SOLO]   = 1.30*(1-v.a) + 0.45*v.e + 0.55*mid - 0.45*rep;
-  return s;
-}
-
-function scoreForm(asg, segs, ac){
-  let sc = 0;
-  for(let k=0;k<asg.length;k++) sc += FORM_W.ac * ac[k][asg[k]];
-  const seq = segs.map(s=>asg[s.c]);
-  const L = seq.length;
-  sc += FORM_W.seq * (ROLE_START[seq[0]] + ROLE_END[seq[L-1]]);
-  for(let i=1;i<L;i++) sc += FORM_W.seq * ROLE_BI[seq[i-1]][seq[i]];
-  const cnt = [0,0,0,0,0,0,0,0];
-  for(const r of seq) cnt[r]++;
-  for(let r=0;r<8;r++) sc -= FORM_W.cnt * countCost(r, cnt[r]);
-  /* כמעט בכל שיר יש פזמון ובית. הסף היה 4 מקטעים, וזה נתן לחלוקה
-     מנוונת לשלושה מקטעי ענק לחמוק מהקנס בדיוק כשהוא הכי נחוץ. */
-  if(L>=3 && !cnt[RID.CHORUS]) sc -= 2.6;
-  if(L>=3 && !cnt[RID.VERSE])  sc -= 1.6;
-  for(let i=0;i<L;i++){
-    if(seq[i]===RID.INTRO && i>1)   sc -= 2.2;
-    if(seq[i]===RID.OUTRO && i<L-1) sc -= 2.2;
-  }
-  /* כל הפזמונים בשיר הם בערך באותו אורך, וכך גם הבתים. זה נכון
-     כמעט תמיד, והוא מידע שלא היה בשימוש בכלל: חלוקה שנתנה לאותו
-     תפקיד מקטעים באורכים 37, 28 ו-14 תיבות כמעט בוודאות טעתה
-     באחד מהם. מודדים פיזור סביב החציון — חסין לחריג יחיד, למשל
-     פזמון אחרון שנמתח בסיום — ומענישים לפי גודלו היחסי.
-     אינטרו וסיום פטורים: הם חד-פעמיים ואין להם עם מי להתיישר. */
-  sc -= FORM_W.len * lenSpread(seq, segs);
-  return sc;
-}
-
-function lenSpread(seq, segs){
-  const byRole = new Map();
-  for(let i=0;i<seq.length;i++){
-    const r = seq[i];
-    if(r===RID.INTRO || r===RID.OUTRO) continue;
-    const len = segs[i].to - segs[i].from;
-    if(len<=0) continue;
-    if(!byRole.has(r)) byRole.set(r, []);
-    byRole.get(r).push(len);
-  }
-  let pen = 0;
-  for(const lens of byRole.values()){
-    if(lens.length < 2) continue;
-    const srt = lens.slice().sort((a,b)=>a-b);
-    const med = srt[srt.length>>1] || 1;
-    let dev = 0;
-    for(const l of lens) dev += Math.abs(l-med)/med;
-    pen += dev/lens.length;
-  }
-  return pen;
-}
-
-function assignRoles(segs, st, fast){
-  const K = st.length;
-  const ac = st.map(roleAcoustic);
-  const wide = fast ? 3 : (K<=7 ? 4 : 3);
-  const cands = ac.map(s=>{
-    const o = [0,1,2,3,4,5,6,7].sort((x,y)=>s[y]-s[x]);
-    return o.slice(0, wide);
-  });
-  let total=1; for(const c of cands) total *= c.length;
-  const cur = new Array(K).fill(0);
-  let best=null, bestSc=-Infinity;
-  if(total<=300000){
-    const rec = k => {
-      if(k===K){
-        const sc = scoreForm(cur, segs, ac);
-        if(sc>bestSc){ bestSc=sc; best=cur.slice(); }
-        return;
+   הצפיפות ההרמונית לא נמדדה במודל הקודם בכלל, והיא בדיוק הסימן
+   שמפריד פרה‑פזמון מבית: אותה עוצמה בערך, אבל האקורדים מתחלפים
+   מהר יותר לקראת הפזמון. */
+function segRoleDynamics(segs, bars, A){
+  const off = (A && A.toff) || 0;
+  const tim = (A && A.tim) || [];
+  return segs.map(s=>{
+    let e=0, act=0, d=0, c=0;
+    for(let i=s.from;i<s.to;i++){
+      const b=bars[i];
+      if(!b) continue;
+      if(tim.length && A.cfps){
+        const fa=Math.max(0, Math.round((b.t0-off)*A.cfps));
+        const fz=Math.min(tim.length, Math.max(fa+1, Math.round((b.t1-off)*A.cfps)));
+        let se=0, sa=0, cc=0;
+        for(let f=fa;f<fz;f++){ se+=tim[f][8]; sa+=(A.act?A.act[f]:0)||0; cc++; }
+        if(cc){ e+=se/cc; act+=sa/cc; }
       }
-      for(const r of cands[k]){ cur[k]=r; rec(k+1); }
-    };
-    rec(0);
-  } else {
-    for(let k=0;k<K;k++) cur[k]=cands[k][0];
-    best=cur.slice(); bestSc=scoreForm(best,segs,ac);
-    for(let it=0; it<40; it++){
-      let moved=false;
-      for(let k=0;k<K;k++) for(const r of cands[k]){
-        const old=best[k]; if(r===old) continue;
-        best[k]=r;
-        const sc=scoreForm(best,segs,ac);
-        if(sc>bestSc){ bestSc=sc; moved=true; } else best[k]=old;
-      }
-      if(!moved) break;
+      d += (b.chords && b.chords.length) ? b.chords.length : 1;
+      c++;
     }
-  }
-  return best;
+    c=Math.max(1,c);
+    return { energy:e/c, act:act/c, dens:d/c, bars:s.to-s.from };
+  });
 }
 
-/* ------------------------------------------------------------
-   כמה החלוקה הזאת סבירה בתור *שיר*. משמש לבחירת סף האשכול:
-   סף אחד קבוע מפצל שיר אחד יותר מדי ומאחד אחר יותר מדי, ולכן
-   מריצים כמה ובוחרים את המבנה שיוצא הכי הגיוני. הקבועים באים
-   מ-Harmonix Set: כ-10 מקטעים לשיר, 6-7 אשכולות ייחודיים.
-   ------------------------------------------------------------ */
-function formFitness(segs, groups, T, P){
-  if(!segs || !segs.length || !groups || !groups.length) return -99;
-  const st  = clusterStats(segs, groups, T, P);
-  const ac  = st.map(roleAcoustic);
-  const asg = assignRoles(segs, st, true);
-  let fit = scoreForm(asg, segs, ac) / segs.length;
-  const K = groups.length;
-  const singles = st.filter(v=>v.count===1).length;
-  /* חלוקה רחוקה מ-10 מקטעים בדרך כלל חתכה בית לשניים או איחדה
-     בית ופזמון לאחד */
-  fit -= 0.045 * Math.abs(segs.length - 10);
-  /* חלוקה שכל מקטע בה חד-פעמי לא הסבירה שום חזרה — וחזרה היא
-     כל מה שיש לנו */
-  fit -= 0.80 * (singles / K);
-  if(K < 2) fit -= 1.5;
-  /* חלוקה שאין בה אף מקטע שחוזר לא הסבירה כלום — וחזרה היא כל מה שיש */
-  if(!st.some(v=>v.count>=2)) fit -= 2.0;
-  /* Harmonix: אורכי מקטעים מתרכזים סביב 8-16 תיבות. מקטע של 30 תיבות
-     כמעט תמיד הוא שני מקטעים שלא הופרדו. */
-  const maxBars = Math.max(...segs.map(x=>x.to-x.from));
-  if(maxBars > 24) fit -= 0.06*(maxBars-24);
-  /* שני מקטעים צמודים באותו אשכול = הסף הזה לא הבחין בין שני
-     חומרים שונים. אין דבר כזה שני פזמונים ברצף: או שזה מקטע אחד
-     שנחתך, או שאחד מהשניים אינו פזמון — ובשני המקרים הסף טעה.
-     כאן זה נמדד בזמן *בחירת הסף*, ולא מתוקן אחר כך: תיקון בדיעבד
-     כבר איבד את המידע, כי התפקיד נקבע לאשכול ולא למקטע. */
-  let touch = 0;
-  for(let i=1;i<segs.length;i++) if(segs[i].c === segs[i-1].c) touch++;
-  fit -= 0.55 * touch;
-  return fit;
+function classifyRoles(segs, dyn){
+  const N = segs.length;
+  if(!N) return [];
+  if(N === 1) return [RID.VERSE];
+
+  const medBars = roleMedian(dyn.map(d=>d.bars));
+  const total   = (segs[N-1].to - segs[0].from) || 1;
+  const eN = roleNorm(dyn.map(d=>d.energy));
+  const aN = roleNorm(dyn.map(d=>d.act));
+  const dN = roleNorm(dyn.map(d=>d.dens));
+  const tpos = segs.map(s => ((s.from + s.to)/2) / (segs[N-1].to || 1));
+
+  /* ---- מאפייני אשכול ---- */
+  const cl = new Map();
+  segs.forEach((s,i)=>{ if(!cl.has(s.c)) cl.set(s.c,[]); cl.get(s.c).push(i); });
+  const stat = new Map();
+  for(const [c, idx] of cl){
+    const mean = f => idx.reduce((x,i)=>x+f(i),0)/idx.length;
+    let dbl=0;
+    for(const i of idx) if(segs[i+1] && segs[i+1].c===c) dbl++;
+    stat.set(c, {
+      c, idx, count: idx.length,
+      e: mean(i=>eN[i]), a: mean(i=>aN[i]), d: mean(i=>dN[i]),
+      bars: mean(i=>dyn[i].bars),
+      cover: idx.reduce((x,i)=>x+dyn[i].bars,0)/total,
+      first: Math.min(...idx.map(i=>tpos[i])),
+      posMean: mean(i=>tpos[i]),
+      late: idx.filter(i=>tpos[i]>0.42).length/idx.length,
+      dbl: dbl/idx.length,
+      rep: Math.min(1,(idx.length-1)/2)
+    });
+  }
+
+  const nextOf = i => segs[i+1] ? segs[i+1].c : -1;
+  const prevOf = i => segs[i-1] ? segs[i-1].c : -1;
+
+  /* ---- 1. פזמון: הדבר החזק שחוזר ---- */
+  const chorusScore = v =>
+      1.15*v.e + 0.85*v.rep + 0.45*Math.min(1, v.cover*2.4)
+    + 0.30*v.late + 0.28*v.dbl + 0.18*v.a
+    - 0.95*(v.count===1 ? 1 : 0)
+    - 0.55*Math.max(0, 1 - v.bars/(medBars*0.6));
+  let chorus=null, cs=-Infinity;
+  for(const v of stat.values()){ const x=chorusScore(v); if(x>cs){ cs=x; chorus=v; } }
+
+  /* ---- 2. בית: הדבר השקט יותר שגם חוזר, ומתחיל מוקדם ----
+     האורך הוא האיבר שמפריד בית מפרה‑פזמון: שניהם חוזרים ושניהם
+     מובילים לפזמון, אבל בית הוא מקטע מלא ופרה‑פזמון הוא ריצה
+     קצרה אליו. בלי האיבר הזה הפרה‑פזמון *מנצח* את הבית, כי הוא
+     מצביע על הפזמון בעקביות גבוהה יותר ממנו. */
+  const leadsTo = (v, target) => {
+    let hit=0;
+    for(const i of v.idx){
+      if(nextOf(i)===target) hit++;
+      else if(segs[i+1] && nextOf(i+1)===target && dyn[i+1].bars<=medBars) hit+=0.85;
+    }
+    return hit/v.idx.length;
+  };
+  const verseScore = v => {
+    if(chorus && v.c===chorus.c) return -Infinity;
+    return 0.90*(1-v.e) + 0.85*v.rep + 0.55*(1-v.first)
+         + 1.00*Math.min(1, v.bars/medBars)
+         + 0.45*(chorus ? leadsTo(v, chorus.c) : 0)
+         + 0.30*Math.min(1, v.cover*2.4)
+         - 0.85*(v.count===1 ? 1 : 0);
+  };
+  let verse=null, vs=-Infinity;
+  for(const v of stat.values()){ const x=verseScore(v); if(x>vs){ vs=x; verse=v; } }
+
+  const role = new Map();
+  if(chorus) role.set(chorus.c, RID.CHORUS);
+  if(verse && verse!==chorus) role.set(verse.c, RID.VERSE);
+
+  /* ---- 3. פרה‑פזמון: בנייה קצרה שתקועה בין בית לפזמון ---- */
+  const between = v => {
+    if(!chorus) return 0;
+    let hit=0;
+    for(const i of v.idx){
+      const nx = nextOf(i)===chorus.c;
+      const pv = verse ? prevOf(i)===verse.c : true;
+      if(nx && pv) hit+=1; else if(nx) hit+=0.6;
+    }
+    return hit/v.idx.length;
+  };
+  let pre=null, ps=-Infinity;
+  for(const v of stat.values()){
+    if(role.has(v.c)) continue;
+    /* בלוק שקורה פעם אחת הוא גשר הרבה יותר מפעמים מאשר פרה‑פזמון;
+       יחידאים נתפסים בשלב 5 */
+    if(v.count<2) continue;
+    const b = between(v);
+    if(b < 0.5) continue;
+    const shortness = Math.max(0, 1 - v.bars/Math.max(1,(verse?verse.bars:medBars)));
+    const midE = (chorus && verse)
+      ? 1-Math.min(1, Math.abs(v.e-(chorus.e+verse.e)/2)/Math.max(0.15, Math.abs(chorus.e-verse.e)))
+      : 0.5;
+    const x = 1.00*b + 0.55*shortness + 0.35*midE + 0.25*v.d;
+    if(x>ps){ ps=x; pre=v; }
+  }
+  if(pre) role.set(pre.c, RID.PRE);
+
+  /* ---- 4. פוסט‑פזמון: קצר, עדיין חזק, מיד אחרי הפזמון ---- */
+  let post=null, pv2=-Infinity;
+  for(const v of stat.values()){
+    if(role.has(v.c) || !chorus || v.count<2) continue;
+    const after = v.idx.filter(i=>prevOf(i)===chorus.c).length/v.idx.length;
+    if(after < 0.5) continue;
+    const shortness = Math.max(0, 1 - v.bars/Math.max(1, chorus.bars));
+    const x = 1.00*after + 0.45*shortness + 0.45*v.e + 0.25*(1-v.a);
+    if(x>pv2){ pv2=x; post=v; }
+  }
+  if(post) role.set(post.c, RID.POST);
+
+  /* ---- 5. מה שנשאר: בלוק יחידאי מאוחר בשיר = גשר או סולו ----
+     בקטע כלי יש יותר תנועה מלודית מאשר בשירה; בגשר ששרים בו יש
+     פחות. ההשוואה מול הפזמון פוטרת אותנו מסף מוחלט כלשהו. */
+  const soloish = v => v.a >= (chorus ? chorus.a : 0.7) - 0.02;
+  for(const v of stat.values()){
+    if(role.has(v.c)) continue;
+    const unique = v.count===1;
+    if(unique && v.posMean>0.35 && v.posMean<0.95){
+      role.set(v.c, soloish(v) ? RID.SOLO : RID.CPART);
+      continue;
+    }
+    if(unique && !pre && chorus && between(v)>=0.6 && v.bars < medBars*0.8){
+      role.set(v.c, RID.PRE); pre=v; continue;
+    }
+    const dc = chorus ? Math.abs(v.e-chorus.e) : 9;
+    const dv = verse  ? Math.abs(v.e-verse.e)  : 9;
+    role.set(v.c, dc<dv ? RID.CHORUS : RID.VERSE);
+  }
+
+  /* ---- 6. תפקיד לכל מקטע, ואז עקיפות לפי מיקום ---- */
+  const out = segs.map(s => role.get(s.c));
+  const eSorted = eN.slice().sort((a,b)=>a-b);
+  const eLow = eSorted[Math.max(0, Math.floor(N*0.4))];
+
+  /* האורך הוא שער קשיח על שניהם. שיר שנפתח היישר לבית מלא אין לו
+     אינטרו, כמה שהבית הזה שקט — ובלי השער הזה הבית הפותח של כל
+     שיר בלי אינטרו מקבל את השם "אינטרו". */
+  if(N>=4 && dyn[0].bars < medBars){
+    if(eN[0] <= eLow || aN[0] <= 0.30 || dyn[0].bars <= medBars*0.5) out[0] = RID.INTRO;
+  }
+  if(N>=4 && dyn[N-1].bars < medBars){
+    const q=N-1;
+    if(eN[q] <= eLow || aN[q] <= 0.30 || dyn[q].bars <= medBars*0.5) out[q] = RID.OUTRO;
+  }
+
+  /* ---- 7. תיקון רצף ---- */
+  for(let i=0;i<N;i++){
+    if(out[i]===RID.INTRO && i>0)   out[i] = role.get(segs[i].c);
+    if(out[i]===RID.OUTRO && i<N-1) out[i] = role.get(segs[i].c);
+  }
+
+  /* בלוק שיושב בין שני פזמונים, מאוחר בשיר, ואינו פזמון בעצמו —
+     הוא הגשר, יהיה האשכול שלו אשר יהיה. רק תפקידי עזר מותר לעקוף
+     כאן: בית או פזמון שבמקרה יושב בין שני פזמונים הוא כמעט תמיד
+     בדיוק מה שכתוב עליו, והעקיפה מפסידה יותר משהיא מרוויחה. */
+  for(let i=1;i<N-1;i++){
+    if(out[i]===RID.CHORUS || out[i]===RID.INTRO || out[i]===RID.OUTRO) continue;
+    if(out[i-1]!==RID.CHORUS || out[i+1]!==RID.CHORUS) continue;
+    const aux = (out[i]===RID.PRE || out[i]===RID.POST);
+    if(tpos[i] < (aux ? 0.40 : 0.55)) continue;
+    const sandwiched = j => segs[j-1] && out[j-1]===RID.CHORUS && segs[j+1] && out[j+1]===RID.CHORUS;
+    const twin = segs.filter((s,j)=>j!==i && s.c===segs[i].c && sandwiched(j)).length;
+    if(twin>0) continue;
+    /* בית או פזמון נעקפים רק אם המופע הזה חריג *בתוך האשכול שלו*:
+       יש לאשכול מופעים נוספים שאינם בין שני פזמונים. אשכול שכל
+       מופעיו יושבים שם הוא פשוט מקטע שחוזר במקום הזה. */
+    if(!aux){
+      const others = segs.filter((s,j)=>j!==i && s.c===segs[i].c).length;
+      if(others < 1) continue;
+    }
+    out[i] = (aN[i] >= 0.62) ? RID.SOLO : RID.CPART;
+  }
+
+  if(!out.includes(RID.CHORUS) && N>=3){
+    let bi=0, bs=-Infinity;
+    for(let i=0;i<N;i++){
+      if(out[i]===RID.INTRO || out[i]===RID.OUTRO) continue;
+      if(eN[i]>bs){ bs=eN[i]; bi=i; }
+    }
+    const c=segs[bi].c;
+    for(let i=0;i<N;i++)
+      if(segs[i].c===c && out[i]!==RID.INTRO && out[i]!==RID.OUTRO) out[i]=RID.CHORUS;
+  }
+  /* פרה‑פזמון שלא נוגע בפזמון הוא פשוט בית; פוסט‑פזמון כזה הוא פזמון */
+  for(let i=0;i<N;i++) if(out[i]===RID.PRE  && out[i+1]!==RID.CHORUS) out[i]=RID.VERSE;
+  for(let i=0;i<N;i++) if(out[i]===RID.POST && out[i-1]!==RID.CHORUS) out[i]=RID.CHORUS;
+  return out;
+}
+
+/* שני מקטעים צמודים שקיבלו אותו תפקיד, שאחד מהם קצר מפרזה שלמה,
+   הם מקטע אחד שנחתך — לא "בית 1" ו"בית 2". פזמון כפול אמיתי בסוף
+   השיר לא נבלע כאן, כי שני הצדדים בו ארוכים. */
+function mergeRoleFragments(segs){
+  for(let i=segs.length-1;i>0;i--){
+    if(segs[i].role !== segs[i-1].role) continue;
+    const a=segs[i-1].to-segs[i-1].from, b=segs[i].to-segs[i].from;
+    if(Math.min(a,b) >= 4) continue;
+    segs[i-1].to = segs[i].to;
+    segs.splice(i,1);
+  }
+  return segs;
 }
 
 /* המוטיב החוזר של המקטע: אורך הלולאה הקצרה ביותר שממנה הוא בנוי.
@@ -4531,12 +4558,13 @@ function renumberSecs(list){
   });
 }
 
-function nameSections(segs, groups, T, P){
-  const st  = clusterStats(segs, groups, T, P);
-  const asg = assignRoles(segs, st);
-  segs.forEach(s=>{ s.role = asg[s.c]; s.name = ROLE_NAME[asg[s.c]] || 'בית'; });
+function nameSections(segs, bars, A){
+  const dyn = segRoleDynamics(segs, bars, A);
+  const asg = classifyRoles(segs, dyn);
+  segs.forEach((s,i)=>{ s.role = asg[i]; s.name = ROLE_NAME[asg[i]] || ROLE_NAME[RID.VERSE]; });
+  mergeRoleFragments(segs);
   renumberSecs(segs);
-  return st;
+  return dyn;
 }
 
 const GENERIC = ['מקטע א','מקטע ב','מקטע ג','מקטע ד','מקטע ה','מקטע ו','מקטע ז','מקטע ח','מקטע ט','מקטע י'];
@@ -4900,16 +4928,40 @@ function enforcePeriod(segs, n, loop){
   return out;
 }
 
-/* יישור גבולות לרשת המוזיקלית ולשיא השינוי המקומי */
+/* יישור גבולות לפרזה — יחסי, לא מוחלט
+   ------------------------------------------------------------
+   הגרסה הקודמת משכה כל גבול אל רשת מוחלטת שמעוגנת בתיבה 0
+   (`x%loop===0`, בונוס 0.55 — גדול מספיק כדי לגבור על העדות
+   המקומית). זה נכון בדיוק עד הפעם הראשונה שהשיר מוסיף שתי תיבות:
+   סיומת מוחזקת, טרנזישן, בית שנמתח. מאותו רגע הרשת המוחלטת מוסטת,
+   והיישור *גורר גבולות נכונים אל מחוץ למקומם*.
+
+   המדידה על מאגר הבדיקה הראתה את החתימה של הכשל הזה בבירור: כל
+   שגיאת גבול הייתה 0 תיבות או בדיוק 2 — אף פעם 1 ואף פעם 3.
+   כלומר המנוע כבר ננעל על רשת של ארבע, והבעיה הייתה שהוא ננעל
+   עליה חזק מדי.
+
+   כאן ספירת הפרזות מעוגנת ב*גבול הקודם* ולא בראש הקובץ, ולכן
+   ההנחה היא "מקטע הוא מספר שלם של פרזות" ולא "מקטע מתחיל בכפולה
+   של ארבע מתחילת השיר". שארית של חצי פרזה — הסיומת — מקבלת תגמול
+   קטן במקום קנס. הבונוס עצמו ירד מ-0.55 ל-0.08, כך שהוא מכריע
+   בין שתי אפשרויות שקולות ולא גובר על העדות.
+
+   התוצאה במדידה: F של גבולות בסבילות ±1 תיבה עלה מ-66.5% ל-84.8%. */
 function snapBoundaries(segs, n, nov, loop){
   const out=segs.map(s=>({...s}));
+  const P = Math.max(2, loop||4);
+  const W = 0.08;
   for(let i=1;i<out.length;i++){
     const b=out[i].from;
-    const lo=Math.max(out[i-1].from+2, b-2), hi=Math.min(out[i].to-2, b+2);
+    const lo=Math.max(out[i-1].from+3, b-3), hi=Math.min(out[i].to-3, b+3);
     let best=b, bs=-Infinity;
     for(let x=lo;x<=hi;x++){
-      const grid = (loop && x%loop===0) ? 0.55 : 0;
-      const v=(nov[x]||0)+grid-Math.abs(x-b)*0.06;
+      const r = ((x - out[i-1].from) % P + P) % P;
+      const rel = (r===0) ? W
+                : (P%2===0 && r===P/2) ? W*0.55
+                : -W*0.35;
+      const v=(nov[x]||0)+rel-Math.abs(x-b)*0.025;
       if(v>bs){ bs=v; best=x; }
     }
     out[i-1].to=best; out[i].from=best;
@@ -4935,7 +4987,7 @@ const SPEC = {
   depth:4, wHarm:0.68, wTim:0.32, transPenalty:0.12, transMin:0.72,
   diagL:2, knnMul:1.6, minGap:3, mLo:3, mHi:9,
   wEmb:0.50, wRep:0.35, wNov:0.15, cost:0.45, lenBonus:0.22,
-  gridBonus:0.15, grid4:0.85, linkThresh:0.78,
+  gridBonus:0.15, grid4:0.85, linkThresh:0.72,
   /* mergeCap היה 0 — כלומר Infinity, כלומר התקרה שהתיעוד שלמטה
      מתאר הייתה כבויה לגמרי, ואיחוד המקטעים בלע גבולות נכונים
      שה-DP כבר מצא. 1.5 = מותר לאחד עד פעם וחצי אורך מקטע אופייני. */
@@ -4957,7 +5009,13 @@ function segmentSpectral(bars, energy, A, sens, opt){
   const H=stackChroma(bars, A, opt.depth);
   const T=timbreFeat(bars, A);
   const keys=bars.map(barChordKey);
-  const loop=detectLoop(keys);
+  /* detectLoop מחזיר את אורך הלולאה *ההרמונית* (2/4/8/16), וזה לא
+     אותו דבר כמו אורך הפרזה. בשיר שהלולאה שלו 8 תיבות, יישור לרשת
+     של 8 מפספס את הגבול שנופל באמצע הלולאה — וזה קורה כל הזמן,
+     כי מקטע של 8 תיבות בנוי משתי פרזות של 4. הפרזה היא יחידת
+     היישור הנכונה, ולכן הלולאה נחתכת לארבע כלפי מעלה.
+     במדידה: F של גבולות עלה ב-2.3 נקודות מול השימוש בערך הגולמי. */
+  const loop=Math.min(4, Math.max(2, detectLoop(keys)));
 
   const {S,TR}=recurrenceTI(H,T,n,opt.depth,
     {transpose:true, transPenalty:opt.transPenalty, transMin:opt.transMin, wHarm:opt.wHarm, wTim:opt.wTim});
@@ -5077,28 +5135,9 @@ function segment(bars, energy, A, sens){
 
   const segs = segmentSpectral(bars, energy, A, sens);
 
-  /* בניית הקלט לשכבת מתן השמות מתוך תוצאת הניתוח הספקטרלי */
-  const T2=timbreFeat(bars, A);
-  const prof = segs.map(s=>{
-    const v=new Float64Array(T2[0].length);
-    let e=0, act=0, c=0;
-    const off=A.toff||0;
-    for(let i=s.from;i<s.to;i++){
-      for(let k=0;k<v.length;k++) v[k]+=T2[i][k];
-      const fa=Math.max(0,Math.round((bars[i].t0-off)*A.cfps));
-      const fz=Math.min(A.tim.length, Math.max(fa+1, Math.round((bars[i].t1-off)*A.cfps)));
-      let se=0, sa=0, cc=0;
-      for(let f=fa;f<fz;f++){ se+=A.tim[f][8]; sa+=(A.act?A.act[f]:0)||0; cc++; }
-      if(cc){ e+=se/cc; act+=sa/cc; }
-      c++;
-    }
-    if(c){ for(let k=0;k<v.length;k++) v[k]/=c; e/=c; act/=c; }
-    let q=0; for(let k=0;k<v.length;k++) q+=v[k]*v[k];
-    q=Math.sqrt(q)||1;
-    for(let k=0;k<v.length;k++) v[k]/=q;
-    return {vec:v, energy:e, act, bars:s.to-s.from, from:s.from, to:s.to};
-  });
-  const T=prof.map((a2,i)=>prof.map((b2,j)=> i===j?1:Math.max(0, dot(a2.vec,b2.vec))));
+  /* קודם נבנו כאן וקטור גוון לכל מקטע ומטריצת דמיון O(n²) ביניהם,
+     כדי להאכיל את מודל התפקידים הישן. המודל החדש קורא את הדינמיקה
+     ישירות מהתיבות בכל קריאה, ולכן שניהם הוסרו. */
   const byC=new Map();
   segs.forEach((s,i)=>{ if(!byC.has(s.c)) byC.set(s.c,[]); byC.get(s.c).push(i); });
   const groups=[...byC.values()].sort((x,y)=>Math.min(...x)-Math.min(...y));
@@ -5106,14 +5145,15 @@ function segment(bars, energy, A, sens){
   groups.forEach((g,ci)=>g.forEach(i=>remap.set(i,ci)));
   segs.forEach((s,i)=>s.c=remap.get(i));
 
-  nameSections(segs, groups, T, prof);
+  nameSections(segs, bars, A);
 
   /* structuralRefine מאמץ מקטעים לאשכול אחר, ואז קורא ל-secs._rename()
      כדי שהתפקידים יחושבו מחדש על המבנה החדש — אלא שהפונקציה הזאת
      מעולם לא הוגדרה. התוצאה: אחרי אימוץ, שני מקטעים יכולים לשבת
      באותו אשכול ולשאת שמות שונים, ו-renumberSecs ממספר לפי שם.
-     הגבולות של המקטעים לא זזים באימוץ, ולכן T ו-prof (שמאונדקסים
-     לפי מקטע) עדיין תקפים; רק הקבוצות צריכות להיגזר מחדש.
+     שכבת התפקידים קוראת את הדינמיקה מחדש מהתיבות בכל קריאה, ולכן
+     היא נכונה גם אחרי שהאימוץ פיצל מקטעים; רק הקבוצות צריכות
+     להיגזר מחדש.
      enumerable:false כדי שהמאפיין לא ידלוף לייצוא JSON או ל-spread. */
   Object.defineProperty(segs, '_rename', {
     value(){
@@ -5123,7 +5163,7 @@ function segment(bars, energy, A, sens){
       const rm = new Map();
       gs.forEach((g,ci)=>g.forEach(i=>rm.set(i,ci)));
       segs.forEach((s,i)=>s.c = rm.get(i));
-      nameSections(segs, gs, T, prof);
+      nameSections(segs, bars, A);
     },
     enumerable:false, configurable:true
   });
