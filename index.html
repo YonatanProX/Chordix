@@ -64,6 +64,26 @@ window.CX_I18N_DICT = {"en":{"html":{"a.1":"Skip to main content","headNav.a.1":
 })();
 </script>
 
+<script>
+/* תרגומי הפקדים שנוספו אחרי בניית מילון התרגום. נרשמים כאן ולא
+   בתוך המילון עצמו כדי שהמילון יישאר קובץ שנוצר אוטומטית. */
+(function(){
+  var d = window.CX_I18N_DICT && window.CX_I18N_DICT.en;
+  if(!d) return;
+  d.html = d.html || {};
+  d.attr = d.attr || {};
+  d.html['timelineView.span.sync']       = 'Sync';
+  d.html['timelineView.button.syncReset'] = 'Reset';
+  d.html['timelineView.p.1'] =
+    'Every square is a chord, positioned by its timing in the recording — the same chords '+
+    'that are written on the chord sheet. Clicking a row jumps to that point, and '+
+    'double-clicking a square corrects the chord there and on the sheet as well. If the '+
+    'highlight runs ahead of or behind what you hear — with Bluetooth headphones, for '+
+    'example — move the “Sync” slider until it lands on the sound.';
+  d.attr['timelineView.button.attr_title.sync'] = 'Reset the sync offset';
+})();
+</script>
+
 
 
 
@@ -397,12 +417,24 @@ html:not(.theme-light) audio{filter:invert(.92) hue-rotate(180deg)}
 .tltime{font-family:var(--mono);font-size:10.5px;color:var(--text-faint);width:38px;flex:0 0 38px;padding-top:20px;text-align:end}
 .tltrack{position:relative;flex:1;height:56px;background:var(--bg-sunken);border:1px solid var(--panel-edge);border-radius:8px;overflow:hidden;cursor:pointer;direction:ltr}
 .tlwave{position:absolute;inset:auto 0 0 0;width:100%;height:20px;opacity:.42}
-.tlch{position:absolute;top:0;height:36px;display:flex;align-items:center;justify-content:center;border-inline-end:1px solid rgba(0,0,0,.45);overflow:hidden;transition:filter .12s}
+.tlch{position:absolute;top:0;height:36px;min-width:3px;display:flex;align-items:center;justify-content:center;border-inline-end:1px solid rgba(0,0,0,.45);overflow:hidden;transition:filter .12s}
 .tlch span{font-family:var(--mono);font-weight:700;font-size:14px;color:#14102a;white-space:nowrap;padding:0 4px}
-.tlch.on{filter:brightness(1.22);box-shadow:inset 0 0 0 2px #fff}
+/* לכל ריבוע יש שם: ככל שהוא צר יותר הכתב קטן יותר, ובריבוע
+   ממש צר השם נכתב אנכית — אבל אף פעם לא נעלם. */
+.tlch.sm span{font-size:12px;padding:0 2px}
+.tlch.xs span{font-size:10px;padding:0 1px;letter-spacing:-.02em}
+.tlch.vert span{font-size:9px;padding:0;writing-mode:vertical-rl;text-orientation:mixed;
+  letter-spacing:-.05em;line-height:1;max-height:36px;overflow:hidden}
+.tlch.cont span::before{content:'·';opacity:.55;margin-inline-end:2px}
+.tlch.cont.vert span::before{content:''}
+.tlch.on{filter:brightness(1.22);box-shadow:inset 0 0 0 2px #fff;z-index:3}
+.tl-sync{display:flex;align-items:center;gap:7px;font-size:12.5px;color:var(--text-dim)}
+.tl-sync input[type=range]{width:104px;accent-color:var(--brass)}
+.tl-sync output{font-family:var(--mono);font-size:12px;min-width:52px;text-align:center;color:var(--text-main)}
+.tl-sync button{padding:4px 8px;font-size:11.5px;border-radius:7px}
 .tlch.nc{background:#332b57!important}
 .tlch.nc span{color:var(--text-faint)}
-.tlhead{position:absolute;top:0;bottom:0;width:2px;background:#fff;pointer-events:none;left:0;display:none;box-shadow:0 0 6px rgba(255,255,255,.7)}
+.tlhead{position:absolute;top:0;bottom:0;width:2px;background:#fff;pointer-events:none;left:0;display:none;z-index:5;box-shadow:0 0 6px rgba(255,255,255,.7)}
 .tlrow.live .tlhead{display:block}
 .tlrow.live .tltrack{border-color:var(--brass)}
 .tl-legend{margin-top:12px;font-size:12.5px;color:var(--text-faint);line-height:1.7}
@@ -446,7 +478,11 @@ button.n:hover::after{content:' ✂'}
   padding:2px 9px;font-size:11.5px;border-radius:6px;font-family:var(--body);cursor:pointer}
 .mini:hover{background:var(--bg-sunken);border-color:var(--a1);color:var(--text-main)}
 .mini:focus-visible{outline:3px solid var(--focus-ring);outline-offset:2px}
-.cellbar .ch{flex:1;display:flex;gap:12px;flex-wrap:wrap}
+.cellbar .ch{flex:1;display:flex;gap:12px;flex-wrap:wrap;align-items:baseline}
+.cellbar .ch .sl{font-style:normal;opacity:.38;font-weight:400}
+/* האקורד שמתנגן ממש עכשיו — לא התיבה כולה */
+.cellbar .cd{border-radius:6px;padding:0 3px;margin:0 -3px;transition:background .12s,color .12s}
+.cellbar .cd.on{background:var(--brass);color:#fff}
 .cellbar input{width:100%;font:inherit;border:0;background:transparent;color:inherit;padding:0}
 /* ---------- קישור לשיר ---------- */
 
@@ -626,6 +662,13 @@ html.a11y-colorblind .sec-tag{box-shadow:inset 0 0 0 2px #14102a}
   .brand{font-size:29px}
   .now .cur{font-size:32px;min-width:110px}
   .tltime{width:30px;flex-basis:30px}
+  /* מסך צר: אותה שורה, פחות מקום — הכתב קטן כדי שהשם יישאר בפנים */
+  .tlch span{font-size:12px}
+  .tlch.sm span{font-size:10px}
+  .tlch.xs span{font-size:9px}
+  .tlch.vert span{font-size:8px}
+  .tl-sync{width:100%;justify-content:flex-end;order:3}
+  .tl-sync input[type=range]{width:86px}
   .float-window{width:calc(100vw - 24px)}
   #utilityStack{bottom:12px;inset-inline-start:12px}
 }
@@ -920,6 +963,8 @@ html.a11y-zoomed .brand-mark{width:52px;height:52px}
   }
   .cellbar.inferred .ch{color:var(--pr-ink)!important}
   .cellbar.playing{background:#fff!important;box-shadow:none!important}
+  .cellbar .cd,.cellbar .cd.on{background:none!important;color:var(--pr-ink)!important;
+    padding:0!important;margin:0!important}
   button.n:hover{background:none!important;color:var(--pr-faint)!important;padding:0!important;margin:0!important}
   button.n:hover::after{content:''}
 
@@ -1083,6 +1128,8 @@ img,svg,video,canvas{max-width:100%}
   .cellbar{font-size:14px;min-height:38px}
   .tltime{width:26px;flex:0 0 26px}
   .now .cur{font-size:30px}
+  .tlch span{font-size:11px}
+  .tlch.sm span{font-size:9.5px}
   .readout .cell{flex:1 1 100%;border-inline-end:0;border-bottom:1px solid var(--panel-edge)}
   .readout .cell:last-child{border-bottom:0}
   .sheet{padding:20px 12px 26px}
@@ -2194,6 +2241,14 @@ html.a11y-reduced-motion .coupon-btn:hover{transform:none}
         <div><span data-i18n="timelineView.span.1" class="lbl">מתנגן</span><span class="cur" id="nowCh">—</span></div>
         <div><span data-i18n="timelineView.span.2" class="lbl">הבא</span><span class="nxt" id="nextCh">—</span></div>
         <div style="flex:1"></div>
+        <div class="tl-sync" style="align-self:center">
+          <label for="sync" data-i18n="timelineView.span.sync">סנכרון</label>
+          <input id="sync" type="range" min="-400" max="400" step="20" value="0"
+                 aria-describedby="syncVal">
+          <output id="syncVal" for="sync">0 ms</output>
+          <button type="button" id="syncReset" data-i18n="timelineView.button.syncReset"
+                  title="איפוס הסנכרון">איפוס</button>
+        </div>
         <label style="font-size:13px;color:var(--muted);align-self:center">
           <span data-i18n="timelineView.span.3" class="sr-only" id="zoomLbl">אורך שורה בציר הזמן</span>
           <select id="zoom" aria-labelledby="zoomLbl">
@@ -2204,7 +2259,7 @@ html.a11y-reduced-motion .coupon-btn:hover{transform:none}
         </label>
       </div>
       <div class="tl" id="tl"></div>
-      <p data-i18n="timelineView.p.1" class="tl-legend">כל ריבוע הוא אקורד לפי התזמון בהקלטה. לחיצה על השורה קופצת לנקודה הזו, לחיצה כפולה על ריבוע מתקנת את האקורד. הצבע נגזר מהצליל השורש, כך שחזרות בשיר בולטות לעין.</p>
+      <p data-i18n="timelineView.p.1" class="tl-legend">כל ריבוע הוא אקורד לפי התזמון בהקלטה — אותם אקורדים בדיוק שכתובים בדף האקורדים. לחיצה על השורה קופצת לנקודה הזו, ולחיצה כפולה על ריבוע מתקנת את האקורד גם כאן וגם בדף. אם ההדגשה מקדימה או מפגרת אחרי מה שנשמע — למשל באוזניות בלוטות' — הזיזו את מחוון "סנכרון" עד שהיא נופלת על הצליל.</p>
     </div>
 
     <div id="sheetView" hidden>
@@ -3609,6 +3664,8 @@ const VIT = { frameSelf:0.94, beatSelf:0.60, moveDiv:12, beatEmit:1.5,
 
 /* ------------------------------------------------------------
    ויטרבי מהיר: מעבר תלוי-יעד בלבד (O(n·S)). לשימוש ברמת הפריים.
+   לא נקרא כרגע במסלול הראשי — הפענוח ברמת הפעימה (viterbiFull)
+   הוא המקור היחיד לאקורדים, בשתי התצוגות גם יחד.
    ------------------------------------------------------------ */
 function viterbiFast(logp, n, pSelf, bias, emitScale, moveDiv){
   const stay = Math.log(pSelf), move = Math.log((1-pSelf)/(moveDiv||24));
@@ -5578,6 +5635,20 @@ function barsFromBeatChords(path, conf, beats, bpb, downbeat, maxPerBar, duratio
   maxPerBar = maxPerBar||1;
   const bars=[];
   const same=(a,b)=> (!a&&!b) || (a&&b&&a.root===b.root&&a.suf===b.suf);
+  /* מיזוג מקטע פנימי אחד לתוך השכן החזק שלו */
+  const mergeSeg=(seg, mi)=>{
+    const prev=seg[mi-1], next=seg[mi+1];
+    const tgt = !prev ? next : !next ? prev : (prev.n>=next.n ? prev : next);
+    if(!tgt) return false;
+    tgt.n += seg[mi].n; tgt.cs += seg[mi].cs;
+    if(tgt===next) next.at = seg[mi].at;
+    seg.splice(mi,1);
+    for(let k=seg.length-1;k>0;k--)
+      if(same(seg[k-1].c, seg[k].c)){
+        seg[k-1].n+=seg[k].n; seg[k-1].cs+=seg[k].cs; seg.splice(k,1);
+      }
+    return true;
+  };
   const add=(i,len)=>{
     len = Math.min(len, beats.length-i);
     if(len<=0) return;
@@ -5588,27 +5659,24 @@ function barsFromBeatChords(path, conf, beats, bpb, downbeat, maxPerBar, duratio
     let cs=0, cn=0;
     for(let k=0;k<len;k++){
       const c = modelIdxToChord(path[i+k]);
+      const w = conf ? conf[i+k] : 0.5;
       const last=seg[seg.length-1];
-      if(last && same(last.c,c)) last.n++;
-      else seg.push({c, n:1, at:k});
-      cs += conf ? conf[i+k] : 0.5; cn++;
+      if(last && same(last.c,c)){ last.n++; last.cs+=w; }
+      else seg.push({c, n:1, at:k, cs:w});
+      cs += w; cn++;
     }
     let guard=0;
     while(seg.filter(x=>x.c).length > maxPerBar && guard++ < 12){
       let mi=-1, mn=Infinity;
       seg.forEach((x,k)=>{ if(x.c && x.n<mn){ mn=x.n; mi=k; } });
       if(mi<0) break;
-      const prev=seg[mi-1], next=seg[mi+1];
-      const tgt = !prev ? next : !next ? prev : (prev.n>=next.n ? prev : next);
-      if(!tgt) break;
-      tgt.n += seg[mi].n;
-      if(tgt===next) next.at = seg[mi].at;
-      seg.splice(mi,1);
-      for(let k=seg.length-1;k>0;k--)
-        if(same(seg[k-1].c, seg[k].c)){ seg[k-1].n+=seg[k].n; seg.splice(k,1); }
+      if(!mergeSeg(seg, mi)) break;
     }
     bars.push({
-      chords: seg.filter(x=>x.c).map(x=>({root:x.c.root, suf:x.c.suf, beat:x.at, span:x.n})),
+      chords: seg.filter(x=>x.c).map(x=>({
+        root:x.c.root, suf:x.c.suf, beat:x.at, span:x.n,
+        conf: x.cs/Math.max(1,x.n)
+      })),
       t0, t1, pickup: len<bpb, beatsInBar: len, beat0: i,
       conf: cn ? cs/cn : 0.5
     });
@@ -5618,10 +5686,98 @@ function barsFromBeatChords(path, conf, beats, bpb, downbeat, maxPerBar, duratio
     if(i+bpb>beats.length){ if(beats.length-i>=2) add(i, beats.length-i); break; }
     add(i,bpb);
   }
+  tidyBarChords(bars, bpb, maxPerBar);
+  stampChordTimes(bars, beats, duration);
   return bars;
 }
 
-/* מסלול פריימים -> ריצות אקורד על ציר הזמן (לתצוגת ציר הזמן) */
+/* ------------------------------------------------------------
+   ניקוי אקורדי־רפאים בתוך התיבה
+   ------------------------------------------------------------
+   הפענוח ברמת הפעימה חופשי להחליף אקורד בכל פעימה, ולכן די
+   בפעימה בודדת שהמודל התנדנד בה — ווקאל חזק, מעבר בס, קישוט של
+   הגיטרה — כדי שהתיבה תיכתב "C G" למרות שנוגן שם C אחד ארוך.
+   זה בדיוק מה שנראה למשתמש כשני אקורדים שאין ביניהם קשר.
+
+   מותר לאקורד שני בתיבה להישאר רק אם יש לו סיבה מוזיקלית:
+     • הוא ארוך מספיק ביחס למה שהמשתמש ביקש (אקורדים בתיבה),
+       ויושב על פעימה חזקה — או שהוודאות בו גבוהה;
+     • הוא מקדים את התיבה הבאה (הקדמה — תופעה אמיתית ונפוצה);
+     • הוא ממשיך את סוף התיבה הקודמת.
+   כל השאר נבלע לתוך השכן החזק שלו. אין כאן ניחוש: המידע שנשאר
+   הוא בדיוק המידע שהיה, רק בלי ההחלפות שאיש לא ניגן.
+   ------------------------------------------------------------ */
+function tidyBarChords(bars, bpb, maxPerBar){
+  if(!bars || maxPerBar<=1) return;
+  const same=(a,b)=> !!a && !!b && a.root===b.root && a.suf===b.suf;
+  const drop=(b,k)=>{
+    const c=b.chords[k], prev=b.chords[k-1], next=b.chords[k+1];
+    const tgt = !prev ? next : !next ? prev : (prev.span>=next.span ? prev : next);
+    if(!tgt) return false;
+    tgt.span += c.span;
+    if(tgt===next) next.beat = c.beat;
+    b.chords.splice(k,1);
+    for(let j=b.chords.length-1;j>0;j--)
+      if(same(b.chords[j-1], b.chords[j])){
+        b.chords[j-1].span += b.chords[j].span;
+        b.chords.splice(j,1);
+      }
+    return true;
+  };
+  for(let bi=0;bi<bars.length;bi++){
+    const b=bars[bi];
+    if(!b.chords || b.chords.length<2) continue;
+    const len=b.beatsInBar || bpb || 4;
+    const minSpan=Math.max(1, Math.floor(len/maxPerBar));
+    const nb=bars[bi+1], pb=bars[bi-1];
+    const nextFirst=(nb && nb.chords && nb.chords.length) ? nb.chords[0] : null;
+    const prevLast =(pb && pb.chords && pb.chords.length) ? pb.chords[pb.chords.length-1] : null;
+    let guard=0, dropped=true;
+    while(dropped && b.chords.length>1 && guard++<8){
+      dropped=false;
+      for(let k=0;k<b.chords.length;k++){
+        const c=b.chords[k];
+        const strong = c.beat===0 || (len>=4 && c.beat===Math.floor(len/2));
+        const cf = c.conf===undefined ? (b.conf===undefined?0.5:b.conf) : c.conf;
+        if(k===b.chords.length-1 && same(c,nextFirst) && cf>=0.28) continue;  // הקדמה
+        if(k===0 && same(c,prevLast)) continue;                               // המשך
+        if(c.span>=minSpan && (strong || cf>=0.45)) continue;                 // מוצדק
+        if(drop(b,k)){ dropped=true; break; }
+      }
+    }
+  }
+}
+
+/* ------------------------------------------------------------
+   זמן התחלה וסיום *בשניות* לכל אקורד, לא רק לתיבה
+   ------------------------------------------------------------
+   זה מה שמאפשר גם לציר הזמן וגם לדף האקורדים להאיר את האקורד
+   הנכון ברגע הנכון, במקום להאיר תיבה שלמה שיש בה שני אקורדים.
+   נקרא אחרי כל שלב שכותב אקורדים מחדש (השלמה מבנית, קונצנזוס),
+   כי אלה מעתיקים אקורדים בין תיבות ואיתם זמנים של תיבה אחרת.
+   ------------------------------------------------------------ */
+function stampChordTimes(bars, beats, duration){
+  if(!bars || !beats || !beats.length) return;
+  const last=beats[beats.length-1];
+  const bt = i => (i<beats.length ? beats[i] : (duration || last));
+  for(const b of bars){
+    const b0=b.beat0||0, n=b.beatsInBar||1;
+    for(const c of (b.chords||[])){
+      const at=c.beat||0, sp=c.span||n;
+      let a=bt(b0+Math.min(n,at)), z=bt(b0+Math.min(n, at+sp));
+      c.t0=Math.max(b.t0, Math.min(a, b.t1));
+      c.t1=Math.min(b.t1, Math.max(z, c.t0));
+      if(!(c.t1>c.t0)){ c.t0=b.t0; c.t1=b.t1; }
+    }
+  }
+}
+
+/* מסלול פריימים -> ריצות אקורד.
+   ------------------------------------------------------------
+   כבר לא בשימוש בתצוגה: ציר הזמן נבנה מהתיבות (runsFromBars),
+   כדי שלא יהיו שתי אמיתות לאותה הקלטה. נשאר כאן כי הוא עצמאי
+   ושימושי לבדיקות — ולמי שירצה בעתיד תצוגה חופשית מרשת הפעימות
+   כאופציה מפורשת, לא כברירת מחדל סמויה. */
 function runsFromPath(path, fps, minDur, toff){
   const off=toff||0;
   let runs=[];
@@ -5653,6 +5809,127 @@ function runsFromPath(path, fps, minDur, toff){
     else out.push(r);
   }
   return out;
+}
+
+/* ------------------------------------------------------------
+   ציר הזמן נגזר מאותם אקורדים שכתובים בדף — מקור אמת אחד
+   ------------------------------------------------------------
+   קודם לכן ציר הזמן פוענח בנפרד, ברמת הפריים, בלי הסולם, בלי
+   ההשלמה המבנית ובלי ההיפוכים — ולכן הראה לפעמים אקורדים אחרים
+   מדף האקורדים של אותו שיר בדיוק. שתי אמיתות לאותה הקלטה הן
+   באג, לא פיצ'ר: המשתמש לא יודע לאיזו מהן להאמין.
+
+   מעכשיו הריצות נבנות מהתיבות הסופיות — אחרי הפענוח ברמת
+   הפעימה, אחרי ההשלמה המבנית, אחרי הבס והפאוור־אקורדים ואחרי
+   תיקונים ידניים. הרזולוציה התת־פעימתית לא אבדה: הגבולות
+   מדויקים אחר כך מול הראיה ברמת הפריים (refineRunEdges).
+   ------------------------------------------------------------ */
+function runsFromBars(bars, duration, edits){
+  const out=[];
+  if(!bars || !bars.length) return out;
+  const push=(o)=>{
+    const last=out[out.length-1];
+    if(last && last.root===o.root && last.suf===o.suf && last.bass===o.bass
+       && last.text===o.text && Math.abs(last.t1-o.t0)<0.03){
+      last.t1=Math.max(last.t1, o.t1);
+      last.bars.push(o.bar);
+      return;
+    }
+    out.push({ root:o.root, suf:o.suf, bass:o.bass, t0:o.t0, t1:o.t1,
+               text:o.text, bars:[o.bar] });
+  };
+  bars.forEach((b,bi)=>{
+    const edited = (edits && edits.has(bi)) ? edits.get(bi) : undefined;
+    if(!b.chords || !b.chords.length){
+      push({ root:-1, suf:'', bass:undefined, t0:b.t0, t1:b.t1, text:edited, bar:bi });
+      return;
+    }
+    const n=b.chords.length, nb=b.beatsInBar||n, span=(b.t1-b.t0)||0;
+    const single = n===1;
+    b.chords.forEach((c,k)=>{
+      /* תיבות שנטענו מהיסטוריה ישנה עדיין בלי זמנים לכל אקורד —
+         שם נגזרים הזמנים מהפעימות, ואם גם הן חסרות, בחלוקה שווה. */
+      const fa = b.t0 + span*(c.beat!==undefined ? c.beat/nb : k/n);
+      const fz = b.t0 + span*(c.beat!==undefined ? Math.min(nb,(c.beat+(c.span||1)))/nb : (k+1)/n);
+      push({ root:c.root, suf:c.suf, bass:c.bass,
+             t0:(c.t0!==undefined?c.t0:fa),
+             t1:(c.t1!==undefined?c.t1:fz),
+             text:(single ? edited : undefined), bar:bi });
+    });
+  });
+  /* שום ריצה לא חופפת לקודמת ולא מתהפכת — הגנה על נתונים שנטענו
+     מבחוץ, לא רק על מה שהניתוח עצמו מייצר. */
+  for(let i=0;i<out.length;i++){
+    if(!(out[i].t1>out[i].t0)) out[i].t1=out[i].t0;
+    if(i && out[i].t0 < out[i-1].t1) out[i-1].t1 = Math.max(out[i-1].t0, out[i].t0);
+  }
+  /* בלי חורים ובלי כפילויות: קודם סוגרים פערים (פעימות שנכתבו
+     בהן "אין אקורד" בתוך תיבה נבלעות באקורד שלפניהן), ורק אז
+     ממזגים ריצות זהות — אחרת נשארים שני ריבועים צמודים עם אותו
+     שם וקו הפרדה מיותר ביניהם. */
+  for(let i=1;i<out.length;i++)
+    if(out[i].t0 > out[i-1].t1) out[i-1].t1 = out[i].t0;
+  const merged=[];
+  for(const r of out){
+    const last=merged[merged.length-1];
+    if(last && last.root===r.root && last.suf===r.suf && last.bass===r.bass
+       && last.text===r.text && Math.abs(last.t1-r.t0)<0.03){
+      last.t1=Math.max(last.t1, r.t1);
+      for(const b of r.bars) if(last.bars[last.bars.length-1]!==b) last.bars.push(b);
+      continue;
+    }
+    merged.push(r);
+  }
+  if(merged.length){
+    merged[0].t0 = Math.min(merged[0].t0, bars[0].t0);
+    const end = duration || bars[bars.length-1].t1;
+    const lastBar = bars[bars.length-1];
+    merged[merged.length-1].t1 =
+      Math.max(merged[merged.length-1].t1, Math.min(end, lastBar.t1));
+  }
+  return merged;
+}
+
+/* ------------------------------------------------------------
+   דיוק תת־פעימתי לגבולות ההחלפה
+   ------------------------------------------------------------
+   רשת הפעימות נכונה מוזיקלית אבל לא תמיד מדויקת לעין: נגנים
+   מקדימים את האקורד הבא בחצי פעימה (הקדמה), ולפעמים נכנסים
+   מעט אחרי. הזהות של האקורד כבר הוכרעה — כאן מוזז רק *קו
+   ההחלפה*, ורק בתוך חלון של פחות מחצי פעימה, לנקודה שבה הראיה
+   ברמת הפריים באמת עוברת מהאקורד היוצא לנכנס.
+   ------------------------------------------------------------ */
+function refineRunEdges(runs, logp, nFrames, fps, toff, win){
+  if(!runs || runs.length<2 || !logp || !nFrames) return runs;
+  const off=toff||0;
+  const fAt = t => clamp(Math.round((t-off)*fps), 0, nFrames-1);
+  const idxOf = r => r.root<0 ? IDX_N : chordIndex(r.root, r.suf);
+  for(let i=1;i<runs.length;i++){
+    const a=runs[i-1], b=runs[i];
+    const ia=idxOf(a), ib=idxOf(b);
+    if(ia<0 || ib<0 || ia===ib) continue;
+    const t=b.t0;
+    const lo=Math.max(a.t0+0.10, t-win), hi=Math.min(b.t1-0.10, t+win);
+    if(!(hi>lo)) continue;
+    const f0=fAt(lo), f1=fAt(hi);
+    if(f1-f0 < 2) continue;
+    /* ציון של גבול בפריים f: הכול לפניו שייך ל-a, הכול ממנו ל-b */
+    let tail=0;
+    for(let g=f0; g<=f1; g++) tail += logp[g*NCLS+ib];
+    let head=0, best=fAt(t), bestS=-Infinity, atCur=-Infinity;
+    for(let f=f0; f<=f1; f++){
+      const s=head+tail;
+      if(s>bestS){ bestS=s; best=f; }
+      if(f===fAt(t)) atCur=s;
+      head += logp[f*NCLS+ia];
+      tail -= logp[f*NCLS+ib];
+    }
+    /* זזים רק אם באמת יש שם ראיה טובה יותר, לא על רעש */
+    if(!(bestS > atCur + 0.35)) continue;
+    const nt=clamp(best/fps+off, lo, hi);
+    a.t1=nt; b.t0=nt;
+  }
+  return runs;
 }
 
 /* מוסיף היפוכים (C/E) לתיבות, לפי מה שנשמע בטווח הבס */
@@ -6416,7 +6693,7 @@ async function modelPredict(feat, nFrames, onProg, shifts){
   return logp;
 }
 
-/* בניית ריצות ותיבות מתבצעת בליבה: runsFromPath / barsFromBeatChords */
+/* בניית ריצות ותיבות מתבצעת בליבה: barsFromBeatChords -> runsFromBars */
 
 /* ============================================================
    3. ממשק
@@ -6507,6 +6784,29 @@ function barText(i, flat){
     return marks.join(' ');
   }
   return parts.join('  ');
+}
+/* אותו תוכן כמו barText, אבל כל אקורד עטוף בנפרד — כדי שאפשר
+   יהיה להאיר את האקורד שמתנגן, ולא תיבה שלמה שיש בה שניים. */
+function cxEsc(s){
+  return String(s).replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+}
+function barCellHTML(i, flat){
+  if(state.edits.has(i))
+    return `<span class="cd" data-ci="0">${cxEsc(state.edits.get(i))}</span>`;
+  const b = state.bars[i];
+  if(!b || !b.chords.length) return '<span class="cd">—</span>';
+  const parts = b.chords.map((c,k)=>
+    `<span class="cd" data-ci="${k}">${cxEsc(chordText(c,flat))}</span>`);
+  if(beatSlashOn() && b.beatsInBar>1 && b.chords[0].beat!==undefined){
+    const marks=[];
+    let ci=0;
+    for(let k=0;k<b.beatsInBar;k++){
+      if(ci<b.chords.length && b.chords[ci].beat===k) marks.push(parts[ci++]);
+      else marks.push('<i class="sl">/</i>');
+    }
+    return marks.join(' ');
+  }
+  return parts.join(' ');
 }
 function fmtTime(s){
   s=Math.max(0,s|0);
@@ -6630,7 +6930,7 @@ function renderSheet(){
       if(b && b.inferred){ cls.push('inferred'); tip=cxT("נכתב לפי מבנה השיר — במופע הזה הוא לא נשמע בבירור"); }
       if(b && b.pickup) cls.push('pickup');
       html += `<div class="${cls.join(' ')}" data-bar="${i}"${mirror} tabindex="0"${tip?` title="${tip}"`:''}>
-        ${num}<span class="ch">${barText(i,flat)}</span></div>`;
+        ${num}<span class="ch">${barCellHTML(i,flat)}</span></div>`;
     }
     html += `</div></div>`;
   });
@@ -6666,7 +6966,10 @@ function renderSheet(){
       const close = ()=>{
         const v = inp.value.trim();
         if(v) state.edits.set(idx, v); else state.edits.delete(idx);
+        /* התיקון חייב להופיע גם בציר הזמן — אותו שיר, אותם אקורדים */
+        refreshRuns();
         renderSheet();
+        if(state.view==='timeline') renderTimeline();
       };
       inp.addEventListener('blur', close);
       inp.addEventListener('keydown', e=>{
@@ -6791,7 +7094,50 @@ function chordColor(root, suf){
 }
 function runLabel(r, flat){
   if(state.runEdits.has(r.i)) return state.runEdits.get(r.i);
+  if(r.text) return r.text;                 /* תיקון שנעשה בדף האקורדים */
   return r.root<0 ? 'N.C.' : chordText(r, flat);
+}
+
+/* בונה מחדש את ריצות ציר הזמן מהתיבות הנוכחיות — כולל תיקונים
+   ידניים. נקרא גם אחרי עריכה בדף, כדי ששתי התצוגות לא ייפרדו. */
+function refreshRuns(){
+  if(!state.bars || !state.bars.length){ state.runs=[]; return; }
+  state.runs = runsFromBars(state.bars, state.duration, state.edits);
+  const A = state.an;
+  if(A && A.folded){
+    try{
+      const win = Math.min(0.35, 0.42*60/Math.max(40, state.bpm||100));
+      refineRunEdges(state.runs, A.folded, A.nFrames, A.mfps, A.toff, win);
+    }catch(err){ /* דיוק הגבולות הוא בונוס, לא תנאי */ }
+  }
+  state._nowIdx=-2;
+}
+
+/* היסט סנכרון בשניות: מפצה על השהיית פלט האודיו (בלוטות' במיוחד)
+   ועל השהיית הציור בדפדפן. חיובי = ההדגשה מקדימה את הצליל. */
+function syncLead(){
+  const el = $('sync');
+  const v = el ? parseFloat(el.value) : 0;
+  return (isFinite(v) ? v : 0)/1000;
+}
+function playTime(){
+  const p=$('player');
+  return (p ? p.currentTime : 0) + syncLead();
+}
+
+/* מוצא את הריצה המתנגנת. חיפוש בינארי — נקרא בכל פריים ציור. */
+function runAt(t){
+  const runs=state.runs;
+  if(!runs || !runs.length) return -1;
+  let lo=0, hi=runs.length-1;
+  if(t<runs[0].t0 || t>=runs[hi].t1) return -1;
+  while(lo<=hi){
+    const m=(lo+hi)>>1;
+    if(t<runs[m].t0) hi=m-1;
+    else if(t>=runs[m].t1) lo=m+1;
+    else return m;
+  }
+  return -1;
 }
 
 function renderTimeline(){
@@ -6811,14 +7157,23 @@ function renderTimeline(){
       const a=Math.max(run.t0,t0), b=Math.min(run.t1,t1);
       const L=(a-t0)/SPR*100, W=(b-a)/SPR*100;
       const txt = runLabel({...run,i}, flat);
-      html += `<div class="tlch${run.root<0?' nc':''}" data-run="${i}"
+      /* לכל ריבוע יש שם. אקורד קצר לא נמחק מהתצוגה — הוא רק
+         נכתב קטן יותר, ואם באמת אין רוחב, אנכית. מה שהיה קודם
+         (טקסט רק מעל 5% מרוחב השורה) פשוט העלים אקורדים
+         מהריבוע שלהם, בזמן ש"מתנגן" למעלה כן הראה אותם. */
+      const size = W>=6.5 ? '' : W>=4 ? ' sm' : W>=2.4 ? ' xs' : ' vert';
+      const cont = run.t0 < t0 - 1e-6 ? ' cont' : '';
+      html += `<div class="tlch${run.root<0?' nc':''}${size}${cont}" data-run="${i}"
         style="left:${L}%;width:${W}%;background:${chordColor(run.root,run.suf)}"
-        title="${txt} · ${fmtTime(run.t0)}"><span>${W>5?txt:''}</span></div>`;
+        title="${txt} · ${fmtTime(run.t0)}"><span>${txt}</span></div>`;
     });
     html += `<div class="tlhead"></div></div></div>`;
   }
   $('tl').innerHTML = html;
   drawWaves(SPR, rows);
+  /* אחרי ציור מחדש אין יותר תא מודגש — מאלצים חישוב מיידי */
+  state._nowIdx=-2; state._nowRow=-2;
+  if(state.runs && state.runs.length) updateNowPlaying(playTime());
 
   $('tl').querySelectorAll('.tltrack').forEach(tr=>{
     tr.addEventListener('click', e=>{
@@ -6832,11 +7187,21 @@ function renderTimeline(){
     el.addEventListener('dblclick', e=>{
       e.stopPropagation();
       const i=+el.dataset.run;
-      const cur=runLabel({...state.runs[i], i}, flat);
+      const run=state.runs[i];
+      const cur=runLabel({...run, i}, flat);
       const v=window.prompt(cxT("שם האקורד לקטע הזה:"), cur);
       if(v===null) return;
-      if(v.trim()) state.runEdits.set(i, v.trim()); else state.runEdits.delete(i);
+      const txt=v.trim();
+      if(txt) state.runEdits.set(i, txt); else state.runEdits.delete(i);
+      /* תיקון בציר הזמן נכתב גם לדף האקורדים, בכל תיבה שהריצה
+         הזו מכסה במלואה. שתי התצוגות הן אותו שיר — לא שתי דעות. */
+      if(run && run.bars) for(const bi of run.bars){
+        const b=state.bars[bi];
+        if(!b || !b.chords || b.chords.length>1) continue;
+        if(txt) state.edits.set(bi, txt); else state.edits.delete(bi);
+      }
       renderTimeline();
+      renderSheet();
     });
   });
 }
@@ -6866,17 +7231,17 @@ function updateNowPlaying(t){
   const runs=state.runs;
   if(!runs || !runs.length) return;
   const flat=useFlats();
-  let idx=-1;
-  for(let i=0;i<runs.length;i++){ if(t>=runs[i].t0 && t<runs[i].t1){ idx=i; break; } }
+  const idx=runAt(t);
   if(idx!==state._nowIdx){
     state._nowIdx=idx;
     $('nowCh').textContent  = idx>=0 ? runLabel({...runs[idx],i:idx}, flat) : '—';
     $('nextCh').textContent = (idx>=0 && runs[idx+1]) ? runLabel({...runs[idx+1],i:idx+1}, flat) : '—';
-    $('tl').querySelector('.tlch.on')?.classList.remove('on');
+    $('tl').querySelectorAll('.tlch.on').forEach(e=>e.classList.remove('on'));
     if(idx>=0) $('tl').querySelectorAll(`.tlch[data-run="${idx}"]`).forEach(e=>e.classList.add('on'));
   }
   const SPR=parseFloat($('zoom').value)||16;
-  const row=Math.floor(t/SPR);
+  const rows=$('tl').children.length;
+  const row=clamp(Math.floor(t/SPR), 0, Math.max(0,rows-1));
   if(row!==state._nowRow){
     state._nowRow=row;
     $('tl').querySelector('.tlrow.live')?.classList.remove('live');
@@ -6884,7 +7249,7 @@ function updateNowPlaying(t){
     if(el){ el.classList.add('live'); if(!$('player').paused) el.scrollIntoView({block:'nearest',behavior:'smooth'}); }
   }
   const live=$('tl').querySelector('.tlrow.live .tlhead');
-  if(live) live.style.left = ((t - state._nowRow*SPR)/SPR*100)+'%';
+  if(live) live.style.left = clamp((t - row*SPR)/SPR*100, 0, 100)+'%';
 }
 
 function setView(v){
@@ -6897,26 +7262,57 @@ function setView(v){
   if(tl) renderTimeline();
 }
 
-/* --- נגן: הדגשת התיבה המתנגנת --- */
+/* --- נגן: הדגשת התיבה, ובתוכה האקורד, שמתנגנים ממש עכשיו ---
+   ------------------------------------------------------------
+   קודם לכן הודגשה תיבה שלמה. בתיבה עם שני אקורדים זה אומר
+   שההדגשה לא זזה כשהאקורד מתחלף — בדיוק התלונה "האקורדים לא
+   עוברים בזמן". עכשיו לכל אקורד יש זמן התחלה וסיום משלו, ומה
+   שמאיר הוא האקורד עצמו. */
+function barAt(t){
+  const bars=state.bars;
+  if(!bars || !bars.length) return -1;
+  let lo=0, hi=bars.length-1;
+  if(t<bars[0].t0 || t>=bars[hi].t1) return -1;
+  while(lo<=hi){
+    const m=(lo+hi)>>1;
+    if(t<bars[m].t0) hi=m-1;
+    else if(t>=bars[m].t1) lo=m+1;
+    else return m;
+  }
+  return -1;
+}
+function chordAt(bar, t){
+  if(!bar || !bar.chords || !bar.chords.length) return -1;
+  for(let k=0;k<bar.chords.length;k++){
+    const c=bar.chords[k];
+    const a=c.t0!==undefined?c.t0:bar.t0, z=c.t1!==undefined?c.t1:bar.t1;
+    if(t>=a && t<z) return k;
+  }
+  return t>=bar.t1 ? bar.chords.length-1 : 0;
+}
 function trackPlayback(){
   const player=$('player'), head=$('playhead'), tape=$('tape');
-  let last=-1;
+  let lastBar=-1, lastCh=-1;
   const tick=()=>{
-    const t=player.currentTime, dur=state.duration||player.duration||1;
-    head.style.left = (t/dur*tape.clientWidth)+'px';
+    const t=playTime(), dur=state.duration||player.duration||1;
+    head.style.left = (clamp(t/dur,0,1)*tape.clientWidth)+'px';
     if(state.view==='timeline') updateNowPlaying(t);
-    let idx=-1;
-    for(let i=0;i<state.bars.length;i++){
-      if(t>=state.bars[i].t0 && t<state.bars[i].t1){ idx=i; break; }
-    }
-    if(idx!==last){
-      $('sheet').querySelector('.cellbar.playing')?.classList.remove('playing');
+    const idx=barAt(t);
+    const ci=idx>=0 ? chordAt(state.bars[idx], t) : -1;
+    if(idx!==lastBar || ci!==lastCh){
+      if(idx!==lastBar){
+        $('sheet').querySelectorAll('.cellbar.playing').forEach(e=>e.classList.remove('playing'));
+      }
+      $('sheet').querySelectorAll('.cd.on').forEach(e=>e.classList.remove('on'));
       if(idx>=0){
         const cell = $('sheet').querySelector(`.cellbar[data-bar="${idx}"]`)
                   || $('sheet').querySelector(`.cellbar[data-mirror~="${idx}"]`);
-        cell?.classList.add('playing');
+        if(cell){
+          cell.classList.add('playing');
+          if(ci>=0) cell.querySelector(`.cd[data-ci="${ci}"]`)?.classList.add('on');
+        }
       }
-      last=idx;
+      lastBar=idx; lastCh=ci;
     }
     requestAnimationFrame(tick);
   };
@@ -7076,9 +7472,6 @@ function rebuild(){
   const bars = barsFromBeatChords(path, conf, beats, bpb, down, maxPer, A.duration);
   if(bars.length < 2) return false;
 
-  /* 5. היפוכים (C/E) מטווח הבס */
-  if($('slash') && $('slash').checked) annotateBass(bars, A.bass, A.cfps, A.toff);
-
   /* 6. מבנה */
   const energy = rmsPerBar(A.sig, A.SR, bars);
   const secs = segment(bars, energy, A, parseFloat($('sens').value));
@@ -7099,11 +7492,14 @@ function rebuild(){
   /* פאוור-אקורדים מסומנים *אחרי* ההשלמה המבנית, לא לפניה: ההשלמה
      מפענחת כל מקטע מחדש במשותף וכותבת את האקורדים שוב, ולכן סימון
      מוקדם יותר פשוט נדרס. */
-  annotatePower(bars, A.nnChroma, A.cfps, A.toff, {soloLow:A.soloLow});
+  /* הזמנים נחתמים מחדש: ההשלמה המבנית והקונצנזוס מעתיקים אקורדים
+     בין מופעים, ואיתם הגיעו זמנים של תיבה אחרת. */
+  stampChordTimes(bars, beats, A.duration);
 
-  /* 8. ציר זמן ברזולוציית פריים — לא כבול לרשת התיבות */
-  const framePath = viterbiFast(folded, A.nFrames, VIT.frameSelf, bias, 1.0, VIT.moveDiv);
-  state.runs = runsFromPath(framePath, A.mfps, 0.30, A.toff);
+  /* 5. היפוכים (C/E) מטווח הבס — גם הם *אחרי* ההשלמה המבנית,
+        אחרת הם נדרסים יחד עם האקורדים שנכתבו מחדש. */
+  if($('slash') && $('slash').checked) annotateBass(bars, A.bass, A.cfps, A.toff);
+  annotatePower(bars, A.nnChroma, A.cfps, A.toff, {soloLow:A.soloLow});
 
   if(state.bars && state.bars.length) state.edits = new Map();
   state.bars = bars;
@@ -7114,6 +7510,11 @@ function rebuild(){
   state.fixedBars = fixedBars;
   state.runEdits = new Map();
   state._nowIdx=-2; state._nowRow=-2;
+
+  /* 8. ציר הזמן נבנה מאותן תיבות — לא מפענוח שני ונפרד.
+        כך אי אפשר יותר לקבל בציר הזמן אקורד שלא כתוב בדף. */
+  A.folded = folded;                 // נשמר כדי לדייק גבולות גם אחרי עריכה
+  refreshRuns();
 
   /* 9. קאפו — לפי האקורדים שיצאו בפועל */
   const cw = chordWeightMap(bars);
@@ -7621,7 +8022,7 @@ window.__loadSavedAnalysis = function(row){
   state.secs = (d.secs && d.secs.length)
     ? d.secs.map(x=>({name:x.name, num:x.num||0, from:x.from, to:x.to, c:x.c||0}))
     : [{ name:cxT("מקטע א"), num:0, from:0, to: state.bars.length, c:0 }];
-  state.runs = [];
+  state.runs = runsFromBars(state.bars, state.duration, state.edits);
   state.capo = 0; state.capoApply = false; state.capoAuto = true;
   state.capoOpts = state.key
     ? capoOptions(chordWeightMap(state.bars), (state.key.root||0)%12, 7) : null;
@@ -7685,6 +8086,37 @@ document.querySelectorAll('[data-export]').forEach(b=>
 $('vTl').addEventListener('click', ()=>setView('timeline'));
 $('vSheet').addEventListener('click', ()=>setView('sheet'));
 $('zoom').addEventListener('change', ()=>{ state._nowRow=-2; renderTimeline(); });
+/* ------------------------------------------------------------
+   היסט סנכרון
+   ------------------------------------------------------------
+   גם כשהאקורדים והזמנים נכונים לגמרי, מה שהעין רואה יכול להקדים
+   או לפגר אחרי מה שהאוזן שומעת: אוזניות בלוטות' מוסיפות 100-300
+   מילישניות של השהיה, וגם רמקול חיצוני מוסיף משהו. זה לא באג
+   בזיהוי ואי אפשר לתקן אותו בניתוח — אבל אפשר לתת למשתמש להזיז
+   את ההדגשה עד שהיא נופלת על הצליל. הערך נשמר בדפדפן, כי מי
+   שמנגן עם אותן אוזניות ירצה אותו גם מחר. */
+(function(){
+  const sl=$('sync'), out=$('syncVal'), rst=$('syncReset');
+  if(!sl) return;
+  const paint=()=>{
+    const v=parseInt(sl.value,10)||0;
+    if(out) out.textContent=(v>0?'+':'')+v+' ms';
+    state._nowIdx=-2;
+  };
+  try{
+    const saved=parseInt(localStorage.getItem('cx_sync'),10);
+    if(isFinite(saved)) sl.value=clamp(saved,-400,400);
+  }catch(e){}
+  paint();
+  sl.addEventListener('input', paint);
+  sl.addEventListener('change', ()=>{
+    try{ localStorage.setItem('cx_sync', sl.value); }catch(e){}
+  });
+  if(rst) rst.addEventListener('click', ()=>{
+    sl.value=0; paint();
+    try{ localStorage.setItem('cx_sync','0'); }catch(e){}
+  });
+})();
 /* הדפסה ושמירה כ-PDF — שני כפתורים, ובכוונה.
    ------------------------------------------------------------
    בדפדפן שתי הפעולות עוברות דרך אותו חלון הדפסה, ולכן ההבדל אינו
