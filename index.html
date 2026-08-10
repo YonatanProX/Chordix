@@ -4376,7 +4376,411 @@ function segRoleDynamics(segs, bars, A){
   });
 }
 
-function classifyRoles(segs, dyn){
+/* ============================================================
+   זהות מקטעים — מי הוא מי, ומתי הוא חוזר
+   ------------------------------------------------------------
+   קודם לכן שאלת "האם שני המקטעים האלה הם אותו מקטע" הוכרעה
+   בהשוואת מרכזי־כובד במרחב השיכון הספקטרלי, בסף קבוע ובמעבר
+   חמדני יחיד. שלוש בעיות נבעו מזה, וכולן נראות למשתמש כאותה
+   תקלה — "הוא לא מזהה שהפזמון חזר":
+
+   1. השיכון הספקטרלי נבנה על גרף שמעורבב בו רכיב *רציפות בזמן*
+      (seqW). זה נחוץ כדי למצוא גבולות, אבל הוא מקודד גם את
+      *מיקום* המקטע בשיר. שני פזמונים רחוקים זה מזה מקבלים לכן
+      מרכזי כובד שונים — בדיוק ההפך ממה שצריך לזיהוי חזרה.
+   2. סף קבוע יחיד. פזמון שדמיונו 0.51 מול סף 0.52 הופך למקטע
+      חדש, ומכאן והלאה כל שכבת התפקידים רואה שני אשכולות בני
+      מופע אחד — שמקבלים קנס כבד על היחידאות שלהם.
+   3. קישור חמדני בלי סגירה טרנזיטיבית: A~B ו-B~C בלי A~C מפרק
+      את השלישייה במקום לחבר אותה.
+
+   המנגנון כאן שואל את השאלה ישירות, על מה שבאמת מגדיר מקטע:
+   רצף האקורדים שלו, פרופיל הכרומה, הגוון והעוצמה. ההשוואה
+   מתבצעת בכל 12 הגלגולים (פזמון אחרון שעולה בטון הוא אותו
+   פזמון), האשכול נבנה בקישור־ממוצע עם סגירה טרנזיטיבית, והסף
+   נבחר לפי איכות החלוקה שהוא מייצר ולא נקבע מראש.
+   ============================================================ */
+
+/* גלגול אינדקס אקורד ב-t חצאי טונים */
+function shiftChordIdx(idx, t){
+  if(idx<0 || idx>=NCH) return idx;
+  const r=(idx/NQ)|0, q=idx%NQ;
+  return ((r+t)%12)*NQ + q;
+}
+
+/* רצף האקורדים של מקטע: שני מדגמים לתיבה (תחילה וסוף), כדי
+   שהחלפה בתוך תיבה תיספר גם היא. */
+function segChordSeq(bars, s){
+  const out=[];
+  for(let i=s.from;i<s.to;i++){
+    const b=bars[i];
+    if(!b || !b.chords || !b.chords.length){ out.push([-1,-1]); continue; }
+    const a=b.chords[0], z=b.chords[b.chords.length-1];
+    out.push([chordIndex(a.root,a.suf), chordIndex(z.root,z.suf)]);
+  }
+  return out;
+}
+
+/* דמיון רצפים בגלגול נתון ובהיסט נתון. שני הרצפים נדגמים מחדש
+   לאורך משותף, כך שגם מופע שנמתח או נקטע בתיבה מושווה נכון.
+
+   ההיסט (d) קיים כי גבולות מקטעים כמעט אף פעם לא מדויקים לתיבה.
+   מספיק שגבול אחד זז בתיבה כדי שרצף האקורדים "יתגלגל" ושני
+   מופעים של אותו פזמון ייראו זרים לגמרי. ההיסט מוגבל לשתי
+   יחידות דגימה ונקנס — הוא מיישר רעידת גבול, לא מאפשר להתאים
+   התקדמות אחת לגלגול מעגלי של אחרת. */
+function seqScoreAt(a, b, t, d){
+  const L=Math.max(a.length, b.length);
+  if(!L) return 0;
+  let s=0;
+  for(let k=0;k<L;k++){
+    const x=a[Math.min(a.length-1, (k*a.length/L)|0)];
+    const kb=Math.max(0, Math.min(L-1, k+d));
+    const y=b[Math.min(b.length-1, (kb*b.length/L)|0)];
+    s += 0.68*chordSim(x[0], shiftChordIdx(y[0],t))
+       + 0.32*chordSim(x[1], shiftChordIdx(y[1],t));
+  }
+  return s/L;
+}
+/* הקנס על גלגול שאינו אפס שומר על העדפה לאותו סולם, בלי לפסול
+   מודולציה — שני פזמונים בהפרש טון הם עדיין אותו פזמון. */
+function seqScoreTI(a, b){
+  let best=-Infinity, shift=0;
+  for(let t=0;t<12;t++){
+    const tp = t===0 ? 0 : 0.07;
+    for(let d=-2;d<=2;d++){
+      const x=seqScoreAt(a,b,t,d) - tp - Math.abs(d)*0.02;
+      if(x>best){ best=x; shift=t; }
+    }
+  }
+  return { score:best, shift };
+}
+
+function rot12(v, t){
+  const o=new Float64Array(12);
+  for(let k=0;k<12;k++) o[(k+t)%12]=v[k];
+  return o;
+}
+
+/* תיאור מלא לכל מקטע. העוצמה והפעילות מגיעות מ-barFeatures שכבר
+   מתוקננות z על פני השיר, ולכן ההשוואה ביניהן היא יחסית לשיר
+   הזה — לא לסף מוחלט כלשהו. */
+function segDescriptors(segs, bars, A){
+  const F = (A && A.chroma && A.tim) ? barFeatures(bars, A) : null;
+  const R = segs._R;
+  const nCep = (F && F[0] && F[0].cp) ? F[0].cp.length : 0;
+  const out = segs.map(s=>{
+    const n=Math.max(1, s.to-s.from);
+    const ch=new Float64Array(12), tm=new Float64Array(8+nCep);
+    let e=0, act=0, dens=0, c=0;
+    for(let i=s.from;i<s.to;i++){
+      const f=F?F[i]:null;
+      if(f){
+        for(let k=0;k<12;k++) ch[k]+=f.ch[k];
+        for(let k=0;k<8;k++)  tm[k]+=f.tm[k];
+        for(let k=0;k<nCep;k++) tm[8+k]+=f.cp[k];
+        e+=f.e; act+=f.act;
+      }
+      const b=bars[i];
+      dens += (b && b.chords && b.chords.length) ? b.chords.length : 1;
+      c++;
+    }
+    c=Math.max(1,c);
+    for(let k=0;k<12;k++) ch[k]/=c;
+    for(let k=0;k<tm.length;k++) tm[k]/=c;
+    /* מרכז הכובד של המקטע בשיכון הספקטרלי, כשהוא זמין */
+    let emb=null;
+    if(R && R.length){
+      const m=R[0].length;
+      emb=new Float64Array(m);
+      let cc=0;
+      for(let i=s.from;i<s.to;i++){ const r=R[i]; if(!r) continue;
+        for(let k=0;k<m;k++) emb[k]+=r[k]; cc++; }
+      if(cc){ let q=0; for(let k=0;k<m;k++){ emb[k]/=cc; q+=emb[k]*emb[k]; }
+              q=Math.sqrt(q)||1; for(let k=0;k<m;k++) emb[k]/=q; }
+    }
+    return { ch, tm, emb, e:e/c, act:act/c, dens:dens/c, len:n,
+             seq:segChordSeq(bars,s), from:s.from, to:s.to };
+  });
+  /* מירכוז הכרומה על פני השיר. בלי זה כל שני וקטורי כרומה
+     דומים זה לזה: כולם אי־שליליים, ולכן הקוסינוס ביניהם גבוה
+     גם כשאין שום קשר — וכל זוג מקטעים בשיר מקבל "דמיון בסיס"
+     מנופח שמטשטש את ההבדל בין דומה באמת לבין זר. */
+  if(out.length){
+    const mu=new Float64Array(12);
+    for(const d of out) for(let k=0;k<12;k++) mu[k]+=d.ch[k];
+    for(let k=0;k<12;k++) mu[k]/=out.length;
+    for(const d of out) for(let k=0;k<12;k++) d.ch[k]-=mu[k];
+  }
+  return out;
+}
+
+/* מטריצת דמיון בין מקטעים. ארבעה מקורות, כל אחד עונה על שאלה
+   אחרת: האקורדים ("אותה התקדמות?"), הכרומה ("אותו צליל?"),
+   הגוון ("אותו עיבוד?") והעוצמה ("אותה עוצמה?"). האקורדים
+   לבדם היו ממזגים בית ופזמון שחולקים אותה לולאה — וזה רוב
+   שירי הפופ; הגוון והעוצמה הם מה שמפריד ביניהם. */
+function segAffinity(D){
+  const N=D.length;
+  const M=new Float64Array(N*N);
+  for(let i=0;i<N;i++) M[i*N+i]=1;
+  for(let i=0;i<N;i++) for(let j=i+1;j<N;j++){
+    const { score, shift } = seqScoreTI(D[i].seq, D[j].seq);
+    /* כל שלושת הערוצים ממופים כך שזרות מוחלטת שווה 0, ולא חצי.
+       ------------------------------------------------------------
+       זו הייתה תקלה עדינה ויקרה: קוסינוס בין וקטורים שאין ביניהם
+       קשר הוא 0, ומיפוי (1+cos)/2 הפך אותו ל-0.5. כך *כל* זוג
+       מקטעים בשיר קיבל דמיון בסיס של חצי, הפער בין "אותו מקטע"
+       ל"מקטע זר" נדחס, ואשכול בקישור־ממוצע — שכל כולו השוואת
+       פערים — נשאר בלי מה להיאחז בו. גשר אקראי יצא דומה לבית
+       כמעט כמו שבית דומה לעצמו.
+
+       גם לרצף האקורדים יש רצפה כזאת: chordSim נותן ניקוד חלקי
+       על צלילים משותפים, ולכן שתי התקדמויות זרות לגמרי עדיין
+       מגיעות ל-0.35 בערך. גם היא מוסרת. */
+    const seqN = Math.max(0, (score-0.35)/0.65);
+    const chr  = Math.max(0, cosine(D[i].ch, rot12(D[j].ch, shift)));
+    const tim  = Math.max(0, cosine(D[i].tm, D[j].tm));
+    const eDif = Math.min(1, Math.abs(D[i].e - D[j].e)/1.6);
+    const lr   = Math.min(D[i].len,D[j].len)/Math.max(D[i].len,D[j].len);
+    /* אורכים רחוקים מדי הם כמעט תמיד מקטעים שונים — אבל יחס של
+       1:2 בדיוק הוא לרוב אותו מקטע שנוגן פעמיים, ולכן מקבל הנחה. */
+    const dbl = Math.abs(lr-0.5)<0.08 ? 0.85 : lr;
+    const lenF = 0.55 + 0.45*Math.max(lr, dbl);
+    /* העוצמה נכנסת כקנס ולא כתרומה: "שתי הרצועות באותה עוצמה"
+       הוא לא סימן שהן אותו מקטע, אבל פער עוצמה גדול כן סימן
+       מובהק שהן אינן. */
+    /* הערוץ הרביעי: השיכון הספקטרלי. הוא לא מחליף את השלושה
+       האחרים ולא מוחלף על ידם — הוא רואה חזרה שנבנתה על גרף
+       הדמיון של כל התיבות בשיר, כלומר עדות מסוג אחר לגמרי. */
+    const emb = (D[i].emb && D[j].emb)
+      ? Math.max(0, dot(D[i].emb, D[j].emb)) : null;
+    /* המשקלים נבחרו בסריקה מול מאגר שירים סינתטי, ואומתו על
+       זרעים שלא השתתפו בסריקה. השיכון מקבל את המשקל הגדול
+       ביותר כי הוא הערוץ החזק ביותר בפועל — אבל לבדו הוא מפספס
+       בדיוק את מה שהמשתמש מתלונן עליו (פזמון שעולה בטון, חזרה
+       על אותה התקדמות בעיבוד אחר), ושם נכנסים השלושה האחרים. */
+    const core = emb===null
+      ? (0.44*seqN + 0.24*chr + 0.28*tim)
+      : (0.25*seqN + 0.10*chr + 0.15*tim + 0.50*emb);
+    const s = Math.max(0, core * lenF - 0.16*eDif);
+    M[i*N+j]=M[j*N+i]=s;
+  }
+  return M;
+}
+
+/* קישור ממוצע: הדמיון בין שני אשכולות הוא ממוצע כל הזוגות
+   ביניהם. זו הסגירה הטרנזיטיבית שהייתה חסרה. */
+function linkAvg(a, b, M, N){
+  let s=0;
+  for(const i of a) for(const j of b) s+=M[i*N+j];
+  return s/(a.length*b.length);
+}
+function agglomerate(M, N, thresh){
+  const members=[]; for(let i=0;i<N;i++) members.push([i]);
+  const alive=new Set(members.keys());
+  for(;;){
+    let bi=-1, bj=-1, bs=thresh;
+    for(const i of alive) for(const j of alive){
+      if(j<=i) continue;
+      const s=linkAvg(members[i], members[j], M, N);
+      if(s>bs){ bs=s; bi=i; bj=j; }
+    }
+    if(bi<0) break;
+    members[bi]=members[bi].concat(members[bj]);
+    members[bj]=[];
+    alive.delete(bj);
+  }
+  const order=[...alive].sort((a,b)=>Math.min(...members[a])-Math.min(...members[b]));
+  const lab=new Array(N).fill(0);
+  order.forEach((g,c)=>{ for(const m of members[g]) lab[m]=c; });
+  return lab;
+}
+
+/* איכות חלוקה. לא סף אחד "נכון" אלא החלוקה שמייצרת מבנה
+   שיר סביר. האיבר המכריע הוא *הידוק*: כמה דומים זה לזה מקטעים
+   שהוכרזו זהים, מול כמה דומים מקטעים שהוכרזו שונים. הוא נמדד
+   גם בממוצע וגם בקשר החלש ביותר בכל אשכול — כי מספיק חבר אחד
+   זר כדי שאשכול יהיה שגוי, וממוצע לבדו מסתיר בדיוק את זה.
+
+   שאר האיברים הם עדיפויות רכות בלבד, ובמשקל נמוך: בגרסה
+   ראשונה של הפונקציה הזאת הם היו כבדים מדי, והתוצאה הייתה
+   שאיחוד הכול לשני אשכולות ענקיים *ניצח* את החלוקה הנכונה. */
+function partitionScore(lab, M, segs, N){
+  const groups=new Map();
+  lab.forEach((c,i)=>{ if(!groups.has(c)) groups.set(c,[]); groups.get(c).push(i); });
+  const K=groups.size;
+  if(K<1) return -Infinity;
+
+  let wSum=0, wN=0, minSum=0, minN=0;
+  for(const idx of groups.values()){
+    if(idx.length<2) continue;
+    let lo=Infinity;
+    for(let a=0;a<idx.length;a++) for(let b=a+1;b<idx.length;b++){
+      const v=M[idx[a]*N+idx[b]];
+      wSum+=v; wN++;
+      if(v<lo) lo=v;
+    }
+    minSum+=lo; minN++;
+  }
+  let bSum=0, bN=0;
+  for(let i=0;i<N;i++) for(let j=i+1;j<N;j++)
+    if(lab[i]!==lab[j]){ bSum+=M[i*N+j]; bN++; }
+
+  const meanW = wN ? wSum/wN : 0;
+  const minW  = minN ? minSum/minN : 0;
+  const meanB = bN ? bSum/bN : 0;
+  /* חלוקה שכולה יחידאים היא המקרה המנוון: אין בה אף זוג פנימי,
+     ולכן "ההידוק" שלה מושלם מבחינה טכנית ולגמרי חסר משמעות.
+     בלי השורה הזאת היא מנצחת את החלוקה הנכונה בשירים קצרים —
+     וזה בדיוק מה שקרה: שיר V-C-V-C-C יצא חמישה מקטעים נפרדים,
+     בלי שום חזרה מזוהה. */
+  const tight = wN ? 0.5*meanW + 0.5*minW : meanB;
+  const sep   = bN ? tight - meanB : 0;
+
+  const total=segs.reduce((a,s)=>a+(s.to-s.from),0)||1;
+  let maxCover=0, repeated=0, singleCover=0;
+  for(const idx of groups.values()){
+    const cov=idx.reduce((a,i)=>a+(segs[i].to-segs[i].from),0)/total;
+    maxCover=Math.max(maxCover,cov);
+    if(idx.length>=2) repeated+=cov; else singleCover+=cov;
+  }
+  return 2.00*sep
+       + 0.20*repeated
+       - 0.90*Math.max(0, maxCover-0.62)      // אשכול שבלע את השיר
+       - 0.45*singleCover                     // מבנה שכולו מקטעים חד־פעמיים
+       - 0.06*Math.abs(K-4);                  // עדיפות רכה ל-3-5 סוגי מקטע
+}
+
+/* מקטע שאורכו כפול מהאורך האופייני לאשכול שלו הוא כמעט תמיד
+   שני מופעים שנבלעו זה בזה — פזמון כפול בסוף, בית שחוזר ברצף.
+   פיצול שלו הוא בדיוק מה שהמשתמש מצפה לראות: "פזמון 3, פזמון 4"
+   ולא בלוק ארוך אחד. */
+function splitDoubledSegs(segs, lab){
+  const byC=new Map();
+  segs.forEach((s,i)=>{ if(!byC.has(lab[i])) byC.set(lab[i],[]); byC.get(lab[i]).push(i); });
+  const out=[];
+  segs.forEach((s,i)=>{
+    const idx=byC.get(lab[i])||[i];
+    const len=s.to-s.from;
+    const lens=idx.map(j=>segs[j].to-segs[j].from).sort((a,b)=>a-b);
+    /* האורך הבסיסי הוא החציון ולא המינימום: אשכול שנכנס אליו
+       בטעות מקטע קצר אחד לא יגרום לפצל את כל השאר לחצי. */
+    const base=lens[lens.length>>1];
+    const atBase=lens.filter(L=>Math.abs(L-base)<=1).length;
+    const k=Math.round(len/base);
+    if(idx.length>=2 && atBase>=2 && base>=4 && k>=2 &&
+       Math.abs(len-k*base)<=1 && len>=2*base-1){
+      for(let q=0;q<k;q++){
+        const a=s.from+Math.round(q*len/k), z=s.from+Math.round((q+1)*len/k);
+        if(z>a) out.push({...s, from:a, to:z});
+      }
+    } else out.push({...s});
+  });
+  return out;
+}
+
+/* קובע לכל מקטע את מספר האשכול שלו (s.c). הסף נסרק, ולא נקבע. */
+function clusterSegments(segs, bars, A){
+  const N=segs.length;
+  if(N<2){ segs.forEach(s=>s.c=0); return segs; }
+  let D=segDescriptors(segs, bars, A);
+  let M=segAffinity(D);
+  /* הספים נסרקים ככמותונים של ההתפלגות בפועל, לא כמספרים
+     מוחלטים. סריקה בערכים קבועים תלויה בסולם של segAffinity,
+     ומספיק לשנות משקל אחד בנוסחה כדי שהיא תפספס את כל התחום
+     המעניין — וזה בדיוק מה שקרה כאן פעם אחת: אחרי שהערוצים
+     מופו מחדש, כל הספים היו מעל הדמיון האמיתי בין מופעים, ושום
+     דבר לא התמזג. כמותונים מסתגלים לשיר ולנוסחה גם יחד. */
+  const offDiag=[];
+  for(let i=0;i<N;i++) for(let j=i+1;j<N;j++) offDiag.push(M[i*N+j]);
+  offDiag.sort((a,b)=>a-b);
+  const qAt = q => offDiag[clamp(Math.round(q*(offDiag.length-1)), 0, offDiag.length-1)];
+  const cand=[];
+  for(let q=0.20; q<=0.96001; q+=0.02){
+    const v=qAt(q);
+    if(!cand.length || v>cand[cand.length-1]+1e-6) cand.push(v);
+  }
+  let best=null, bestTh=cand[Math.floor(cand.length/2)]||0.5, bs=-Infinity;
+  for(const th of cand){
+    const lab=agglomerate(M, N, th);
+    const sc=partitionScore(lab, M, segs, N);
+    if(sc>bs){ bs=sc; best=lab; bestTh=th; }
+  }
+  if(!best) best=agglomerate(M, N, bestTh);
+
+  /* הזדמנות שנייה ליחידאים: מקטע שנשאר לבדו אבל דומה מאוד
+     לאשכול קיים מצטרף אליו. זה המקרה של הפזמון האחרון, שהעיבוד
+     בו עשיר יותר וההשוואה הגלובלית פספסה אותו בשערורית אחוז.
+
+     הסף כאן חייב להיות גבוה, ולא רק "מעל סף האשכול": לגשר,
+     לאינטרו ולסולו *מותר* להיות חד־פעמיים, וזה בדיוק מה שהם.
+     המבחן הוא יחסי — היחידאי צריך להיות קרוב לאשכול כמעט כמו
+     שחבריו קרובים זה לזה. גשר שדומה 0.67 לבית שחבריו דומים
+     0.99 זה לזה איננו בית. */
+  const groups=()=>{
+    const g=new Map();
+    best.forEach((c,i)=>{ if(!g.has(c)) g.set(c,[]); g.get(c).push(i); });
+    return g;
+  };
+  let g=groups();
+  const tightOf = idx => {
+    if(idx.length<2) return null;
+    let lo=Infinity;
+    for(let a=0;a<idx.length;a++) for(let b=a+1;b<idx.length;b++)
+      lo=Math.min(lo, M[idx[a]*N+idx[b]]);
+    return lo;
+  };
+  for(const [c,idx] of g){
+    if(idx.length>1) continue;
+    const i=idx[0];
+    let tc=-1, ts=-Infinity, tIdx=null;
+    for(const [c2,idx2] of g){
+      if(c2===c || !idx2.length) continue;
+      const s=linkAvg([i], idx2, M, N);
+      if(s>ts){ ts=s; tc=c2; tIdx=idx2; }
+    }
+    if(tc<0) continue;
+    const tight=tightOf(tIdx);
+    const bar = tight===null ? bestTh-0.04
+                             : Math.max(bestTh-0.04, tight-0.12);
+    if(ts >= bar) best[i]=tc;
+  }
+
+  /* מקטעים כפולים מפוצלים, ואז מאשכלים מחדש על החלוקה החדשה */
+  const split=splitDoubledSegs(segs, best);
+  if(split.length!==segs.length){
+    segs.length=0;
+    for(const s of split) segs.push(s);
+    D=segDescriptors(segs, bars, A);
+    M=segAffinity(D);
+    const N2=segs.length;
+    const off2=[];
+    for(let i=0;i<N2;i++) for(let j=i+1;j<N2;j++) off2.push(M[i*N2+j]);
+    off2.sort((a,b)=>a-b);
+    let l2=null, s2=-Infinity;
+    for(let q=0.20; q<=0.96001; q+=0.02){
+      const th=off2[clamp(Math.round(q*(off2.length-1)),0,off2.length-1)];
+      const lab=agglomerate(M, N2, th);
+      const sc=partitionScore(lab, M, segs, N2);
+      if(sc>s2){ s2=sc; l2=lab; }
+    }
+    best=l2 || agglomerate(M, N2, bestTh);
+  }
+
+  segs.forEach((s,i)=>s.c=best[i]);
+  /* המטריצה נשמרת לשכבת התפקידים — "כמה זהה המקטע לעצמו בכל
+     מופע" הוא אחד הסימנים הטובים ביותר לפזמון, ואין טעם לחשב
+     אותו פעמיים. */
+  Object.defineProperty(segs, '_aff', { value:{M, D, N:segs.length},
+                                        enumerable:false, configurable:true, writable:true });
+  return segs;
+}
+
+/* ============================================================
+   תפקידים: איך קוראים למקטע
+   ============================================================ */
+function classifyRoles(segs, dyn, aff){
   const N = segs.length;
   if(!N) return [];
   if(N === 1) return [RID.VERSE];
@@ -4391,11 +4795,34 @@ function classifyRoles(segs, dyn){
   /* ---- מאפייני אשכול ---- */
   const cl = new Map();
   segs.forEach((s,i)=>{ if(!cl.has(s.c)) cl.set(s.c,[]); cl.get(s.c).push(i); });
+
+  /* עד איזה מקטע השיר "נגמר": מקטע אחרון קצר ושקט הוא סיום,
+     ומה שלפניו הוא הסגירה האמיתית של השיר. */
+  let lastMain = N-1;
+  while(lastMain>0 && dyn[lastMain].bars < medBars*0.6) lastMain--;
+
+  /* עד כמה האשכול זהה לעצמו בין מופע למופע. פזמון נשמע בכל פעם
+     כמעט אותו דבר — אותה שירה, אותו עיבוד, אותן מילים. בבתים
+     המילים והמלודיה מתחלפים, ולכן הם דומים לעצמם פחות. זה סימן
+     חזק שלא נמדד כאן קודם. */
+  const M = aff && aff.M, AN = aff && aff.N;
+  const selfSimOf = idx => {
+    if(!M || AN!==N || idx.length<2) return null;
+    let s=0, c=0;
+    for(let a=0;a<idx.length;a++) for(let b=a+1;b<idx.length;b++){ s+=M[idx[a]*N+idx[b]]; c++; }
+    return c ? s/c : null;
+  };
+  const ssRaw = [];
+  for(const [,idx] of cl){ const v=selfSimOf(idx); if(v!==null) ssRaw.push(v); }
+  const ssLo = ssRaw.length ? Math.min(...ssRaw) : 0;
+  const ssHi = ssRaw.length ? Math.max(...ssRaw) : 1;
+
   const stat = new Map();
   for(const [c, idx] of cl){
     const mean = f => idx.reduce((x,i)=>x+f(i),0)/idx.length;
     let dbl=0;
     for(const i of idx) if(segs[i+1] && segs[i+1].c===c) dbl++;
+    const ss = selfSimOf(idx);
     stat.set(c, {
       c, idx, count: idx.length,
       e: mean(i=>eN[i]), a: mean(i=>aN[i]), d: mean(i=>dN[i]),
@@ -4405,16 +4832,24 @@ function classifyRoles(segs, dyn){
       posMean: mean(i=>tpos[i]),
       late: idx.filter(i=>tpos[i]>0.42).length/idx.length,
       dbl: dbl/idx.length,
-      rep: Math.min(1,(idx.length-1)/2)
+      rep: Math.min(1,(idx.length-1)/2),
+      selfSim: ss===null ? 0.5 : (ssHi>ssLo ? (ss-ssLo)/(ssHi-ssLo) : 0.5),
+      closes: idx.includes(lastMain) ? 1 : 0
     });
   }
 
   const nextOf = i => segs[i+1] ? segs[i+1].c : -1;
   const prevOf = i => segs[i-1] ? segs[i-1].c : -1;
 
-  /* ---- 1. פזמון: הדבר החזק שחוזר ---- */
+  /* ---- 1. פזמון: הדבר החזק שחוזר, נשמע אותו דבר בכל פעם,
+          וסוגר את השיר ----
+     שני איברים חדשים כאן. selfSim מבדיל פזמון מבית כששניהם
+     חוזרים באותה תדירות ובאותה עוצמה. closes תופס את העובדה
+     שכמעט כל שיר פופ נגמר בפזמון — סימן פשוט, חזק, ובלתי תלוי
+     בכל השאר. */
   const chorusScore = v =>
-      1.15*v.e + 0.85*v.rep + 0.45*Math.min(1, v.cover*2.4)
+      1.10*v.e + 0.80*v.rep + 0.45*Math.min(1, v.cover*2.4)
+    + 0.50*v.selfSim + 0.32*v.closes
     + 0.30*v.late + 0.28*v.dbl + 0.18*v.a
     - 0.95*(v.count===1 ? 1 : 0)
     - 0.55*Math.max(0, 1 - v.bars/(medBars*0.6));
@@ -4542,14 +4977,39 @@ function classifyRoles(segs, dyn){
     const sandwiched = j => segs[j-1] && out[j-1]===RID.CHORUS && segs[j+1] && out[j+1]===RID.CHORUS;
     const twin = segs.filter((s,j)=>j!==i && s.c===segs[i].c && sandwiched(j)).length;
     if(twin>0) continue;
-    /* בית או פזמון נעקפים רק אם המופע הזה חריג *בתוך האשכול שלו*:
-       יש לאשכול מופעים נוספים שאינם בין שני פזמונים. אשכול שכל
-       מופעיו יושבים שם הוא פשוט מקטע שחוזר במקום הזה. */
+    /* מקטע שהאשכול שלו מופיע גם *במקום אחר* בשיר איננו גשר —
+       הוא מקטע חוזר שבמקרה יושב הפעם בין שני פזמונים. בשיר
+       V-C-V-C הבית השני יושב בדיוק שם, והכלל הזה הוא ששלח אותו
+       להיקרא "C-part". גשר אמיתי הוא חד־פעמי. */
     if(!aux){
       const others = segs.filter((s,j)=>j!==i && s.c===segs[i].c).length;
-      if(others < 1) continue;
+      if(others > 0) continue;
     }
     out[i] = (aN[i] >= 0.62) ? RID.SOLO : RID.CPART;
+  }
+
+  /* ---- שיר בלי ניגוד: AABA ----
+     אשכול אחד חוזר, אין בשיר שום אשכול חוזר אחר, והוא גם זה
+     שפותח את השיר. זה לא מבנה בית-פזמון אלא צורה שבה המקטע
+     החוזר *הוא* הבית והיחידאי שבאמצע הוא הגשר. בלי הכלל הזה
+     כל שיר כזה יוצא "פזמון, פזמון, גשר, פזמון" — שם הפוך.
+
+     המבחן מבני ולא מבוסס עוצמה בכוונה: בשיר פופ אמיתי גם הבית
+     חוזר, ולכן יש שני אשכולות חוזרים והכלל לא נוגע בו. וכששיר
+     נפתח בבית שלא זוהה כחוזר — המקטע הראשון אינו באשכול החוזר,
+     והכלל שוב לא נוגע בו. */
+  const repeatedC = [...stat.values()].filter(v=>v.count>=2);
+  let head=0;
+  while(head<N && out[head]===RID.INTRO) head++;
+  const flatForm = repeatedC.length===1 && chorus &&
+                   repeatedC[0].c===chorus.c &&
+                   head<N && segs[head].c===chorus.c;
+  if(flatForm){
+    for(let i=0;i<N;i++){
+      if(out[i]===RID.INTRO || out[i]===RID.OUTRO) continue;
+      out[i] = segs[i].c===chorus.c ? RID.VERSE : RID.CPART;
+    }
+    return out;
   }
 
   if(!out.includes(RID.CHORUS) && N>=3){
@@ -4617,7 +5077,18 @@ function renumberSecs(list){
 
 function nameSections(segs, bars, A){
   const dyn = segRoleDynamics(segs, bars, A);
-  const asg = classifyRoles(segs, dyn);
+  /* מטריצת הדמיון נבנתה כבר באשכול. אם המבנה השתנה מאז (אימוץ
+     מבני פיצל מקטעים), היא כבר לא מיושרת — ואז מחשבים מחדש. */
+  let aff = segs._aff;
+  if(!aff || aff.N !== segs.length){
+    const D = segDescriptors(segs, bars, A);
+    aff = { M: segAffinity(D), D, N: segs.length };
+    try{
+      Object.defineProperty(segs, '_aff',
+        { value:aff, enumerable:false, configurable:true, writable:true });
+    }catch(e){}
+  }
+  const asg = classifyRoles(segs, dyn, aff);
   segs.forEach((s,i)=>{ s.role = asg[i]; s.name = ROLE_NAME[asg[i]] || ROLE_NAME[RID.VERSE]; });
   mergeRoleFragments(segs);
   renumberSecs(segs);
@@ -5174,16 +5645,42 @@ function segmentSpectral(bars, energy, A, sens, opt){
   const lens=segs.map(s=>s.to-s.from).sort((a,b)=>a-b);
   const typ=lens[Math.min(lens.length-1, Math.floor(lens.length*0.65))] || 8;
   const cap = opt.mergeCap>0 ? Math.max(typ*opt.mergeCap, minLen*2.5) : Infinity;
+  /* ...וגם לא כשהעוצמה קופצת בין השניים. בית ופזמון צמודים
+     שהשיכון הספקטרלי לא הבדיל ביניהם היו נבלעים כאן לבלוק אחד,
+     ומרגע שהגבול נמחק שום שלב מאוחר יותר לא יכול להחזיר אותו.
+     שתי מחציות של אותו בית, לעומת זאת, יושבות באותה רמת עוצמה
+     בדיוק — ולכן הן ממשיכות להתמזג כרגיל. */
+  const eZ = (()=>{
+    const v = (energy && energy.length===n) ? Array.from(energy) : new Array(n).fill(0);
+    const m = v.reduce((a,b)=>a+b,0)/Math.max(1,n);
+    const sd = Math.sqrt(v.reduce((a,b)=>a+(b-m)*(b-m),0)/Math.max(1,n))||1;
+    return v.map(x=>(x-m)/sd);
+  })();
+  const segE = s => {
+    let t=0, c=0;
+    for(let i=s.from;i<s.to;i++){ t+=eZ[i]||0; c++; }
+    return c ? t/c : 0;
+  };
   const merged=[];
   for(const s of segs){
     const last=merged[merged.length-1];
-    if(last && last.c===s.c && (s.to-last.from)<=cap) last.to=s.to;
+    if(last && last.c===s.c && (s.to-last.from)<=cap &&
+       Math.abs(segE(last)-segE(s))<0.85) last.to=s.to;
     else merged.push({...s});
   }
   let out = opt.usePeriod ? enforcePeriod(merged, n, loop) : merged;
   if(opt.useSnap) out=snapBoundaries(out, n, strength, loop);
   out=relabel(out);
-  return out.filter(s=>s.to>s.from);
+  const res = out.filter(s=>s.to>s.from);
+  /* השיכון הספקטרלי לכל תיבה נשמר על מערך המקטעים. שכבת הזהות
+     משתמשת בו כערוץ נוסף: הוא רואה דמיון שלא עובר דרך אקורדים
+     או גוון, ולכן הוא מוסיף מידע — גם אם לבדו הוא כלי גרוע
+     לשאלה "האם זה אותו מקטע" (הוא מקודד גם מיקום בזמן). */
+  try{
+    Object.defineProperty(res, '_R',
+      { value:R, enumerable:false, configurable:true, writable:true });
+  }catch(e){}
+  return res;
 }
 
 function segment(bars, energy, A, sens){
@@ -5192,9 +5689,13 @@ function segment(bars, energy, A, sens){
 
   const segs = segmentSpectral(bars, energy, A, sens);
 
-  /* קודם נבנו כאן וקטור גוון לכל מקטע ומטריצת דמיון O(n²) ביניהם,
-     כדי להאכיל את מודל התפקידים הישן. המודל החדש קורא את הדינמיקה
-     ישירות מהתיבות בכל קריאה, ולכן שניהם הוסרו. */
+  /* הגבולות מגיעים מהניתוח הספקטרלי; *הזהות* נקבעת מחדש כאן.
+     השיכון הספקטרלי טוב במציאת נקודות המעבר, אבל הוא מקודד גם
+     את מיקום המקטע בזמן, ולכן הוא כלי גרוע לשאלה "האם זה אותו
+     מקטע שכבר היה". clusterSegments שואל את השאלה הזאת ישירות:
+     רצף אקורדים, כרומה, גוון ועוצמה — בכל 12 הגלגולים. */
+  clusterSegments(segs, bars, A);
+
   const byC=new Map();
   segs.forEach((s,i)=>{ if(!byC.has(s.c)) byC.set(s.c,[]); byC.get(s.c).push(i); });
   const groups=[...byC.values()].sort((x,y)=>Math.min(...x)-Math.min(...y));
