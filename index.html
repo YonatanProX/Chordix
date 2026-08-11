@@ -4320,7 +4320,21 @@ function viterbiFull(logp, n, A, emitScale, bias, movePen){
 
 /* ------------------------------------------------------------
    צבירת לוג-הסתברויות לפעימות (ממוצע גיאומטרי בתוך הפעימה)
+   ------------------------------------------------------------
+   הפריימים בתוך הפעימה אינם שווי-ערך, ולכן הם גם לא נשקלים
+   שווה עוד. חלון ה-CQT בתדרים הנמוכים ארוך במאות מילישניות,
+   ורוורב וסוסטיין ממשיכים את האקורד הקודם פיזית — כך שתחילת
+   הפעימה מזוהמת באקורד שכבר נגמר. ממוצע פשוט על כל הפריימים
+   מדלל בדיוק שם את הראיה לאקורד החדש, וזו הסיבה השורשית לכך
+   ש-C נמשך לתוך התיבה של A. הפריימים הראשונים נשקלים פחות,
+   האחרונים מעט פחות (החלון מסתכל גם קדימה), והאמצע מלא.
    ------------------------------------------------------------ */
+const POOL = { head:0.30, headW:0.32, tail:0.12, tailW:0.78 };
+function poolWeight(u){
+  if(u < POOL.head)   return POOL.headW + (1-POOL.headW)*(u/POOL.head);
+  if(u > 1-POOL.tail) return 1 - (1-POOL.tailW)*((u-(1-POOL.tail))/POOL.tail);
+  return 1;
+}
 function beatLogProbs(logp, n, fps, beats, duration, toff){
   const off = toff||0;
   const nb = beats.length;
@@ -4331,12 +4345,17 @@ function beatLogProbs(logp, n, fps, beats, duration, toff){
     let a = Math.round((t0-off)*fps), b = Math.round((t1-off)*fps);
     a = Math.max(0, Math.min(n-1, a));
     b = Math.max(a+1, Math.min(n, b));
-    const o = i*NCLS;
+    const o = i*NCLS, m = b-a;
+    let wsum = 0;
     for(let f=a;f<b;f++){
+      /* פחות משלושה פריימים בפעימה — אין מה לשקול, וכל משקל רק
+         היה מוחק ראיה. קורה רק בטמפו מהיר מאוד. */
+      const wf = (m>2) ? poolWeight((f-a+0.5)/m) : 1;
+      wsum += wf;
       const fo = f*NCLS;
-      for(let s=0;s<NCLS;s++) out[o+s] += logp[fo+s];
+      for(let s=0;s<NCLS;s++) out[o+s] += wf*logp[fo+s];
     }
-    const inv = 1/(b-a);
+    const inv = 1/(wsum||1);
     let mx=-Infinity;
     for(let s=0;s<NCLS;s++){ out[o+s]*=inv; if(out[o+s]>mx) mx=out[o+s]; }
     let sum=0;
@@ -6578,7 +6597,11 @@ function structuralRefine(secs, bars, C, opts){
     const pooled = poolBeats(C.blp, starts, L);
     /* מקטע מתחיל תמיד בראש תיבה, ולכן הקנס המטרי כאן מחזורי מפאזה 0 */
     const lpen   = meterMovePenalty(L, C.bpb||4, 0, C.grip||0);
-    const path   = viterbiFull(pooled, L, C.trans, C.emit, C.bias, lpen);
+    /* גם הפענוח המאוחד של המקטע מיושר: הראיה המחוברת חזקה יותר,
+       אבל האיחור שלה זהה — הוא נובע מהאקוסטיקה ולא מחוזק הראיה. */
+    const path   = alignChordBoundaries(
+      viterbiFull(pooled, L, C.trans, C.emit, C.bias, lpen),
+      pooled, L, C.bpb||4, 0, { emit:C.emit, grip:C.grip });
     return { L, path, pooled, n:starts.length,
              variety: pathVariety(path), score: pathScore(pooled,0,path) };
   };
@@ -6689,7 +6712,7 @@ function structuralRefine(secs, bars, C, opts){
   const fromForm = new Set();
   secs.forEach(s=>{ if(s.adopted) for(let i=s.from;i<s.to;i++) fromForm.add(i); });
   const rebuilt = barsFromBeatChords(newPath, newConf, C.beats, C.bpb, C.down,
-                                     C.maxPer, C.duration);
+                                     C.maxPer, C.duration, C.grid);
   const sig = b => (!b||!b.chords||!b.chords.length) ? 'N'
                  : b.chords.map(c=>c.root+'|'+c.suf+'@'+c.beat).join(' ');
   const n = Math.min(bars.length, rebuilt.length);
@@ -6817,7 +6840,352 @@ function envelopePoints(sig, sr, count){
 
 /* אקורד לכל פעימה -> תיבות. שומר את מיקום הפעימה של כל אקורד,
    כדי שדף האקורדים יוכל להראות מתי בדיוק בתוך התיבה הוא נכנס. */
-function barsFromBeatChords(path, conf, beats, bpb, downbeat, maxPerBar, duration){
+/* ==== CHORDIX-XCHECK-START ==== */
+/* ============================================================
+   3ב. יישור גבולות · הצלבת שני מפענחים · גריד הרמוני
+   ============================================================
+   שלושת המנגנונים כאן נכתבו כתשובה לתלונה אחת ומדויקת: "האקורד
+   נמשך תיבה וחצי" — C ממשיך לתוך התיבה של A, והתיבה נכתבת
+   "C A" במקום "A".
+
+   הסיבות, וכולן מטות לאותו כיוון:
+   • חלון ה-CQT בתדרים הנמוכים ארוך במאות מילישניות, ולכן הפריים
+     הראשון של הפעימה החדשה עדיין מכיל את האקורד הקודם.
+   • רוורב, סוסטיין ופדל ממשיכים את האקורד הקודם פיזית.
+   • למודל יש הטיית התמדה, ולוויטרבי קנס מעבר. שניהם דוחפים את
+     ההחלפה קדימה בזמן — אף אחד מהם לא דוחף אותה אחורה.
+   שלוש הסיבות מאחרות את הגבול ואף אחת לא מקדימה אותו. לכן
+   התיקון חייב להיות אסימטרי, ולא "החלקה" סימטרית.
+
+   1. alignChordBoundaries — אחרי הפענוח כל גבול נבחן מחדש מול
+      שתי פעימות לפניו ואחריו: איזו נקודה באמת מרוויחה יותר
+      לוג-הסתברות, בתוספת בונוס ליישור על פעימה חזקה והטיה
+      מפורשת לכיוון מוקדם.
+   2. crossDecode — המודל הנוירוני והכרומה מפוענחים *בנפרד* ואז
+      מוצלבים. הסכמה נועלת, אי-הסכמה מורידה ודאות, ומי מהשניים
+      שכבר עבר לאקורד שהשני עתיד לעבור אליו מקבל את הזכות —
+      כי האיחור חד-כיווני.
+   3. harmonicGrid / loopComplete — הקצב ההרמוני של השיר נמדד
+      (אקורד לתיבה? לשתי תיבות? לחצי תיבה?) ומוחזר כקנס על
+      החלפה מחוץ לגריד; ובנוסף מזוהה הלולאה ההרמונית בתוך כל
+      מקטע, ותיבה חלשה שסותרת לולאה מבוססת נכתבת לפי הלולאה.
+   ============================================================ */
+
+const ALIGN = { reach:2, metric:1.55, lag:0.30, passes:2, minRun:1 };
+const XD    = { chromaSelf:0.52, lock:0.50, cand:0.20, early:0.45,
+                openMove:0.55, disagreeDown:0.80,
+                anchorBoth:1.00, anchorOne:0.28 };
+const HGRID = { minChanges:5, floor:0.46, coarse:0.06, strength:0.95,
+                loopMin:0.62, loopConf:0.46, loopShare:0.60 };
+
+/* רצפי אקורד זהה מתוך מסלול פעימות */
+function runsOfPath(path){
+  const runs=[], n=path.length;
+  if(!n) return runs;
+  let st=0;
+  for(let i=1;i<=n;i++)
+    if(i===n || path[i]!==path[st]){ runs.push({s:st, e:i, c:path[st]}); st=i; }
+  return runs;
+}
+
+/* סכום לוג-ההסתברות של אקורד יחיד על פני טווח פעימות */
+function spanScore(blp, c, s, e){
+  let v=0;
+  for(let i=s;i<e;i++) v += blp[i*NCLS + c];
+  return v;
+}
+
+/* לאיזה אקורד עתיד המסלול לעבור אחרי הפעימה הזו */
+function upcomingChord(path){
+  const n=path.length;
+  const up=new Int16Array(n).fill(-1);
+  let next=-1;
+  for(let i=n-1;i>=0;i--){
+    up[i]=next;
+    if(i>0 && path[i]!==path[i-1]) next=path[i];
+  }
+  return up;
+}
+
+/* ------------------------------------------------------------
+   יישור גבולות אחרי הפענוח
+   ------------------------------------------------------------
+   ויטרבי בוחר את המסלול הכי טוב *בהינתן* קנס מעבר אחיד, ולכן
+   הוא שם את הגבול ברגע שבו הראיה המצטברת גברה על הקנס — כלומר
+   מאוחר, כמעט תמיד. כאן כל גבול נשקל בנפרד: מזיזים אותו עד שתי
+   פעימות לכל כיוון ובודקים איזו נקודה נותנת את סכום הלוג הגבוה
+   ביותר לשני האקורדים יחד, עם שני תיקונים:
+     • בונוס ליישור על פעימה חזקה — אקורדים מתחלפים בראש תיבה.
+     • הטיה קבועה לטובת מוקדם: הטשטוש הפיזי חד-כיווני, ולכן גבול
+       מאוחר חשוד יותר מגבול מוקדם באותה מידת ראיה.
+   מה שאין כאן: ניחוש. אם הראיה באמת אומרת שהאקורד נמשך לתוך
+   התיבה הבאה — העלות תעלה על הבונוס והגבול יישאר במקומו.
+   ------------------------------------------------------------ */
+function alignChordBoundaries(path, blp, nb, bpb, down, opt){
+  const o = Object.assign({}, ALIGN, opt||{});
+  /* "הצמדה למשקל" של המשתמש שולטת גם כאן. על "בלי" הבונוס המטרי
+     מתאפס לגמרי — ההזזה עדיין מותרת, אבל רק אם ההסתברות עצמה
+     תומכת בה, בלי שום העדפה לראש התיבה. ההטיה לכיוון מוקדם
+     נשארת חלקית: היא מתקנת עיוות אקוסטי ולא כופה גריד. */
+  if(o.grip!==undefined){
+    const g = o.grip/0.85;
+    if(!opt || opt.metric===undefined) o.metric = ALIGN.metric*Math.min(1.8,Math.max(0,g));
+    if(!opt || opt.lag===undefined)    o.lag    = ALIGN.lag   *Math.min(1.8,Math.max(0.5,g));
+  }
+  const emit = (o.emit===undefined) ? VIT.beatEmit : o.emit;
+  const B = bpb||4, D = down||0;
+  const W = metricWeights(B);
+  const cur = Int16Array.from(path);
+  if(nb < 3 || !(o.reach>0)) return cur;
+  for(let pass=0; pass<o.passes; pass++){
+    const runs = runsOfPath(cur);
+    if(runs.length < 2) break;
+    let moved = false;
+    for(let k=1;k<runs.length;k++){
+      const L = runs[k-1], R = runs[k];
+      const lo = Math.max(L.s + o.minRun, R.s - o.reach);
+      const hi = Math.min(R.e - o.minRun, R.s + o.reach);
+      if(hi < lo) continue;
+      let bestT = R.s, bestV = -Infinity;
+      for(let t=lo;t<=hi;t++){
+        const p = (((t-D)%B)+B)%B;
+        let v = emit*(spanScore(blp, L.c, L.s, t) + spanScore(blp, R.c, t, R.e));
+        v += o.metric * (W[p]!==undefined ? W[p] : 0.30);
+        v -= o.lag * (t - R.s);
+        /* עוגן: פעימה ששני המפענחים העצמאיים ראו בה החלפה. בלי
+           זה "הצמדה למשקל" היתה גוררת גם סינקופה אמיתית אל ראש
+           התיבה — והרי בדיוק ההקדמות האלה הן מה שמייחד את השיר. */
+        if(o.anchor) v += o.anchor[t];
+        if(v > bestV){ bestV=v; bestT=t; }
+      }
+      if(bestT === R.s) continue;
+      if(bestT < R.s) for(let i=bestT;i<R.s;i++) cur[i]=R.c;
+      else            for(let i=R.s;i<bestT;i++) cur[i]=L.c;
+      L.e = bestT; R.s = bestT;
+      moved = true;
+    }
+    if(!moved) break;
+  }
+  return cur;
+}
+
+/* ------------------------------------------------------------
+   הקצב ההרמוני של השיר
+   ------------------------------------------------------------
+   רוב השירים מחליפים אקורד בקצב אחד קבוע — אחד לתיבה, אחד
+   לשתי תיבות, לפעמים שניים לתיבה. מודדים איזה גריד מסביר את
+   רוב ההחלפות שכבר פוענחו, ומעדיפים את הגס מביניהם: גריד עדין
+   תמיד "מסביר" גם את הגס, ולכן בלי ההעדפה הזו התשובה היתה
+   תמיד חצי תיבה. אם אף גריד לא מסביר מספיק — מחזירים null ולא
+   כופים כלום. שיר עם קצב הרמוני חופשי לא ייכפה לרשת.
+   ------------------------------------------------------------ */
+function harmonicGrid(path, nb, bpb, down){
+  const ch=[];
+  for(let i=1;i<nb;i++) if(path[i]!==path[i-1]) ch.push(i);
+  if(ch.length < HGRID.minChanges) return null;
+  const B = bpb||4, D = down||0;
+  const set=[], half = Math.max(1, Math.round(B/2));
+  [half, B, B*2, B*4].forEach(u=>{ if(u>=1 && u*3<=nb && set.indexOf(u)<0) set.push(u); });
+  if(!set.length) return null;
+  const maxU = set[set.length-1];
+  let best=null;
+  for(const u of set){
+    let on=0;
+    for(const i of ch) if((((i-D)%u)+u)%u===0) on++;
+    const frac = on/ch.length;
+    const sc = frac - HGRID.coarse*Math.log2(maxU/u);
+    if(!best || sc > best.score) best = {unit:u, frac, score:sc};
+  }
+  if(!best || best.frac < HGRID.floor) return null;
+  best.conf = Math.min(1, (best.frac - HGRID.floor)/0.34);
+  best.perBar = B/best.unit;
+  return best;
+}
+
+/* קנס נוסף על החלפת אקורד מחוץ לגריד ההרמוני שנמדד */
+function gridPenalty(nb, bpb, down, grid, strength){
+  const out = new Float32Array(nb);
+  if(!grid || !(strength>0)) return out;
+  const u = grid.unit, D = down||0, s = strength*grid.conf;
+  for(let i=0;i<nb;i++) if((((i-D)%u)+u)%u!==0) out[i] = -s;
+  return out;
+}
+
+/* ------------------------------------------------------------
+   הצלבה בין שני מפענחים עצמאיים
+   ------------------------------------------------------------
+   עד עכשיו המודל הנוירוני והכרומה מוזגו *לפני* הפענוח: ממוצע
+   משוקלל של לוג-הסתברויות, ואז ויטרבי אחד. מיזוג מוקדם מוחק
+   בדיוק את המידע שההצלבה צריכה — איפה שני המקורות לא הסכימו.
+   כאן כל אחד מפוענח בנפרד, ורק אז הם נפגשים:
+
+     • הסכימו — האקורד ננעל בבונוס, והוודאות נשארת מלאה.
+     • לא הסכימו — שני המועמדים מקבלים בונוס קטן, ההכרעה נופלת
+       על ההקשר, והוודאות יורדת. תיבה כזו תסומן למשתמש בקו
+       מקווקו, וזה בדיוק המצב שבו כדאי לו לבדוק באוזן.
+     • לא הסכימו, ואחד מהם כבר עבר לאקורד שהשני עוד *עתיד*
+       לעבור אליו — זה שכבר עבר צודק. האיחור חד-כיווני: אף
+       מפענח לא מקדים אקורד שלא נוגן, אבל שניהם מאחרים אותו.
+       זה הכלל שמוחק את ה-C המיותר בראש התיבה של A.
+     • שניהם ראו החלפה באותה פעימה — שם באמת מתחלף האקורד, גם
+       אם היא לא נופלת על ראש תיבה. הקנס המטרי מוקל שם, אחרת
+       "הצמדה למשקל" היתה מוחקת סינקופה אמיתית.
+
+   הכרומה כמעט אף פעם לא מאחרת כמו המודל — היא נמדדת ישירות
+   מהספקטרום ואין לה זיכרון — ולכן ההצלבה לבדה מיישרת גבולות
+   גם בלי שום כלל נוסף.
+   ------------------------------------------------------------ */
+function crossDecode(C){
+  const nb = C.nb, S = NCLS;
+  const bpb = C.bpb||4, down = C.down||0;
+  const xw = (C.xw===undefined) ? 1 : C.xw;
+  const g  = (C.grip===undefined) ? 1 : C.grip/0.85;
+  const gm = Math.min(1.8, Math.max(0,   g));    // סקאלת הבונוס המטרי
+  const gl = Math.min(1.8, Math.max(0.5, g));    // סקאלת ההטיה לכיוון מוקדם
+  const aopt = { emit:C.emit, metric:ALIGN.metric*gm, lag:ALIGN.lag*gl };
+
+  /* א. שני פענוחים עצמאיים, כל אחד מיושר בנפרד */
+  let pathM = viterbiFull(C.blpM, nb, C.trans, C.emit, C.bias, C.pen);
+  pathM = alignChordBoundaries(pathM, C.blpM, nb, bpb, down, aopt);
+
+  let pathC = null;
+  if(C.blpC){
+    /* הכרומה מפוענחת עם קנס מעבר נמוך יותר: אין לה זיכרון, ולכן
+       אין סיבה לחסום אותה מלהחליף. זה מה שהופך אותה לעד עצמאי
+       ולא לעותק חיוור של המודל. */
+    const transC = buildTransition(XD.chromaSelf, VIT.motionW, VIT.moveDiv);
+    pathC = viterbiFull(C.blpC, nb, transC, C.emit, C.bias, C.pen);
+    pathC = alignChordBoundaries(pathC, C.blpC, nb, bpb, down, aopt);
+  }
+
+  /* ב. ההצלבה עצמה */
+  const agree = new Uint8Array(nb);
+  let fused = C.blpF;
+  let pen2  = C.pen ? Float32Array.from(C.pen) : new Float32Array(nb);
+  if(pathC){
+    const upM = upcomingChord(pathM), upC = upcomingChord(pathC);
+    const adj = new Float32Array(nb*S);
+    adj.set(C.blpF);
+    for(let i=0;i<nb;i++){
+      const o=i*S, m=pathM[i], c=pathC[i];
+      if(m===c){ agree[i]=1; adj[o+m] += XD.lock*xw; continue; }
+      adj[o+m] += XD.cand*xw;
+      adj[o+c] += XD.cand*xw;
+      if(upC[i]===m) adj[o+m] += XD.early*xw;   // הכרומה מאחרת
+      if(upM[i]===c) adj[o+c] += XD.early*xw;   // המודל מאחר
+    }
+    for(let i=1;i<nb;i++){
+      const cm = pathM[i]!==pathM[i-1], cc = pathC[i]!==pathC[i-1];
+      if(cm && cc)      pen2[i] = Math.min(0, pen2[i] + XD.openMove*xw);
+      else if(cm || cc) pen2[i] = Math.min(0, pen2[i] + XD.openMove*0.4*xw);
+    }
+    fused = adj;
+  } else {
+    agree.fill(1);
+  }
+
+  /* ג. עוגני גבול: איפה כל אחד מהשניים ראה החלפה בעצמו */
+  const anchor = new Float32Array(nb);
+  if(pathC) for(let i=1;i<nb;i++){
+    const cm = pathM[i]!==pathM[i-1], cc = pathC[i]!==pathC[i-1];
+    anchor[i] = (cm && cc) ? XD.anchorBoth : ((cm||cc) ? XD.anchorOne : 0);
+  }
+  const aanc = Object.assign({anchor}, aopt);
+
+  /* ד. פענוח מוצלב ויישור */
+  let path = viterbiFull(fused, nb, C.trans, C.emit, C.bias, pen2);
+  path = alignChordBoundaries(path, C.blpF, nb, bpb, down, aanc);
+
+  /* ה. הגריד ההרמוני נמדד מהתוצאה ומוחזר לתוך הפענוח */
+  const grid = harmonicGrid(path, nb, bpb, down);
+  if(grid && grid.conf > 0){
+    const gp = gridPenalty(nb, bpb, down, grid, HGRID.strength*gm);
+    const pen3 = new Float32Array(nb);
+    for(let i=0;i<nb;i++) pen3[i] = pen2[i] + gp[i];
+    path = viterbiFull(fused, nb, C.trans, C.emit, C.bias, pen3);
+    path = alignChordBoundaries(path, C.blpF, nb, bpb, down, aanc);
+  }
+
+  /* ו. ודאות מהפוסטריור המקורי, מוכפלת בהסכמה בין השניים */
+  const conf = pathConfidence(C.blpF, path);
+  let ag = 0;
+  for(let i=0;i<nb;i++){
+    if(agree[i]) ag++;
+    else conf[i] *= XD.disagreeDown;
+  }
+  return { path, conf, agree, grid, pathM, pathC,
+           agreeRate: nb ? ag/nb : 1 };
+}
+
+/* ------------------------------------------------------------
+   השלמה לפי הלולאה ההרמונית שבתוך המקטע
+   ------------------------------------------------------------
+   הקונצנזוס בין מופעים (sectionConsensus) עובד רק כשיש שני
+   מופעים של אותו מקטע ומעלה. אבל בית של שמונה תיבות בנוי כמעט
+   תמיד מלולאה של ארבע — C G Am F, ושוב C G Am F — וגם כשהבית
+   מופיע פעם אחת בלבד, הלולאה הפנימית שלו היא עדות. תיבה בודדת
+   שיצאה F#dim בין F לבין C, בוודאות נמוכה, נכתבת לפי הלולאה.
+
+   שלושה תנאים, וכולם נדרשים יחד: הלולאה חייבת להיות חזקה,
+   למיקום בלולאה חייב להיות רוב ברור, ולתיבה שנדרסת חייבת
+   להיות ודאות נמוכה. תיבה שהמודל בטוח בה לא נדרסת גם אם היא
+   שוברת את הלולאה — כי בדיוק שם יושבות התפניות האמיתיות של
+   השיר.
+   ------------------------------------------------------------ */
+function loopComplete(bars, secs, conf, boldness){
+  if(!bars || !secs || !(boldness>0)) return 0;
+  let filled = 0;
+  for(const s of secs){
+    const n = s.to - s.from;
+    if(n < 4) continue;
+    const keys=[];
+    for(let i=s.from;i<s.to;i++) keys.push(barChordKey(bars[i]));
+    let best=null;
+    for(const L of [2,4,8]){
+      if(L*2 > n) break;
+      let hit=0, cnt=0;
+      for(let i=0;i+L<n;i++){
+        if(keys[i]<0 || keys[i+L]<0) continue;
+        hit += chordSim(keys[i], keys[i+L]); cnt++;
+      }
+      if(cnt < L) continue;
+      const sc = hit/cnt;
+      if(!best || sc > best.score + 0.02) best = {L, score:sc};
+    }
+    if(!best || best.score < HGRID.loopMin) continue;
+    const L = best.L;
+    for(let p=0;p<L;p++){
+      const tally = new Map();
+      let tot = 0;
+      for(let i=p;i<n;i+=L){
+        const k = keys[i];
+        if(k<0) continue;
+        const w = Math.max(0.05, conf ? (conf[s.from+i]||0.5) : 0.5);
+        tally.set(k,(tally.get(k)||0)+w); tot += w;
+      }
+      if(tally.size < 2 || !tot) continue;
+      let bk=-1, bv=0;
+      for(const [k,v] of tally) if(v>bv){ bv=v; bk=k; }
+      if(bk<0 || bv/tot < HGRID.loopShare) continue;
+      let src = null;
+      for(let i=p;i<n;i+=L) if(keys[i]===bk){ src = bars[s.from+i]; break; }
+      if(!src || !src.chords || !src.chords.length) continue;
+      for(let i=p;i<n;i+=L){
+        const bi = s.from+i, b = bars[bi];
+        if(!b || keys[i]===bk) continue;
+        const cf = conf ? (conf[bi]||0.5) : 0.5;
+        if(cf > HGRID.loopConf*boldness) continue;
+        b.chords = src.chords.map(c=>({...c}));
+        b.inferred = true; b.fixed = true;
+        filled++;
+      }
+    }
+  }
+  return filled;
+}
+/* ==== CHORDIX-XCHECK-END ==== */
+
+function barsFromBeatChords(path, conf, beats, bpb, downbeat, maxPerBar, duration, grid){
   maxPerBar = maxPerBar||1;
   const bars=[];
   const same=(a,b)=> (!a&&!b) || (a&&b&&a.root===b.root&&a.suf===b.suf);
@@ -6872,7 +7240,7 @@ function barsFromBeatChords(path, conf, beats, bpb, downbeat, maxPerBar, duratio
     if(i+bpb>beats.length){ if(beats.length-i>=2) add(i, beats.length-i); break; }
     add(i,bpb);
   }
-  tidyBarChords(bars, bpb, maxPerBar);
+  tidyBarChords(bars, bpb, maxPerBar, grid);
   stampChordTimes(bars, beats, duration);
   return bars;
 }
@@ -6893,7 +7261,7 @@ function barsFromBeatChords(path, conf, beats, bpb, downbeat, maxPerBar, duratio
    כל השאר נבלע לתוך השכן החזק שלו. אין כאן ניחוש: המידע שנשאר
    הוא בדיוק המידע שהיה, רק בלי ההחלפות שאיש לא ניגן.
    ------------------------------------------------------------ */
-function tidyBarChords(bars, bpb, maxPerBar){
+function tidyBarChords(bars, bpb, maxPerBar, grid){
   if(!bars || maxPerBar<=1) return;
   const same=(a,b)=> !!a && !!b && a.root===b.root && a.suf===b.suf;
   const drop=(b,k)=>{
@@ -6914,6 +7282,16 @@ function tidyBarChords(bars, bpb, maxPerBar){
      ב-4/4 התוצאה זהה לקודם (1 ו-3); ב-3/4 רק הראשונה חזקה,
      וב-6/8 גם הרביעית. */
   const Wm = metricWeights(bpb || 4);
+  /* ------------------------------------------------------------
+     הסף לאקורד שני בתיבה תלוי בקצב ההרמוני של השיר עצמו. בשיר
+     שמחליף אקורד פעם בתיבה, אקורד שני הוא חריג ולא כלל — ולכן
+     נדרשת לו ראיה חזקה יותר. הגריד מגיע מ-harmonicGrid, כלומר
+     נמדד מהשיר הזה ולא מהנחה כללית.
+     ------------------------------------------------------------ */
+  const slow     = !!(grid && grid.unit >= (bpb||4) && grid.conf > 0.35);
+  const need     = slow ? 0.60 : 0.45;
+  const preNeed  = slow ? 0.40 : 0.28;
+  const holdNeed = slow ? 0.62 : 0.50;
   for(let bi=0;bi<bars.length;bi++){
     const b=bars[bi];
     if(!b.chords || b.chords.length<2) continue;
@@ -6929,9 +7307,17 @@ function tidyBarChords(bars, bpb, maxPerBar){
         const c=b.chords[k];
         const strong = (Wm[c.beat]!==undefined) ? Wm[c.beat]>=0.5 : (c.beat===0);
         const cf = c.conf===undefined ? (b.conf===undefined?0.5:b.conf) : c.conf;
-        if(k===b.chords.length-1 && same(c,nextFirst) && cf>=0.28) continue;  // הקדמה
-        if(k===0 && same(c,prevLast)) continue;                               // המשך
-        if(c.span>=minSpan && (strong || cf>=0.45)) continue;                 // מוצדק
+        if(k===b.chords.length-1 && same(c,nextFirst) && cf>=preNeed) continue; // הקדמה
+        /* ------------------------------------------------------
+           "המשך מהתיבה הקודמת" היה עד עכשיו פטור מוחלט, וזו היתה
+           בדיוק הפרצה שדרכה עבר האקורד הנגרר. אקורד שבאמת נמשך
+           מעבר לקו התיבה תופס את התיבה כולה, ואז אין כאן שני
+           אקורדים מלכתחילה. שארית של פעימה אחת בראש התיבה שבמקרה
+           זהה לאקורד שנגמר היא חתימה של איחור, לא של קשירה.
+           הפטור נשאר — אבל רק לשארית ארוכה מספיק או בטוחה מספיק.
+           ------------------------------------------------------ */
+        if(k===0 && same(c,prevLast) && (c.span>=minSpan || cf>=holdNeed)) continue;
+        if(c.span>=minSpan && (strong || cf>=need)) continue;                  // מוצדק
         if(drop(b,k)){ dropped=true; break; }
       }
     }
@@ -8709,7 +9095,8 @@ function rebuildCore(A, bpm, meterSel, grip, allowFix){
     chromaOpinion = fuseLogProbs(A.logpTpl, A.logpNnls, nnShare, A.nFrames);
   }
   const fused  = w>0 ? fuseLogProbs(A.logpModel, chromaOpinion, w, A.nFrames) : A.logpModel;
-  const folded = foldVocab(fused, A.nFrames, $('vocab').value);
+  const vocab  = $('vocab').value;
+  const folded = foldVocab(fused, A.nFrames, vocab);
 
   /* 2. פענוח ראשון ברמת הפעימה — בלי סולם ובלי משקל. הוא לא
         מיועד לתצוגה: תפקידו לספק את העדות שממנה נקבעים השניים. */
@@ -8772,9 +9159,30 @@ function rebuildCore(A, bpm, meterSel, grip, allowFix){
     conf = pathConfidence(blp, path);
   }
 
+  /* 7ב. הצלבת שני המפענחים, יישור הגבולות והגריד ההרמוני.
+         כאן נחתך האקורד שנמשך תיבה וחצי.
+         ------------------------------------------------------------
+         המיזוג המוקדם שבשלב 1 נשאר כפי שהיה, אבל כל מקור נשמר
+         עכשיו גם *בנפרד*: ממוצע משוקלל מוחק בדיוק את המידע
+         שההצלבה צריכה — איפה שני המקורות לא הסכימו. הקיפול
+         והצבירה נעשים כאן ולא בשלב 1, כדי לא לשלם עליהם כשתיקון
+         אוקטבת הטמפו יוצא מוקדם ומריץ הכול מחדש.
+         ------------------------------------------------------------ */
+  const foldedM = foldVocab(A.logpModel, A.nFrames, vocab);
+  const foldedC = chromaOpinion ? foldVocab(chromaOpinion, A.nFrames, vocab) : null;
+  const blpM = beatLogProbs(foldedM, A.nFrames, A.mfps, beats, A.duration, A.toff).blp;
+  const blpC = foldedC
+    ? beatLogProbs(foldedC, A.nFrames, A.mfps, beats, A.duration, A.toff).blp : null;
+  const cross = crossDecode({
+    blpM, blpC, blpF: blp, nb, trans, emit: VIT.beatEmit,
+    bias, pen, bpb, down, grip, xw: (w>0 ? 1 : 0.35)
+  });
+  path = cross.path;
+  conf = cross.conf;
+
   /* 8. תיבות */
   const maxPer = parseInt($('twoPerBar').value,10)||2;
-  const bars = barsFromBeatChords(path, conf, beats, bpb, down, maxPer, A.duration);
+  const bars = barsFromBeatChords(path, conf, beats, bpb, down, maxPer, A.duration, cross.grid);
   if(bars.length < 2) return null;
 
   /* 9. מבנה */
@@ -8787,9 +9195,14 @@ function rebuildCore(A, bpm, meterSel, grip, allowFix){
   const sbold = smode==='off' ? 0 : (smode==='safe' ? 0.4 : 1);
   const refined = structuralRefine(secs, bars, {
     blp, nb, beats, bpb, down, trans, bias, emit:VIT.beatEmit,
-    duration:A.duration, maxPer, path, conf, grip
+    duration:A.duration, maxPer, path, conf, grip, grid: cross.grid
   }, {boldness: sbold});
   if(sbold>0) refined.fixed += sectionConsensus(secs, bars, bars.map(b=>b.conf));
+
+  /* 10ב. השלמה לפי הלולאה ההרמונית *בתוך* המקטע. הקונצנזוס שמעל
+          דורש שני מופעים של אותו מקטע; זה עובד גם על מקטע יחיד,
+          כי בית של שמונה תיבות בנוי כמעט תמיד מלולאה של ארבע. */
+  if(sbold>0) refined.inferred += loopComplete(bars, secs, bars.map(b=>b.conf), sbold);
 
   /* הזמנים נחתמים מחדש: ההשלמה המבנית מעתיקה אקורדים בין מופעים,
      ואיתם הגיעו זמנים של תיבה אחרת. */
@@ -8799,7 +9212,7 @@ function rebuildCore(A, bpm, meterSel, grip, allowFix){
   if($('slash') && $('slash').checked) annotateBass(bars, A.bass, A.cfps, A.toff);
   annotatePower(bars, A.nnChroma, A.cfps, A.toff, {soloLow:A.soloLow});
 
-  return { bars, secs, key, meter, beats, down, refined, folded, nb };
+  return { bars, secs, key, meter, beats, down, refined, folded, nb, cross };
 }
 
 function rebuild(){
@@ -8826,6 +9239,7 @@ function rebuild(){
   state.duration = A.duration;
   state.fixedBars = r.refined.fixed;
   state.refined = r.refined;
+  state.cross = r.cross;
   state.runEdits = new Map();
   state._nowIdx=-2; state._nowRow=-2;
 
