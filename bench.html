@@ -1,0 +1,592 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Chordix — מדידה מול אמת</title>
+<style>
+  :root{ --bg:#0e1116; --fg:#e6e9ef; --dim:#8b94a7; --line:#232936;
+         --card:#151a22; --ok:#3fb950; --bad:#f85149; --warn:#d29922; --acc:#58a6ff; }
+  *{box-sizing:border-box}
+  body{margin:0;padding:24px;background:var(--bg);color:var(--fg);
+       font:15px/1.6 system-ui,"Segoe UI",Arial,sans-serif}
+  h1{font-size:22px;margin:0 0 4px}
+  h2{font-size:16px;margin:28px 0 10px;color:var(--acc)}
+  .sub{color:var(--dim);margin:0 0 22px;font-size:14px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:10px;
+        padding:16px;margin-bottom:16px}
+  label.f{display:block;margin-bottom:12px}
+  label.f b{display:block;font-weight:600;margin-bottom:5px}
+  label.f small{color:var(--dim);font-weight:400}
+  input[type=file]{width:100%;padding:9px;background:#0b0e13;color:var(--fg);
+                   border:1px solid var(--line);border-radius:7px}
+  button{background:var(--acc);color:#04121f;border:0;border-radius:7px;
+         padding:10px 20px;font:inherit;font-weight:700;cursor:pointer}
+  button:disabled{opacity:.45;cursor:default}
+  table{border-collapse:collapse;width:100%;font-size:14px}
+  th,td{border:1px solid var(--line);padding:7px 9px;text-align:right;
+        white-space:nowrap}
+  th{background:#1b212b;font-weight:600}
+  td.n{font-variant-numeric:tabular-nums}
+  .ok{color:var(--ok)} .bad{color:var(--bad)} .warn{color:var(--warn)}
+  .dim{color:var(--dim)}
+  #log{font:12.5px/1.7 ui-monospace,Consolas,monospace;color:var(--dim);
+       max-height:220px;overflow:auto;white-space:pre-wrap}
+  pre#json{background:#0b0e13;border:1px solid var(--line);border-radius:8px;
+           padding:12px;overflow:auto;max-height:420px;font-size:12px;
+           direction:ltr;text-align:left}
+  .bar{height:6px;background:#0b0e13;border-radius:3px;overflow:hidden;margin:10px 0}
+  .bar i{display:block;height:100%;background:var(--acc);width:0;transition:width .2s}
+  .note{border-inline-start:3px solid var(--warn);padding:2px 12px;margin:8px 0;
+        color:var(--dim);font-size:13.5px}
+</style>
+</head>
+<body>
+
+<h1>Chordix — מדידה מול אמת</h1>
+<p class="sub">מריץ את מנוע הניתוח של <code>index.html</code> עצמו, בלי עותק שני של הקוד,
+ומשווה לתשובות שכתבת ידנית. הפורמט מתואר ב־<code>bench/README.md</code>.</p>
+
+<div class="card">
+  <label class="f">
+    <b>קבצי אודיו <small>— mp3/wav/m4a, אפשר לבחור כמה יחד</small></b>
+    <input type="file" id="fAudio" multiple accept="audio/*,.mp3,.wav,.m4a,.ogg,.flac">
+  </label>
+  <label class="f">
+    <b>קבצי אמת <small>— ה-.txt מ-bench/truth, שם זהה לקובץ האודיו</small></b>
+    <input type="file" id="fTruth" multiple accept=".txt,text/plain">
+  </label>
+  <button id="run" disabled>הרץ מדידה</button>
+  <div class="bar"><i id="prog"></i></div>
+  <div id="log">ממתין לקבצים…</div>
+</div>
+
+<div id="out"></div>
+
+<!-- פקדי ההגדרות של index.html, משוכפלים כדי ש-rebuildCore ימצא אותם.
+     הערכים זהים לברירות המחדל בדף האמיתי — כל שינוי כאן משנה את מה שנמדד. -->
+<div id="cxStubs" hidden>
+  <input type="checkbox" id="tta">
+  <input type="checkbox" id="hpss" checked>
+  <input type="checkbox" id="slash">
+  <input type="number" id="bpmIn"><input type="number" id="tuneIn" value="0">
+  <select id="meterIn"><option value="auto" selected></option></select>
+  <select id="meterGrip"><option value="0.85" selected></option></select>
+  <select id="downIn"><option value="0" selected></option></select>
+  <select id="vocab"><option value="basic" selected></option></select>
+  <select id="twoPerBar"><option value="2" selected></option></select>
+  <select id="sens"><option value="1" selected></option></select>
+  <select id="tplW"><option value="0.25" selected></option></select>
+  <select id="consensus"><option value="bold" selected></option></select>
+  <div id="barFill"></div><div id="step"></div>
+</div>
+
+<script>
+"use strict";
+/* הכול עטוף ב-IIFE, וזה לא קוסמטי: המנוע מצהיר `const $` ברמה
+   העליונה, ושתי הצהרות const באותו שם בסקופ הגלובלי הן SyntaxError
+   שמפיל את ההזרקה כולה. בתוך פונקציה אין התנגשות. */
+(function(){
+
+/* cxT חי בבלוק ה-i18n של index.html, שאנחנו לא טוענים. המנוע קורא לו
+   בהודעות שגיאה בלבד, ולכן די בתחליף שמחזיר את המפתח עם ההצבות. */
+window.cxT = function(k){
+  const a = arguments;
+  return String(k).replace(/\{(\d+)\}/g, (m,i)=> a[+i+1] !== undefined ? a[+i+1] : m);
+};
+
+const $  = id => document.getElementById(id);
+const logEl = $('log');
+const log = m => { logEl.textContent += '\n' + m; logEl.scrollTop = 1e9; };
+const setProg = p => { $('prog').style.width = Math.round(p*100)+'%'; };
+
+/* ============================================================
+   1. טעינת המנוע מתוך index.html
+   ------------------------------------------------------------
+   לא מעתיקים קוד. שולפים את בלוק ה-<script> שמכיל את הליבה,
+   חותכים אותו בדיוק לפני function rebuild() — משם והלאה הכול
+   ציור מסך ומאזיני DOM — ומזריקים כתסריט קלאסי, כך שההצהרות
+   נכנסות לסקופ הגלובלי. נבדק: בין תחילת הבלוק לנקודת החיתוך אין
+   ולו משפט אחד ברמה העליונה שנוגע ב-DOM.
+   ============================================================ */
+const CUT = '\nfunction rebuild(){';
+let engineReady = false;
+
+async function loadEngine(){
+  if(engineReady) return;
+  log('טוען את המנוע מ-index.html…');
+  const res = await fetch('index.html', {cache:'no-store'});
+  if(!res.ok) throw new Error('index.html לא נמצא (' + res.status + '). ' +
+    'bench.html חייב לשבת באותה תיקייה עם index.html ועם chordix-model.bin.');
+  const doc  = new DOMParser().parseFromString(await res.text(), 'text/html');
+  const code = [...doc.querySelectorAll('script:not([src])')]
+    .map(s => s.textContent)
+    .find(t => t.includes('CHORDIX-CORE-START'));
+  if(!code) throw new Error('לא נמצא בלוק המנוע ב-index.html (חסר CHORDIX-CORE-START).');
+  const cut = code.indexOf(CUT);
+  if(cut < 0) throw new Error('לא נמצאה נקודת החיתוך "function rebuild(){" — ' +
+    'כנראה הפונקציה שונתה. עדכנו את CUT ב-bench.html.');
+
+  const tag = document.createElement('script');
+  tag.textContent = code.slice(0, cut);
+  document.head.appendChild(tag);
+
+  /* הצהרות function ברמה העליונה של תסריט קלאסי נרשמות על window,
+     ולכן די בבדיקה הזאת כדי לדעת שהחיתוך לא בלע משהו נחוץ. */
+  for(const fn of ['rebuildCore','modelCQT','modelPredict','chromaPath',
+                   'onsetEnvelope','estimateTempoFull','ensureModel','toMono',
+                   'resample','estimateTuning','harmonicChange','harmonicPeriod',
+                   'noteName'])
+    if(typeof window[fn] !== 'function')
+      throw new Error('המנוע נטען אבל ' + fn + ' חסרה — כנראה נקודת החיתוך זזה.');
+
+  engineReady = true;
+  log('המנוע נטען. מוריד את המודל…');
+  await ensureModel(p => setProg(p*0.15));
+  log('המודל מוכן.');
+}
+
+/* ============================================================
+   2. הרצת הניתוח — אותה שרשרת כמו analyze(), בלי מסך
+   ------------------------------------------------------------
+   analyze() עצמה כרוכה בפסי התקדמות, בגבייה ובציור, ולכן היא לא
+   נקראת כאן. סדר הפעולות והפרמטרים זהים לה שורה מול שורה; אם
+   analyze() משתנה, צריך לעדכן גם כאן.
+   ============================================================ */
+async function decodeFile(file){
+  const ctx = new (window.AudioContext || window.webkitAudioContext)();
+  try{ return await ctx.decodeAudioData(await file.arrayBuffer()); }
+  finally{ try{ ctx.close(); }catch(e){} }
+}
+
+async function runEngine(file, onProg){
+  const audio = await decodeFile(file);
+  const SR = 11025;
+  const mono   = toMono(audio);
+  const sig    = resample(mono, audio.sampleRate, SR);
+  const sig22  = resample(mono, audio.sampleRate, M_SR);
+  const duration = sig.length / SR;
+
+  const tune = estimateTuning(sig, SR);
+  M_TUNE = tune;
+
+  const {feat, mag, nFrames, fps:mfps} = await modelCQT(sig22, p => onProg(0.05 + p*0.35));
+  const logpModel = await modelPredict(feat, nFrames, p => onProg(0.40 + p*0.35), [0]);
+
+  const CP = chromaPath(mag, nFrames, true);
+  const {chroma, bass, tim, cep, act, logpTpl, logpNnls, soloLow, nnChroma} = CP;
+
+  const OE = await onsetEnvelope(sig, SR, p => onProg(0.75 + p*0.15));
+  const {env, fps:efps} = OE;
+
+  const harmD = harmonicPeriod(harmonicChange(chroma, nFrames, mfps, 0.45), mfps);
+  const T = estimateTempoFull(env, efps,
+              {harmPeriod: harmD, accentEnv: OE.acc, duration});
+
+  const A = {sig, SR, duration, chroma, bass, tim, cep, act,
+             cfps:mfps, toff:0, env, efps, bpm:T.bpm, tune,
+             envLo:OE.lo, envMid:OE.mid, envHi:OE.hi, envAcc:OE.acc,
+             harmD, tempoConf:T.conf,
+             logpModel, logpTpl, logpNnls, soloLow, nnChroma,
+             nFrames, mfps, sig22, mag};
+
+  /* אותה לולאת ניסיון-חוזר שיש ב-rebuild(): תיקון אוקטבת הטמפו
+     יוצא מוקדם ומחזיר {retry}, ואז מריצים שוב עם הקצב המתוקן. */
+  let bpm = clamp(T.bpm, 30, 260);
+  $('bpmIn').value = Math.round(bpm*10)/10;
+  let r = rebuildCore(A, bpm, 'auto', 0.85, true);
+  if(r && r.retry){
+    bpm = clamp(bpm * r.retry, 30, 260);
+    $('bpmIn').value = Math.round(bpm*10)/10;
+    r = rebuildCore(A, bpm, 'auto', 0.85, false);
+  }
+  if(!r) throw new Error('rebuildCore החזיר null — הקובץ קצר או שקט מדי.');
+  onProg(1);
+  return {r, bpm, duration, tune, tempoConf:T.conf};
+}
+
+/* ============================================================
+   3. קריאת קובץ האמת
+   ============================================================ */
+const ROOTS = {C:0,'C#':1,DB:1,D:2,'D#':3,EB:3,E:4,F:5,'F#':6,GB:6,
+               G:7,'G#':8,AB:8,A:9,'A#':10,BB:10,B:11};
+const rootOf = s => { const v = ROOTS[s.toUpperCase()]; return v===undefined ? null : v; };
+
+/* כתיבים חלופיים -> 14 הסוגים שהמודל מכיר */
+const QUAL_ALIAS = {
+  '':'', 'maj':'', 'M':'', 'add9':'', 'add2':'', '5':'',
+  'm':'m', 'min':'m', '-':'m',
+  '7':'7', '9':'7', '11':'7', '13':'7', '7sus4':'sus4',
+  'maj7':'maj7', 'M7':'maj7', 'Δ':'maj7', 'maj9':'maj7',
+  'm7':'m7', 'min7':'m7', '-7':'m7', 'm9':'m7', 'm11':'m7',
+  '6':'6', 'm6':'m6', 'min6':'m6',
+  'mMaj7':'mMaj7', 'mM7':'mMaj7',
+  'dim':'dim', '°':'dim', 'dim7':'dim7', '°7':'dim7',
+  'm7b5':'m7b5', 'ø':'m7b5', 'halfdim':'m7b5',
+  'aug':'aug', '+':'aug',
+  'sus2':'sus2', 'sus4':'sus4', 'sus':'sus4'
+};
+
+function parseChord(tok){
+  if(!tok || tok==='%' || tok==='N' || tok==='-' || tok==='NC') return null;
+  const m = tok.match(/^([A-Ga-g][#b]?)(.*)$/);
+  if(!m) return {bad:tok};
+  const root = rootOf(m[1]);
+  if(root===null) return {bad:tok};
+  let rest = m[2], bass = null;
+  const sl = rest.indexOf('/');
+  if(sl >= 0){ bass = rootOf(rest.slice(sl+1)); rest = rest.slice(0, sl); }
+  const suf = QUAL_ALIAS[rest];
+  if(suf === undefined) return {bad:tok};
+  return {root, suf, bass};
+}
+
+function parseTruth(text){
+  const t = {file:null, key:null, bpm:null, meter:null, sections:[], end:null, errors:[]};
+  let cur = null;
+  for(const raw of text.split(/\r?\n/)){
+    const line = raw.trim();
+    if(!line || line[0]==='#') continue;
+    let m;
+    if((m = line.match(/^(?:קובץ|file)\s*:\s*(.+)$/i)))  { t.file  = m[1].trim(); continue; }
+    if((m = line.match(/^(?:סולם|key)\s*:\s*(.+)$/i)))   { t.key   = m[1].trim(); continue; }
+    if((m = line.match(/^bpm\s*:\s*([\d.]+)$/i)))        { t.bpm   = parseFloat(m[1]); continue; }
+    if((m = line.match(/^(?:משקל|meter)\s*:\s*(.+)$/i))) { t.meter = m[1].trim(); continue; }
+
+    if((m = line.match(/^\[([^\]]+)\]\s*(?:(\d+):)?(\d+(?:[.:]\d+)?)\s*$/))){
+      const name = m[1].trim();
+      const mm = m[2] ? +m[2] : 0;
+      const time = mm*60 + parseFloat(String(m[3]).replace(':','.'));
+      if(name==='סוף' || /^end$/i.test(name)){ t.end = time; cur = null; continue; }
+      cur = {name, start:time, bars:[]};
+      t.sections.push(cur);
+      continue;
+    }
+
+    if(line.includes('|')){
+      if(!cur){ t.errors.push('תיבות לפני המקטע הראשון: ' + line); continue; }
+      for(const cell of line.split('|')){
+        const c = cell.trim();
+        if(!c) continue;
+        cur.bars.push(c.split(/\s+/).map(parseChord));
+      }
+      continue;
+    }
+    t.errors.push('שורה לא מזוהה: ' + line);
+  }
+
+  if(!t.key)   t.errors.push('חסרה שורת "סולם:"');
+  if(!t.bpm)   t.errors.push('חסרה שורת "BPM:"');
+  if(!t.meter) t.errors.push('חסרה שורת "משקל:"');
+  if(!t.sections.length) t.errors.push('אין אף מקטע');
+  if(t.end===null) t.errors.push('חסרה שורת "[סוף] mm:ss" — בלעדיה המקטע האחרון לא נסגר');
+  for(const s of t.sections)
+    for(const bar of s.bars)
+      for(const c of bar)
+        if(c && c.bad) t.errors.push('אקורד לא מזוהה: "' + c.bad + '" במקטע ' + s.name);
+  return t;
+}
+
+/* "Am" / "C" / "D hijaz" / "E phrygian" */
+function parseKey(s){
+  const p = s.trim().split(/\s+/);
+  if(p.length === 1){
+    const minor = /m$/i.test(p[0]) && rootOf(p[0].slice(0,-1)) !== null;
+    const root  = minor ? rootOf(p[0].slice(0,-1)) : rootOf(p[0]);
+    return {root, mode: minor ? 'minor' : 'major', modal:false};
+  }
+  const root = rootOf(p[0]);
+  const mode = p.slice(1).join(' ').toLowerCase();
+  if(/^(major|maj|ionian)$/.test(mode)) return {root, mode:'major', modal:false};
+  if(/^(minor|min|aeolian)$/.test(mode)) return {root, mode:'minor', modal:false};
+  return {root, mode, modal:true};
+}
+
+/* ציר זמן אמיתי: תיבות מפוזרות שווה בין תחילת המקטע לתחילת הבא */
+function truthTimeline(t){
+  const out = [];
+  for(let i=0;i<t.sections.length;i++){
+    const s = t.sections[i];
+    const end = (i+1 < t.sections.length) ? t.sections[i+1].start : t.end;
+    if(!(end > s.start) || !s.bars.length) continue;
+    const barDur = (end - s.start) / s.bars.length;
+    s.t0 = s.start; s.t1 = end; s.barDur = barDur;
+    for(let b=0;b<s.bars.length;b++){
+      const bt0 = s.start + b*barDur, chords = s.bars[b];
+      const n = chords.length || 1;
+      for(let c=0;c<chords.length;c++){
+        const ch = chords[c];
+        if(!ch) continue;
+        out.push({t0: bt0 + c*barDur/n, t1: bt0 + (c+1)*barDur/n,
+                  root: ch.root, suf: ch.suf});
+      }
+    }
+  }
+  return out;
+}
+
+function estTimeline(bars){
+  const out = [];
+  for(const b of bars)
+    for(const c of (b.chords || []))
+      if(c && c.root !== undefined && c.root >= 0 && c.t1 > c.t0)
+        out.push({t0:c.t0, t1:c.t1, root:c.root, suf:c.suf || ''});
+  return out;
+}
+
+/* ============================================================
+   4. ניקוד
+   ============================================================ */
+const MINORISH = new Set(['m','m7','m6','mMaj7','dim','dim7','m7b5']);
+const majmin = c => c.root*2 + (MINORISH.has(c.suf) ? 1 : 0);
+
+function scoreChords(ref, est, t0, t1){
+  const STEP = 0.02;
+  let n=0, mm=0, root=0, full=0;
+  /* מצביעים רצים במקום חיפוש לכל דגימה — שני הצירים ממוינים בזמן */
+  let i=0, j=0;
+  for(let t=t0; t<t1; t+=STEP){
+    while(i<ref.length && ref[i].t1 <= t) i++;
+    while(j<est.length && est[j].t1 <= t) j++;
+    const r = (i<ref.length && t >= ref[i].t0) ? ref[i] : null;
+    if(!r) continue;                       // אין אמת כאן — לא נספר
+    n++;
+    const e = (j<est.length && t >= est[j].t0) ? est[j] : null;
+    if(!e) continue;
+    if(e.root === r.root) root++;
+    if(majmin(e) === majmin(r)) mm++;
+    if(e.root === r.root && e.suf === r.suf) full++;
+  }
+  return n ? {n, majmin:mm/n, root:root/n, full:full/n} : {n:0, majmin:0, root:0, full:0};
+}
+
+const median = a => { if(!a.length) return 0; const s=[...a].sort((x,y)=>x-y);
+  const h=s.length>>1; return s.length&1 ? s[h] : (s[h-1]+s[h])/2; };
+
+function scoreKey(est, truth){
+  const k = parseKey(truth);
+  if(k.root === null) return {type:'לא נקרא', ok:false, modal:false};
+  const eMinor = !!est.minor, eRoot = est.root;
+  if(k.modal) return {type:'מודוס — אין ייצוג', ok:false, modal:true,
+                      tonicOk: eRoot === k.root};
+  const tMinor = k.mode === 'minor';
+  if(eRoot === k.root && eMinor === tMinor) return {type:'נכון', ok:true, modal:false};
+  const d = ((eRoot - k.root) % 12 + 12) % 12;
+  let type = 'אחר';
+  if(eRoot === k.root)                    type = 'מקביל (אותו שורש, מוד הפוך)';
+  else if(!tMinor && eMinor && d === 9)   type = 'רלטיבי';
+  else if(tMinor && !eMinor && d === 3)   type = 'רלטיבי';
+  else if(eMinor === tMinor && d === 7)   type = 'קווינטה מעלה';
+  else if(eMinor === tMinor && d === 5)   type = 'קווינטה מטה';
+  else if(d === 1 || d === 11)            type = 'חצי טון (כיוון הקלטה?)';
+  return {type, ok:false, modal:false};
+}
+
+function scoreBpm(est, truth){
+  const rel = x => Math.abs(est - x) / x <= 0.04;
+  if(rel(truth)) return {type:'נכון', ok:true, oct:true};
+  for(const f of [2, 0.5, 3, 1/3, 1.5, 2/3])
+    if(rel(truth*f)) return {type:'פי ' + (f<1 ? '1/'+Math.round(1/f) : f), ok:false, oct:true};
+  return {type:'שגוי', ok:false, oct:false};
+}
+
+/* גבולות מבנה — F עם סבילות של ±3 שניות (מקובל ב-MIREX) */
+function scoreBoundaries(refT, estT, tol){
+  const used = new Set();
+  let hit = 0;
+  for(const r of refT){
+    let best = -1, bd = tol;
+    for(let i=0;i<estT.length;i++){
+      if(used.has(i)) continue;
+      const d = Math.abs(estT[i] - r);
+      if(d <= bd){ bd = d; best = i; }
+    }
+    if(best >= 0){ used.add(best); hit++; }
+  }
+  const p = estT.length ? hit/estT.length : 0;
+  const r = refT.length ? hit/refT.length : 0;
+  return {p, r, f: (p+r) ? 2*p*r/(p+r) : 0, hit, nRef:refT.length, nEst:estT.length};
+}
+
+/* זהות מקטעים — F זוגי. שואל "האם שני רגעים באותו מקטע?" ומשווה
+   את התשובה, ולכן הוא לא תלוי בשמות שנתנו לאשכולות. */
+function scorePairwise(refLab, estLab){
+  let both=0, inRef=0, inEst=0;
+  for(let i=0;i<refLab.length;i++)
+    for(let j=i+1;j<refLab.length;j++){
+      if(refLab[i]===null || estLab[i]===null || refLab[j]===null || estLab[j]===null) continue;
+      const a = refLab[i]===refLab[j], b = estLab[i]===estLab[j];
+      if(a) inRef++;
+      if(b) inEst++;
+      if(a && b) both++;
+    }
+  const p = inEst ? both/inEst : 0, r = inRef ? both/inRef : 0;
+  return {p, r, f:(p+r) ? 2*p*r/(p+r) : 0};
+}
+
+const baseName = s => s.replace(/[\sא-ת]*\d+\s*$/, '').trim() || s;
+
+function scoreSong(res, truth){
+  const {r, bpm, duration} = res;
+  const ref = truthTimeline(truth);
+  const est = estTimeline(r.bars);
+  const t0 = truth.sections[0].start;
+  const t1 = Math.min(truth.end, duration);
+
+  const ch = scoreChords(ref, est, t0, t1);
+
+  /* מדד "מושך אקורדים": אורך אקורד חציוני, מוערך מול אמיתי */
+  const refDur = median(ref.map(c => c.t1 - c.t0));
+  const estDur = median(est.map(c => c.t1 - c.t0));
+
+  /* מבנה */
+  const refB = truth.sections.map(s => s.start).filter(x => x > t0 + 0.5);
+  const estB = r.secs.map(s => r.bars[s.from] && r.bars[s.from].t0)
+                     .filter(x => x !== undefined && x > t0 + 0.5);
+  const bnd3 = scoreBoundaries(refB, estB, 3);
+
+  const STEP = 1;
+  const refLab = [], estLab = [];
+  for(let t=t0; t<t1; t+=STEP){
+    let rl = null;
+    for(const s of truth.sections) if(t >= s.t0 && t < s.t1){ rl = baseName(s.name); break; }
+    let el = null;
+    for(const s of r.secs){
+      const a = r.bars[s.from], b = r.bars[s.to-1];
+      if(a && b && t >= a.t0 && t < b.t1){ el = s.c; break; }
+    }
+    refLab.push(rl); estLab.push(el);
+  }
+  const pair = scorePairwise(refLab, estLab);
+
+  return {
+    key:   {est: noteName(r.key.root, false) + (r.key.minor?'m':''),
+            truth: truth.key, ...scoreKey(r.key, truth.key)},
+    bpm:   {est: Math.round(bpm*10)/10, truth: truth.bpm, ...scoreBpm(bpm, truth.bpm)},
+    meter: {est: r.meter.label, truth: truth.meter, ok: r.meter.label === truth.meter,
+            raw: r.meter.rawBpb, conf: Math.round((r.meter.conf||0)*100)/100},
+    chords: {...ch,
+             refMedianSec: Math.round(refDur*100)/100,
+             estMedianSec: Math.round(estDur*100)/100,
+             stretch: refDur ? Math.round(estDur/refDur*100)/100 : null},
+    structure: {boundaryF: bnd3.f, boundaryP: bnd3.p, boundaryR: bnd3.r,
+                nRefSec: truth.sections.length, nEstSec: r.secs.length,
+                labelF: pair.f},
+    meta: {duration: Math.round(duration*10)/10,
+           tuneCents: res.tune, tempoConf: Math.round((res.tempoConf||0)*100)/100}
+  };
+}
+
+/* ============================================================
+   5. ממשק
+   ============================================================ */
+const pct = x => (x*100).toFixed(1) + '%';
+const cls = (ok, warn) => ok ? 'ok' : (warn ? 'warn' : 'bad');
+const base = f => f.name.replace(/\.[^.]+$/, '');
+
+let AUDIO = [], TRUTH = [];
+function refresh(){
+  const pairs = AUDIO.filter(a => TRUTH.some(t => base(t) === base(a)));
+  $('run').disabled = !pairs.length;
+  logEl.textContent =
+    AUDIO.length + ' קבצי אודיו · ' + TRUTH.length + ' קבצי אמת · ' +
+    pairs.length + ' זוגות תואמים';
+  const orphanA = AUDIO.filter(a => !TRUTH.some(t => base(t)===base(a))).map(base);
+  const orphanT = TRUTH.filter(t => !AUDIO.some(a => base(a)===base(t))).map(base);
+  if(orphanA.length) log('אודיו בלי אמת: ' + orphanA.join(', '));
+  if(orphanT.length) log('אמת בלי אודיו: ' + orphanT.join(', '));
+}
+$('fAudio').addEventListener('change', e => { AUDIO = [...e.target.files]; refresh(); });
+$('fTruth').addEventListener('change', e => { TRUTH = [...e.target.files]; refresh(); });
+
+$('run').addEventListener('click', async () => {
+  $('run').disabled = true;
+  const all = [];
+  try{
+    await loadEngine();
+    const pairs = AUDIO.map(a => ({a, t: TRUTH.find(t => base(t) === base(a))}))
+                       .filter(p => p.t);
+    for(let i=0;i<pairs.length;i++){
+      const {a, t} = pairs[i];
+      log('— ' + base(a));
+      const truth = parseTruth(await t.text());
+      if(truth.errors.length){
+        truth.errors.forEach(e => log('   ⚠ ' + e));
+        if(!truth.sections.length || truth.end===null){ log('   דילוג.'); continue; }
+      }
+      const res = await runEngine(a, p => setProg((i + p) / pairs.length));
+      const sc  = scoreSong(res, truth);
+      sc.song = base(a);
+      sc.truthWarnings = truth.errors;
+      all.push(sc);
+      log('   סולם ' + sc.key.est + '/' + sc.key.truth + ' · BPM ' + sc.bpm.est +
+          '/' + sc.bpm.truth + ' · משקל ' + sc.meter.est + '/' + sc.meter.truth +
+          ' · אקורדים ' + pct(sc.chords.majmin));
+    }
+    render(all);
+  }catch(err){
+    log('✖ ' + (err && err.message ? err.message : err));
+    console.error(err);
+  }
+  setProg(0);
+  $('run').disabled = false;
+});
+
+function render(all){
+  if(!all.length){ $('out').innerHTML = ''; return; }
+  const avg = f => all.reduce((s,x)=>s+f(x),0)/all.length;
+  const cnt = f => all.filter(f).length;
+
+  let h = '<h2>סיכום — ' + all.length + ' שירים</h2><div class="card"><table>' +
+    '<tr><th>מדד</th><th>תוצאה</th><th>הערה</th></tr>' +
+    row('סולם נכון',   cnt(x=>x.key.ok) + '/' + all.length,
+        cnt(x=>x.key.modal) ? cnt(x=>x.key.modal) + ' שירים במודוס — אין להם תשובה אפשרית' : '') +
+    row('BPM נכון (±4%)', cnt(x=>x.bpm.ok) + '/' + all.length,
+        cnt(x=>!x.bpm.ok && x.bpm.oct) + ' טעויות אוקטבה בלבד') +
+    row('משקל נכון',   cnt(x=>x.meter.ok) + '/' + all.length, '') +
+    row('אקורדים — majmin', pct(avg(x=>x.chords.majmin)), 'המדד הראשי, משוקלל בזמן') +
+    row('אקורדים — שורש בלבד', pct(avg(x=>x.chords.root)), '') +
+    row('אקורדים — סוג מדויק', pct(avg(x=>x.chords.full)), '') +
+    row('מתיחת אקורדים', avg(x=>x.chords.stretch||1).toFixed(2) + '×',
+        'אורך אקורד חציוני מול האמת. מעל 1.15 = מושך אקורדים') +
+    row('גבולות מבנה — F', pct(avg(x=>x.structure.boundaryF)), 'סבילות ±3 שניות') +
+    row('זהות מקטעים — F', pct(avg(x=>x.structure.labelF)), 'האם הפזמונים קובצו יחד') +
+    '</table></div>';
+
+  h += '<h2>לפי שיר</h2><div class="card"><table><tr>' +
+    ['שיר','סולם','BPM','משקל','majmin','שורש','מתיחה','גבולות','זהות'].map(x=>'<th>'+x+'</th>').join('') +
+    '</tr>';
+  for(const s of all){
+    h += '<tr><td>' + s.song + '</td>' +
+      '<td class="' + cls(s.key.ok, s.key.modal) + '">' + s.key.est + ' / ' + s.key.truth +
+        (s.key.ok ? '' : '<br><small class="dim">' + s.key.type + '</small>') + '</td>' +
+      '<td class="n ' + cls(s.bpm.ok, s.bpm.oct) + '">' + s.bpm.est + ' / ' + s.bpm.truth +
+        (s.bpm.ok ? '' : '<br><small class="dim">' + s.bpm.type + '</small>') + '</td>' +
+      '<td class="' + cls(s.meter.ok) + '">' + s.meter.est + ' / ' + s.meter.truth + '</td>' +
+      '<td class="n ' + cls(s.chords.majmin>0.75, s.chords.majmin>0.6) + '">' + pct(s.chords.majmin) + '</td>' +
+      '<td class="n dim">' + pct(s.chords.root) + '</td>' +
+      '<td class="n ' + cls(s.chords.stretch<1.15, s.chords.stretch<1.35) + '">' + s.chords.stretch + '×</td>' +
+      '<td class="n ' + cls(s.structure.boundaryF>0.6, s.structure.boundaryF>0.4) + '">' + pct(s.structure.boundaryF) +
+        '<br><small class="dim">' + s.structure.nEstSec + '/' + s.structure.nRefSec + ' מקטעים</small></td>' +
+      '<td class="n ' + cls(s.structure.labelF>0.6, s.structure.labelF>0.4) + '">' + pct(s.structure.labelF) + '</td>' +
+      '</tr>';
+  }
+  h += '</table></div>';
+
+  const warn = all.filter(s => s.truthWarnings.length);
+  if(warn.length) h += '<div class="note">' + warn.length +
+    ' שירים עם אזהרות בקובץ האמת — ראו את הלוג למעלה.</div>';
+
+  h += '<h2>JSON — העתיקו ושלחו</h2><pre id="json">' +
+       JSON.stringify(all, null, 2).replace(/</g,'&lt;') + '</pre>';
+  $('out').innerHTML = h;
+}
+function row(a,b,c){
+  return '<tr><td>'+a+'</td><td class="n"><b>'+b+'</b></td><td class="dim">'+(c||'')+'</td></tr>';
+}
+
+})();
+</script>
+</body>
+</html>
