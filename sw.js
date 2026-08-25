@@ -6,8 +6,8 @@
    · chordix-model.bin לא משתנה  → מטמון תחילה, בלי לגעת ברשת
    הגרסה מוטבעת בשם המטמון; שינוי שלה מנקה את הישן.
    ============================================================ */
-const V = 'chordix-v4';
-const SHELL = ['./', './index.html', './site.webmanifest'];
+const V = 'chordix-v5';
+const SHELL = ['./', './index.html', './build.html', './site.webmanifest'];
 
 self.addEventListener('install', e => {
   self.skipWaiting();
