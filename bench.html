@@ -31,6 +31,9 @@
   td.n{font-variant-numeric:tabular-nums}
   .ok{color:var(--ok)} .bad{color:var(--bad)} .warn{color:var(--warn)}
   .dim{color:var(--dim)}
+  details.card>summary{cursor:pointer;user-select:none;padding:2px 0}
+  details.card[open]>summary{margin-bottom:8px;padding-bottom:8px;
+    border-bottom:1px solid var(--line)}
   #log{font:12.5px/1.7 ui-monospace,Consolas,monospace;color:var(--dim);
        max-height:220px;overflow:auto;white-space:pre-wrap}
   pre#json{background:#0b0e13;border:1px solid var(--line);border-radius:8px;
@@ -61,6 +64,26 @@
   <div class="bar"><i id="prog"></i></div>
   <div id="log">ממתין לקבצים…</div>
 </div>
+
+<!-- ================= knobs לניסויי כיול (שלב 1 בתוכנית) =================
+     שדות שנקראים לפני כל ריצה ודורסים קבועים במנוע. ריק = ברירת המחדל
+     של index.html. כך אפשר להריץ ablation (VIT.keyW=0 וכו') בלי לגעת
+     בקוד ובלי deploy, והערך שנוסה נשמר ב-JSON של הריצה לתיעוד. -->
+<details class="card" id="knobsCard">
+  <summary><b>knobs — ניסויי כיול</b> <small class="dim">(ריק = ברירת מחדל; משפיע על הריצה הבאה)</small></summary>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-top:10px">
+    <label class="f"><b>VIT.keyW <small>ברירת מחדל 0.50</small></b>
+      <input type="number" step="0.05" id="kKeyW" placeholder="0.50"
+             style="width:100%;padding:8px;background:#0b0e13;color:var(--fg);border:1px solid var(--line);border-radius:7px"></label>
+    <label class="f"><b>VIT.tplWeight <small>ברירת מחדל 0.25</small></b>
+      <input type="number" step="0.05" id="kTplW" placeholder="0.25"
+             style="width:100%;padding:8px;background:#0b0e13;color:var(--fg);border:1px solid var(--line);border-radius:7px"></label>
+    <label class="f"><b>KEY_W2.foreign <small>ברירת מחדל −0.50</small></b>
+      <input type="number" step="0.05" id="kForeign" placeholder="-0.50"
+             style="width:100%;padding:8px;background:#0b0e13;color:var(--fg);border:1px solid var(--line);border-radius:7px"></label>
+  </div>
+  <div class="note" id="knobsMsg">כל השדות ריקים — המנוע רץ בברירות המחדל.</div>
+</details>
 
 <div id="out"></div>
 
@@ -427,6 +450,65 @@ function scorePairwise(refLab, estLab){
 
 const baseName = s => s.replace(/[\sא-ת]*\d+\s*$/, '').trim() || s;
 
+/* ============================================================
+   תפקידים — שם עברי → מזהה קנוני
+   ------------------------------------------------------------
+   ROLE_NAME ו-RID במנוע מוגדרים ב-const, ולכן הם *לא* נרשמים על
+   window בתסריט קלאסי ואי אפשר לקרוא להם מכאן. במקום זה ממפים את
+   השם שהמנוע כבר כתב על המקטע (s.name), ואת שם מקטע האמת, דרך
+   אותה פונקציה בדיוק — כך שני הצדדים מדוברים באותה שפה.
+   סדר הבדיקות מהותי: "פרה‑פזמון" ו"פוסט‑פזמון" מכילים "פזמון",
+   ולכן הם נבדקים לפניו.
+   ============================================================ */
+const ROLES  = ['intro','verse','pre','chorus','post','cpart','solo','outro'];
+const ROLE_HE = {intro:'אינטרו', verse:'בית', pre:'פרה‑פזמון', chorus:'פזמון',
+                 post:'פוסט‑פזמון', cpart:'C‑part', solo:'סולו', outro:'סיום'};
+function roleOf(name){
+  if(!name) return null;
+  /* כל וריאנטי המקף (כולל U+2011 שבו המנוע משתמש) → מקף רגיל */
+  const s = String(name).replace(/[‐-―־−]/g,'-')
+                        .replace(/\s+/g,'').toLowerCase();
+  if(/intro|אינטרו|פתיחה|מבוא/.test(s))            return 'intro';
+  if(/outro|סיום|סיומת|אאוטרו/.test(s))            return 'outro';
+  if(/pre|פרה/.test(s))                            return 'pre';
+  if(/post|פוסט/.test(s))                          return 'post';
+  if(/chorus|פזמון/.test(s))                       return 'chorus';
+  if(/verse|בית/.test(s))                          return 'verse';
+  if(/solo|סולו|מעבר|כלי/.test(s))                 return 'solo';
+  if(/c-?part|cpart|גשר|bridge/.test(s))           return 'cpart';
+  return null;
+}
+
+/* דיוק תפקידים ברמת פריים, ומטריצת בלבול.
+   נספרים רק פריימים ששני הצדדים נתנו להם תפקיד מוכר — שם שלא
+   זוהה לא נחשב טעות, כדי ששמות חופשיים בקובץ האמת לא יזהמו. */
+function scoreRoles(refR, estR){
+  let hit=0, tot=0;
+  const conf = {};
+  for(let i=0;i<refR.length;i++){
+    const a=refR[i], b=estR[i];
+    if(!a || !b) continue;
+    tot++; if(a===b) hit++;
+    conf[a] = conf[a] || {};
+    conf[a][b] = (conf[a][b]||0) + 1;
+  }
+  return {acc: tot?hit/tot:0, n:tot, conf};
+}
+
+/* הסטייה *החתומה* של כל גבול אמת מהגבול המוערך הקרוב לו.
+   חיובי = המערכת מאחרת. חציון עקבי בסימן אחד מעיד על רשת תיבות
+   מוסטת (BPM/ראש‑תיבה) ולא על מבנה שגוי — וזו ההפרדה שבלעדיה
+   אי אפשר לדעת אם בכלל יש מה לתקן בשכבת המבנה. */
+function boundaryOffsets(refT, estT, tol){
+  const out=[];
+  for(const r of refT){
+    let bd=Infinity;
+    for(const e of estT){ const d=e-r; if(Math.abs(d)<Math.abs(bd)) bd=d; }
+    if(isFinite(bd) && Math.abs(bd)<=tol) out.push(bd);
+  }
+  return out;
+}
+
 function scoreSong(res, truth){
   const {r, bpm, duration} = res;
   const ref = truthTimeline(truth);
@@ -446,19 +528,39 @@ function scoreSong(res, truth){
                      .filter(x => x !== undefined && x > t0 + 0.5);
   const bnd3 = scoreBoundaries(refB, estB, 3);
 
+  /* סבילות מוזיקלית ולא סבילות שעון: חצי תיבה. ב-90 BPM תיבה היא
+     2.7 שניות, ולכן ±3 שניות סולחת על גבול שזז תיבה שלמה — טעות
+     שהמשתמש רואה מיד בדף. */
+  const barDur = median(r.bars.map(b => b.t1 - b.t0).filter(x => x > 0)) || 1;
+  const bndBar = scoreBoundaries(refB, estB, barDur * 0.5);
+  const offs   = boundaryOffsets(refB, estB, 6);
+  const medOff = offs.length ? median(offs) : null;
+
   const STEP = 1;
-  const refLab = [], estLab = [];
+  const refLab = [], estLab = [], refRole = [], estRole = [];
   for(let t=t0; t<t1; t+=STEP){
-    let rl = null;
-    for(const s of truth.sections) if(t >= s.t0 && t < s.t1){ rl = baseName(s.name); break; }
-    let el = null;
+    let rl = null, rr = null;
+    for(const s of truth.sections)
+      if(t >= s.t0 && t < s.t1){ rl = baseName(s.name); rr = roleOf(s.name); break; }
+    let el = null, er = null;
     for(const s of r.secs){
       const a = r.bars[s.from], b = r.bars[s.to-1];
-      if(a && b && t >= a.t0 && t < b.t1){ el = s.c; break; }
+      if(a && b && t >= a.t0 && t < b.t1){ el = s.c; er = roleOf(s.name); break; }
     }
     refLab.push(rl); estLab.push(el);
+    refRole.push(rr); estRole.push(er);
   }
-  const pair = scorePairwise(refLab, estLab);
+  const pair  = scorePairwise(refLab, estLab);
+  const roles = scoreRoles(refRole, estRole);
+
+  /* פירוט המקטעים משני הצדדים — לעין, לא לניקוד */
+  const refSecs = truth.sections.map(s => ({
+    name: s.name, role: roleOf(s.name),
+    t0: Math.round(s.t0*10)/10, bars: s.bars.length }));
+  const estSecs = r.secs.map(s => ({
+    name: s.name + (s.num ? ' ' + s.num : ''), role: roleOf(s.name),
+    t0: r.bars[s.from] ? Math.round(r.bars[s.from].t0*10)/10 : null,
+    bars: s.to - s.from }));
 
   return {
     key:   {est: noteName(r.key.root, false) + (r.key.minor?'m':''),
@@ -471,8 +573,16 @@ function scoreSong(res, truth){
              estMedianSec: Math.round(estDur*100)/100,
              stretch: refDur ? Math.round(estDur/refDur*100)/100 : null},
     structure: {boundaryF: bnd3.f, boundaryP: bnd3.p, boundaryR: bnd3.r,
+                boundaryBarF: bndBar.f,
+                barTolSec: Math.round(barDur*50)/100,
+                medianOffsetSec: medOff===null ? null : Math.round(medOff*100)/100,
+                nOffsets: offs.length,
                 nRefSec: truth.sections.length, nEstSec: r.secs.length,
-                labelF: pair.f},
+                segRatio: Math.round(r.secs.length /
+                          Math.max(1, truth.sections.length) * 100)/100,
+                labelF: pair.f,
+                roleAcc: roles.acc, roleN: roles.n, roleConf: roles.conf,
+                refSecs, estSecs},
     meta: {duration: Math.round(duration*10)/10,
            tuneCents: res.tune, tempoConf: Math.round((res.tempoConf||0)*100)/100}
   };
@@ -505,6 +615,7 @@ $('run').addEventListener('click', async () => {
   const all = [];
   try{
     await loadEngine();
+    const knobs = applyKnobs();
     const pairs = AUDIO.map(a => ({a, t: TRUTH.find(t => base(t) === base(a))}))
                        .filter(p => p.t);
     for(let i=0;i<pairs.length;i++){
@@ -524,7 +635,7 @@ $('run').addEventListener('click', async () => {
           '/' + sc.bpm.truth + ' · משקל ' + sc.meter.est + '/' + sc.meter.truth +
           ' · אקורדים ' + pct(sc.chords.majmin));
     }
-    render(all);
+    render(all, knobs);
   }catch(err){
     log('✖ ' + (err && err.message ? err.message : err));
     console.error(err);
@@ -533,7 +644,24 @@ $('run').addEventListener('click', async () => {
   $('run').disabled = false;
 });
 
-function render(all){
+/* קורא את שדות ה-knobs, דורס את הקבועים במנוע (שנטענו לסקופ הגלובלי),
+   ומחזיר את מה שבאמת הופעל — כדי שיישמר ב-JSON וכל ריצה תהיה משוחזרת. */
+function applyKnobs(){
+  const num = id => { const v = $(id).value.trim(); return v === '' ? null : parseFloat(v); };
+  const set = [];
+  const kw = num('kKeyW');
+  if(kw !== null && typeof VIT === 'object'){ VIT.keyW = kw; set.push('VIT.keyW='+kw); }
+  const tw = num('kTplW');
+  if(tw !== null && typeof VIT === 'object'){ VIT.tplWeight = tw; set.push('VIT.tplWeight='+tw); }
+  const fg = num('kForeign');
+  if(fg !== null && typeof KEY_W2 === 'object'){ KEY_W2.foreign = fg; set.push('KEY_W2.foreign='+fg); }
+  const msg = $('knobsMsg');
+  if(set.length){ msg.textContent = 'הריצה רצה עם: ' + set.join(' · '); log('knobs: ' + set.join(' · ')); }
+  else msg.textContent = 'כל השדות ריקים — המנוע רץ בברירות המחדל.';
+  return set;
+}
+
+function render(all, knobs){
   if(!all.length){ $('out').innerHTML = ''; return; }
   const avg = f => all.reduce((s,x)=>s+f(x),0)/all.length;
   const cnt = f => all.filter(f).length;
@@ -551,11 +679,25 @@ function render(all){
     row('מתיחת אקורדים', avg(x=>x.chords.stretch||1).toFixed(2) + '×',
         'אורך אקורד חציוני מול האמת. מעל 1.15 = מושך אקורדים') +
     row('גבולות מבנה — F', pct(avg(x=>x.structure.boundaryF)), 'סבילות ±3 שניות') +
+    row('גבולות מבנה — F (±חצי תיבה)', pct(avg(x=>x.structure.boundaryBarF)),
+        'סבילות מוזיקלית ולא סבילות שעון — זה המדד שמשקף את מה שרואים בדף') +
+    row('היסט גבולות חציוני', (()=>{
+          const v = all.map(x=>x.structure.medianOffsetSec).filter(x=>x!==null);
+          if(!v.length) return '—';
+          const m = median(v);
+          return (m>0?'+':'') + m.toFixed(2) + ' ש׳';
+        })(),
+        'היסט עקבי בסימן אחד = רשת התיבות מוסטת, ולא המבנה') +
+    row('תפקידים נכונים', pct(avg(x=>x.structure.roleAcc)),
+        'בית / פזמון / גשר — המדד של "השמות הפוכים"') +
     row('זהות מקטעים — F', pct(avg(x=>x.structure.labelF)), 'האם הפזמונים קובצו יחד') +
+    row('יחס מספר מקטעים', avg(x=>x.structure.segRatio).toFixed(2) + '×',
+        'מעל 1 = מפצל יותר מדי · מתחת ל‑1 = בולע מקטעים') +
     '</table></div>';
 
   h += '<h2>לפי שיר</h2><div class="card"><table><tr>' +
-    ['שיר','סולם','BPM','משקל','majmin','שורש','מתיחה','גבולות','זהות'].map(x=>'<th>'+x+'</th>').join('') +
+    ['שיר','סולם','BPM','משקל','majmin','שורש','מתיחה','גבולות','זהות','תפקידים']
+      .map(x=>'<th>'+x+'</th>').join('') +
     '</tr>';
   for(const s of all){
     h += '<tr><td>' + s.song + '</td>' +
@@ -567,23 +709,106 @@ function render(all){
       '<td class="n ' + cls(s.chords.majmin>0.75, s.chords.majmin>0.6) + '">' + pct(s.chords.majmin) + '</td>' +
       '<td class="n dim">' + pct(s.chords.root) + '</td>' +
       '<td class="n ' + cls(s.chords.stretch<1.15, s.chords.stretch<1.35) + '">' + s.chords.stretch + '×</td>' +
-      '<td class="n ' + cls(s.structure.boundaryF>0.6, s.structure.boundaryF>0.4) + '">' + pct(s.structure.boundaryF) +
-        '<br><small class="dim">' + s.structure.nEstSec + '/' + s.structure.nRefSec + ' מקטעים</small></td>' +
+      '<td class="n ' + cls(s.structure.boundaryBarF>0.6, s.structure.boundaryBarF>0.4) + '">' +
+        pct(s.structure.boundaryBarF) +
+        '<br><small class="dim">±3ש׳: ' + pct(s.structure.boundaryF) + '</small>' +
+        '<br><small class="dim">' + s.structure.nEstSec + '/' + s.structure.nRefSec + ' מקטעים</small>' +
+        (s.structure.medianOffsetSec===null ? '' :
+          '<br><small class="dim">היסט ' +
+          (s.structure.medianOffsetSec>0?'+':'') + s.structure.medianOffsetSec + 'ש׳</small>') + '</td>' +
       '<td class="n ' + cls(s.structure.labelF>0.6, s.structure.labelF>0.4) + '">' + pct(s.structure.labelF) + '</td>' +
+      '<td class="n ' + cls(s.structure.roleAcc>0.7, s.structure.roleAcc>0.5) + '">' +
+        pct(s.structure.roleAcc) + '</td>' +
       '</tr>';
   }
   h += '</table></div>';
+
+  h += renderConfusion(all);
+  h += renderSections(all);
 
   const warn = all.filter(s => s.truthWarnings.length);
   if(warn.length) h += '<div class="note">' + warn.length +
     ' שירים עם אזהרות בקובץ האמת — ראו את הלוג למעלה.</div>';
 
+  const payload = { knobs: (knobs && knobs.length) ? knobs : 'ברירת מחדל', songs: all };
+  if(knobs && knobs.length)
+    h += '<div class="note">הריצה כללה שינוי knobs: <b>' + knobs.join(' · ') +
+         '</b> — נשמר גם ב-JSON.</div>';
   h += '<h2>JSON — העתיקו ושלחו</h2><pre id="json">' +
-       JSON.stringify(all, null, 2).replace(/</g,'&lt;') + '</pre>';
+       JSON.stringify(payload, null, 2).replace(/</g,'&lt;') + '</pre>';
   $('out').innerHTML = h;
 }
 function row(a,b,c){
   return '<tr><td>'+a+'</td><td class="n"><b>'+b+'</b></td><td class="dim">'+(c||'')+'</td></tr>';
+}
+
+const fmtT = s => (s===null || s===undefined) ? '' :
+  Math.floor(s/60) + ':' + String(Math.round(s%60)).padStart(2,'0');
+
+/* מטריצת בלבול מצטברת. זה הפלט החשוב של המדידה: הוא אומר *איזו*
+   טעות חוזרת, ולא רק כמה טעויות יש. בית שנקרא פזמון ופזמון שנקרא
+   בית ייראו כאן כשני תאים סימטריים מחוץ לאלכסון. */
+function renderConfusion(all){
+  const agg = {};
+  for(const s of all){
+    const c = (s.structure && s.structure.roleConf) || {};
+    for(const a in c) for(const b in c[a]){
+      agg[a] = agg[a] || {};
+      agg[a][b] = (agg[a][b]||0) + c[a][b];
+    }
+  }
+  const rows = ROLES.filter(r => agg[r]);
+  if(!rows.length) return '';
+  const cols = ROLES.filter(c => rows.some(a => agg[a][c]));
+
+  let h = '<h2>מטריצת בלבול — תפקידים</h2>' +
+    '<div class="note">שורה = מה שכתבתם בקובץ האמת · עמודה = מה שהמערכת אמרה. ' +
+    'האלכסון הוא הצלחה; תא אדום גדול מחוץ לאלכסון הוא הטעות שכדאי לתקן ראשונה. ' +
+    'היחידה היא שניות.</div>' +
+    '<div class="card"><table><tr><th>אמת \\ מערכת</th>' +
+    cols.map(c=>'<th>'+ROLE_HE[c]+'</th>').join('') + '<th>סה״כ</th></tr>';
+  for(const a of rows){
+    const tot = cols.reduce((s,c)=>s+(agg[a][c]||0),0) || 1;
+    h += '<tr><td><b>'+ROLE_HE[a]+'</b></td>' +
+      cols.map(c=>{
+        const v = agg[a][c]||0;
+        if(!v) return '<td class="n dim">·</td>';
+        return '<td class="n ' + (a===c ? 'ok' : 'bad') + '">' + v +
+               '<br><small>' + Math.round(v/tot*100) + '%</small></td>';
+      }).join('') +
+      '<td class="n dim">'+tot+'</td></tr>';
+  }
+  return h + '</table></div>';
+}
+
+/* המקטעים משני הצדדים זה מול זה. ההצמדה היא *לפי סדר* ולא לפי
+   זמן — כשמספר המקטעים שונה, השורות מפסיקות להתאים מנקודה מסוימת,
+   וזה בדיוק מה שרוצים לראות: איפה המערכת פיצלה או בלעה. */
+function renderSections(all){
+  let h = '<h2>מקטעים — אמת מול מערכת</h2>' +
+    '<div class="note">ההשוואה היא לפי סדר המקטעים, לא לפי זמן. ' +
+    'המקום שבו הטור הימני מתחיל להיסחף הוא המקום שבו המערכת פיצלה או בלעה מקטע.</div>';
+  for(const s of all){
+    const R = s.structure.refSecs || [], E = s.structure.estSecs || [];
+    h += '<details class="card"><summary><b>' + s.song + '</b> — ' +
+         R.length + ' אמת / ' + E.length + ' מערכת · תפקידים ' +
+         pct(s.structure.roleAcc) + '</summary><table>' +
+         '<tr><th>#</th><th>אמת</th><th>זמן</th><th>תיבות</th>' +
+         '<th>מערכת</th><th>זמן</th><th>תיבות</th></tr>';
+    for(let i=0; i<Math.max(R.length, E.length); i++){
+      const a=R[i], b=E[i];
+      const ok = a && b && a.role && b.role && a.role===b.role;
+      h += '<tr><td class="dim">'+(i+1)+'</td>' +
+        '<td>'      + (a ? a.name : '—') + '</td>' +
+        '<td class="n dim">' + (a ? fmtT(a.t0) : '') + '</td>' +
+        '<td class="n dim">' + (a ? a.bars : '') + '</td>' +
+        '<td class="' + (a && b ? (ok ? 'ok' : 'bad') : 'dim') + '">' + (b ? b.name : '—') + '</td>' +
+        '<td class="n dim">' + (b ? fmtT(b.t0) : '') + '</td>' +
+        '<td class="n dim">' + (b ? b.bars : '') + '</td></tr>';
+    }
+    h += '</table></details>';
+  }
+  return h;
 }
 
 })();
