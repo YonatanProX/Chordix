@@ -2248,6 +2248,7 @@ html.a11y-reduced-motion .coupon-btn:hover{transform:none}
           <button data-i18n="sheetOpts.button.1" data-export="txt">טקסט</button>
           <button data-export="cho">ChordPro</button>
           <button data-export="json">JSON</button>
+          <button id="devExport" title="ייצוא ניתוח בתבנית אמת (מוגן בקוד)">כפתור מפתחים</button>
         </div>
       </div>
     </details>
@@ -9837,6 +9838,50 @@ $('longSong').addEventListener('change', refreshCostBadge);
 refreshCostBadge();
 document.querySelectorAll('[data-export]').forEach(b=>
   b.addEventListener('click', ()=>doExport(b.dataset.export)));
+
+/* ------------------------------------------------------------
+   כפתור מפתחים: מייצא את ניתוח האתר בדיוק בתבנית קובץ האמת של
+   הבנצ' (קובץ:/סולם:/BPM:/משקל: ואז [מקטע] mm:ss עם | תיבות |),
+   כדי שאפשר יהיה להשוות ניתוח מול אמת באותה שפה. מוגן בקוד 313.
+   ------------------------------------------------------------ */
+function buildTruthText(){
+  const flat = useFlats();
+  /* אקורד גולמי כפי שהמודל זיהה — בלי טרנספוזיציה/קאפו/נוטציה רומית,
+     כי מודדים את הזיהוי מול האמת, לא את מצב התצוגה. */
+  const nameRaw = c => {
+    let t = noteName(c.root, flat) + c.suf;
+    if(c.bass!==undefined && c.bass!==null) t += '/' + noteName(c.bass, flat);
+    return t;
+  };
+  const key  = state.key ? noteName(state.key.root, flat)+(state.key.minor?'m':'') : '?';
+  const bpm  = state.bpm ? Math.round(state.bpm) : '?';
+  const meter= state.meter ? state.meter.label : '4/4';
+  let t = '';
+  t += 'קובץ: ' + safeName() + '.mp3\n';
+  t += 'סולם: ' + key + '\n';
+  t += 'BPM: '  + bpm + '\n';
+  t += 'משקל: ' + meter + '\n\n';
+  for(const s of state.secs){
+    const t0 = state.bars[s.from] ? state.bars[s.from].t0 : 0;
+    t += '[' + secLabel(s) + '] ' + fmtTime(t0) + '\n';
+    const cells = [];
+    for(let i=s.from; i<s.to; i++){
+      const b = state.bars[i];
+      cells.push( (b && b.chords && b.chords.length) ? b.chords.map(nameRaw).join(' ') : '%' );
+    }
+    t += '| ' + cells.join(' | ') + ' |\n';
+  }
+  t += '[סוף] ' + fmtTime(state.duration||0) + '\n';
+  return t;
+}
+$('devExport').addEventListener('click', ()=>{
+  if(!state.secs.length){ toast(cxT('קודם צריך לנתח שיר')); return; }
+  const code = prompt('קוד מפתחים:');
+  if(code === null) return;
+  if(code.trim() !== '313'){ toast(cxT('קוד שגוי')); return; }
+  downloadText(safeName()+'.md', buildTruthText(), 'text/markdown');
+  toast(cxT('הניתוח יוצא בתבנית אמת'));
+});
 $('vTl').addEventListener('click', ()=>setView('timeline'));
 $('vSheet').addEventListener('click', ()=>setView('sheet'));
 $('zoom').addEventListener('change', ()=>{ state._nowRow=-2; renderTimeline(); });
