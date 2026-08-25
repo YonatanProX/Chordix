@@ -45,21 +45,11 @@
          letter-spacing:-.02em;
          background:linear-gradient(120deg,var(--acc),var(--acc2));
          -webkit-background-clip:text;background-clip:text;color:transparent}
-  h1{margin-top:14px;font-weight:700;font-size:clamp(22px,5vw,32px)}
-  p.lead{margin-top:12px;color:var(--dim);font-size:clamp(15px,3.5vw,19px);
+  h1{margin-top:20px;font-weight:900;font-size:clamp(30px,8vw,58px);
+     line-height:1.15;letter-spacing:-.01em}
+  p.lead{margin-top:16px;color:var(--dim);font-size:clamp(15px,3.5vw,20px);
          font-weight:400;line-height:1.6}
-
-  /* פס "התקדמות" דקורטיבי */
-  .bar{margin:30px auto 0;width:min(360px,80vw);height:7px;border-radius:99px;
-       background:#1b212e;overflow:hidden;position:relative}
-  .bar i{position:absolute;inset:0;width:45%;border-radius:99px;
-         background:linear-gradient(90deg,var(--acc),var(--acc2));
-         animation:slide 2.4s ease-in-out infinite}
-  @keyframes slide{
-    0%{transform:translateX(-120%)}
-    60%,100%{transform:translateX(320%)}
-  }
-  .foot{margin-top:26px;color:#5f6880;font-size:13px}
+  .foot{margin-top:34px;color:#5f6880;font-size:13px}
   .dots::after{content:'';animation:dots 1.6s steps(4,end) infinite}
   @keyframes dots{0%{content:''}25%{content:'.'}50%{content:'..'}75%{content:'...'}}
 </style>
@@ -71,9 +61,8 @@
   <main class="card">
     <div class="emoji" aria-hidden="true">🤫</div>
     <div class="brand">Chordix</div>
-    <h1>האתר בשיפוצים<span class="dots"></span></h1>
-    <p class="lead">דברים טובים בדרך.<br>אנחנו משפרים את זיהוי האקורדים והמבנה — שווה לחכות.</p>
-    <div class="bar" aria-hidden="true"><i></i></div>
+    <h1>דברים טובים בדרך<span class="dots"></span></h1>
+    <p class="lead">האתר בשיפוצים.<br>אנחנו משפרים את זיהוי האקורדים והמבנה — שווה לחכות.</p>
     <p class="foot">Chordix · דף אקורדים מכל הקלטה</p>
   </main>
 </body>
