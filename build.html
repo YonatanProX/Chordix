@@ -9879,7 +9879,7 @@ $('devExport').addEventListener('click', ()=>{
   const code = prompt('קוד מפתחים:');
   if(code === null) return;
   if(code.trim() !== '313'){ toast(cxT('קוד שגוי')); return; }
-  downloadText(safeName()+'.md', buildTruthText(), 'text/markdown');
+  downloadText(safeName()+'-site.md', buildTruthText(), 'text/markdown');
   toast(cxT('הניתוח יוצא בתבנית אמת'));
 });
 $('vTl').addEventListener('click', ()=>setView('timeline'));
