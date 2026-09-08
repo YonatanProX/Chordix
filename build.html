@@ -5057,6 +5057,9 @@ function clusterByHarmony(H, thresh){
    ב-Harmonix Set — כבר לא נדרשים כאן, כי אין חיפוש למסנן.)
    ------------------------------------------------------------ */
 const RID = { INTRO:0, VERSE:1, PRE:2, CHORUS:3, POST:4, CPART:5, SOLO:6, OUTRO:7 };
+/* דיבאג מבנה: classifyRoles שומר כאן את המאפיינים והציונים לכל אשכול,
+   וכפתור המפתחים (קוד 313d) מוריד אותם — כדי לאבחן החלפות בית↔פזמון. */
+let __ROLE_DEBUG = null;
 const ROLE_NAME = ['אינטרו','בית','פרה‑פזמון','פזמון','פוסט‑פזמון','C‑part','סולו / מעבר','סיום'];
 
 const roleNorm = arr => {
@@ -5599,6 +5602,27 @@ function classifyRoles(segs, dyn, aff){
   };
   let verse=null, vs=-Infinity;
   for(const v of stat.values()){ const x=verseScore(v); if(x>vs){ vs=x; verse=v; } }
+
+  /* שמירת דיבאג: מאפיינים + ציוני פזמון/בית לכל אשכול, ומי נבחר.
+     זה מה שמאפשר לראות *למה* אשכול מסוים נבחר כפזמון. */
+  try{
+    __ROLE_DEBUG = {
+      N, medBars: +medBars.toFixed(1),
+      chorusC: chorus ? chorus.c : null,
+      verseC:  verse  ? verse.c  : null,
+      clusters: [...stat.values()].map(v => ({
+        c: v.c, count: v.count,
+        e:+v.e.toFixed(3), a:+v.a.toFixed(3), d:+v.d.toFixed(3),
+        bars:+v.bars.toFixed(1), cover:+v.cover.toFixed(3),
+        first:+v.first.toFixed(3), posMean:+v.posMean.toFixed(3),
+        late:+v.late.toFixed(2), dbl:+v.dbl.toFixed(2), rep:+v.rep.toFixed(2),
+        selfSim:+v.selfSim.toFixed(3), closes:v.closes,
+        chorusScore:+chorusScore(v).toFixed(3),
+        verseScore: verseScore(v)===-Infinity ? null : +verseScore(v).toFixed(3)
+      })),
+      segments: segs.map((s,i)=>({ i, c:s.c, from:s.from, to:s.to }))
+    };
+  }catch(e){ __ROLE_DEBUG = { error:String(e) }; }
 
   const role = new Map();
   if(chorus) role.set(chorus.c, RID.CHORUS);
@@ -9914,9 +9938,26 @@ $('devExport').addEventListener('click', ()=>{
   if(!state.secs.length){ toast(cxT('קודם צריך לנתח שיר')); return; }
   const code = prompt('קוד מפתחים:');
   if(code === null) return;
-  if(code.trim() !== '313'){ toast(cxT('קוד שגוי')); return; }
-  downloadText(safeName()+'-site.md', buildTruthText(), 'text/markdown');
-  toast(cxT('הניתוח יוצא בתבנית אמת'));
+  const c = code.trim();
+  if(c === '313'){
+    downloadText(safeName()+'-site.md', buildTruthText(), 'text/markdown');
+    toast(cxT('הניתוח יוצא בתבנית אמת'));
+    return;
+  }
+  if(c === '313d'){   /* ייצוא דיבאג מבנה — מאפיינים וציונים לכל אשכול */
+    const flat = useFlats();
+    const payload = {
+      file: safeName(),
+      key: state.key ? noteName(state.key.root, flat)+(state.key.minor?'m':'') : '?',
+      bpm: state.bpm ? Math.round(state.bpm) : null,
+      meter: state.meter ? state.meter.label : '4/4',
+      roleDebug: __ROLE_DEBUG
+    };
+    downloadText(safeName()+'-debug.json', JSON.stringify(payload,null,2), 'application/json');
+    toast(cxT('דיבאג מבנה יוצא'));
+    return;
+  }
+  toast(cxT('קוד שגוי'));
 });
 $('vTl').addEventListener('click', ()=>setView('timeline'));
 $('vSheet').addEventListener('click', ()=>setView('sheet'));
