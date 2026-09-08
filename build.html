@@ -5572,7 +5572,7 @@ function classifyRoles(segs, dyn, aff){
      בכל השאר. */
   const chorusScore = v =>
       1.10*v.e + 0.80*v.rep + 0.45*Math.min(1, v.cover*2.4)
-    + 0.50*v.selfSim + 0.32*v.closes
+    + 0.35*v.selfSim + 0.32*v.closes
     + 0.30*v.late + 0.28*v.dbl + 0.18*v.a
     - 0.95*(v.count===1 ? 1 : 0)
     - 0.55*Math.max(0, 1 - v.bars/(medBars*0.6));
