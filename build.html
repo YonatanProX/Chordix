@@ -3659,6 +3659,36 @@ function estimateTempoFull(env, fps, opts){
     }
   }
 
+  /* ------------------------------------------------------------
+     תיקון אוקטבה סימטרי (double/half) מול ה-prior הפרספטואלי
+     ------------------------------------------------------------
+     כאן נמצא הבאג שהמדידה חשפה: ב-4 מתוך 7 שירים הטמפו יצא פי 2
+     או חצי מהאמת. ה-comb לבדו נועל על רמה מטרית שגויה — בהפקה
+     צפופה (הי-הטים/כלי-הקשה בשמיניות) האוטוקורלציה חזקה גם בחצי-
+     הזמן, אז המנצח יוצא *מהיר מדי*; בהד-טיים קורה ההפך. "מבחן
+     האמצע" הקודם רק הכפיל (טיפל באיטי-מדי), לעולם לא חצה — לכן
+     טמפו מהיר-מדי נשאר שגוי. הבחירה בין אוקטבות אינה עניין של comb
+     אלא של הקצב המועדף (~120): בין best, כפולו וחציו בוחרים לפי
+     comb*prior, כשה-prior משמש שער. מתקנים אוקטבה רק אם לחלופה יש
+     תמיכת comb ממשית (>=80% מהמנצח) — כדי לא להזיז שירים איטיים/
+     מהירים אמיתיים שבהם ה-comb וה-prior מסכימים ממילא. */
+  {
+    const octAt = m => {
+      const c = scoreAt(fps*60/(best.bpm*m));      // m>1 => מהר יותר
+      return (c && c.bpm>=55 && c.bpm<=200) ? c : null;
+    };
+    const bComb = best.comb || (scoreAt(fps*60/best.bpm)||{}).comb || 0;
+    const octs = [best, octAt(2), octAt(0.5)].filter(Boolean);
+    let bo=best, bv=-Infinity;
+    for(const c of octs){
+      const cComb = c.comb || 0;
+      if(c!==best && cComb < 0.80*bComb) continue; // דורשים תמיכת comb ממשית
+      const v = cComb * prior(c.bpm);
+      if(v>bv){ bv=v; bo=c; }
+    }
+    best = bo;
+  }
+
   out.bpm  = best.bpm;
   out.cands = cands.slice(0,6);
   out.conf = cands.length>1
