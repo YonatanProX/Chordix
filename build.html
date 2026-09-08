@@ -5623,6 +5623,10 @@ function classifyRoles(segs, dyn, aff){
     if(v.count<2) continue;
     const b = between(v);
     if(b < 0.5) continue;
+    /* שער אורך: פרה-פזמון קצר מבית. בלי זה בית מלא שמוביל לפזמון
+       נחטף כ"פרה-פזמון". פרה אמיתי הוא ריצה קצרה, לא מקטע מלא. */
+    const vRef = verse ? verse.bars : medBars;
+    if(v.bars >= vRef*0.85) continue;
     const shortness = Math.max(0, 1 - v.bars/Math.max(1,(verse?verse.bars:medBars)));
     const midE = (chorus && verse)
       ? 1-Math.min(1, Math.abs(v.e-(chorus.e+verse.e)/2)/Math.max(0.15, Math.abs(chorus.e-verse.e)))
@@ -5638,6 +5642,8 @@ function classifyRoles(segs, dyn, aff){
     if(role.has(v.c) || !chorus || v.count<2) continue;
     const after = v.idx.filter(i=>prevOf(i)===chorus.c).length/v.idx.length;
     if(after < 0.5) continue;
+    /* שער אורך: פוסט-פזמון קצר מפזמון. */
+    if(v.bars >= chorus.bars*0.85) continue;
     const shortness = Math.max(0, 1 - v.bars/Math.max(1, chorus.bars));
     const x = 1.00*after + 0.45*shortness + 0.45*v.e + 0.25*(1-v.a);
     if(x>pv2){ pv2=x; post=v; }
