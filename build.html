@@ -5648,6 +5648,13 @@ function classifyRoles(segs, dyn, aff){
         verseScore: verseScore(v)===-Infinity ? null : +verseScore(v).toFixed(3)
       })),
       segments: segs.map((s,i)=>({ i, c:s.c, from:s.from, to:s.to })),
+      /* affinity ממוצע בין כל זוג אשכולות — כדי לזהות פזמון שפוצל
+         לכמה אשכולות (affinity גבוה ביניהם) ולתייג את כולם כפזמון. */
+      clusterAff: (function(){ const o={}; if(M&&AN===N){ const ks=[...cl.keys()];
+        for(let x=0;x<ks.length;x++) for(let y=x+1;y<ks.length;y++){
+          const A=cl.get(ks[x]), B=cl.get(ks[y]); let s=0,n=0;
+          for(const p of A) for(const q of B){ s+=M[p*N+q]; n++; }
+          if(n) o[ks[x]+'-'+ks[y]]=+(s/n).toFixed(3); } } return o; })(),
       segmentation: segs._segDebug || null
     };
   }catch(e){ __ROLE_DEBUG = { error:String(e) }; }
