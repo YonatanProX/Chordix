@@ -2066,20 +2066,25 @@ html.a11y-reduced-motion .coupon-btn:hover{transform:none}
       <li data-i18n="main.7"><span aria-hidden="true">✏️</span> כל אקורד ניתן לתיקון</li>
     </ul>
 
-    <div style="text-align:center;margin:2px 0 12px">
-      <button id="stockBtn" type="button" title="עיבוד אצווה (מוגן בקוד)"
-        style="font-size:12px;opacity:.55;background:transparent;border:1px solid var(--panel-edge);border-radius:8px;padding:5px 12px;cursor:pointer;color:inherit">כפתור סטוק</button>
-    </div>
     <div id="stockPanel" hidden dir="rtl"
-      style="position:fixed;inset:0;z-index:99999;background:#0b0e13;color:#eef1f7;padding:28px;overflow:auto;font-family:inherit">
-      <h2 style="margin:0 0 8px">עיבוד סטוק — כמה שירים במקביל</h2>
-      <p style="color:#9aa3b5;margin:0 0 16px;max-width:640px">בוחרים כמה קובצי שמע, לוחצים "עבד הכל", ומקבלים קובץ ZIP עם <b>-site.md</b> ו-<b>-debug.json</b> לכל שיר. לא מוצג דף אקורדים — רק הקבצים.</p>
-      <input type="file" id="stockFiles" multiple accept="audio/*,.mp3,.wav,.m4a,.ogg,.flac" style="display:block;margin-bottom:14px;color:inherit">
-      <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
-        <button id="stockRun" type="button" style="background:#5b8cff;color:#fff;border:0;border-radius:10px;padding:12px 22px;font-weight:700;cursor:pointer">עבד הכל</button>
-        <button id="stockClose" type="button" style="background:transparent;border:1px solid #333;color:inherit;border-radius:10px;padding:12px 18px;cursor:pointer">סגור</button>
+      style="position:fixed;inset:0;z-index:99999;background:rgba(8,10,14,.93);backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;padding:20px;font-family:inherit">
+      <div style="width:100%;max-width:560px;background:#141a24;border:1px solid #2a3342;border-radius:18px;padding:26px;box-shadow:0 24px 70px #000b;color:#eef1f7">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+          <h2 style="margin:0;font-size:22px">📦 עיבוד סטוק</h2>
+          <button id="stockClose" type="button" aria-label="סגור" style="background:transparent;border:0;color:#9aa3b5;font-size:26px;cursor:pointer;line-height:1;padding:0 4px">×</button>
+        </div>
+        <p style="color:#9aa3b5;margin:0 0 18px;font-size:14px;line-height:1.6">בוחרים כמה קובצי שמע, לוחצים "עבד הכל", ומקבלים קובץ ZIP אחד עם <b>site.md</b> ו-<b>debug.json</b> לכל שיר. לא מוצג דף אקורדים — רק הקבצים. הניתוח זהה למצב הרגיל.</p>
+        <label id="stockDrop" style="display:block;border:2px dashed #38445a;border-radius:14px;padding:26px 18px;text-align:center;cursor:pointer;transition:border-color .2s,background .2s;background:#0f1520">
+          <div style="font-size:30px;line-height:1">🎵</div>
+          <div id="stockPick" style="margin-top:8px;color:#c7d0e0;font-size:14px">גררו לכאן קבצים, או לחצו לבחירה</div>
+          <input type="file" id="stockFiles" multiple accept="audio/*,.mp3,.wav,.m4a,.ogg,.flac" hidden>
+        </label>
+        <button id="stockRun" type="button" style="width:100%;margin-top:16px;background:linear-gradient(120deg,#5b8cff,#8a6bff);color:#fff;border:0;border-radius:12px;padding:14px;font-weight:800;font-size:16px;cursor:pointer">עבד הכל</button>
+        <div id="stockBar" style="height:8px;background:#0b0e13;border-radius:99px;margin-top:16px;overflow:hidden;display:none">
+          <div id="stockBarFill" style="height:100%;width:0;background:linear-gradient(90deg,#5b8cff,#8a6bff);transition:width .3s"></div>
+        </div>
+        <div id="stockProg" style="margin-top:12px;font-size:13.5px;color:#cfd6e4;white-space:pre-line;font-variant-numeric:tabular-nums"></div>
       </div>
-      <div id="stockProg" style="margin-top:18px;font-variant-numeric:tabular-nums;white-space:pre-line"></div>
     </div>
 
     <div class="stage" id="app">
@@ -2567,6 +2572,11 @@ html.a11y-reduced-motion .coupon-btn:hover{transform:none}
     <a href="mailto:chordix.business@gmail.com">chordix.business@gmail.com</a>
   </p>
 </footer>
+
+<div style="text-align:center;padding:14px 0 36px">
+  <button id="stockBtn" type="button" title="עיבוד אצווה (מוגן בקוד)"
+    style="font-size:12px;opacity:.5;background:transparent;border:1px solid var(--panel-edge);border-radius:8px;padding:6px 14px;cursor:pointer;color:inherit">כפתור סטוק</button>
+</div>
 
 <div id="utilityStack">
   <button data-i18n-attr="title:utilityStack.button.attr_title.1,aria-label:utilityStack.button.attr_label.1" class="float-btn" id="helpToggle" title="עזרה" aria-label="עזרה והוראות" aria-expanded="false" aria-controls="helpWindow">
@@ -10026,11 +10036,20 @@ $('devExport').addEventListener('click', ()=>{
     return new Blob([out],{type:'application/zip'});
   }
 
+  let stockSelected=[];
+  function setPick(){
+    const el=$('stockPick'); if(!el) return;
+    el.textContent = stockSelected.length
+      ? ('נבחרו '+stockSelected.length+' קבצים ✓') : 'גררו לכאן קבצים, או לחצו לבחירה';
+  }
   async function runStock(files){
     const prog=$('stockProg'), enc=new TextEncoder(), zf=[];
+    const bar=$('stockBar'), fill=$('stockBarFill');
+    if(bar) bar.style.display='block';
     for(let i=0;i<files.length;i++){
       const f=files[i];
       prog.textContent='מעבד '+(i+1)+'/'+files.length+': '+f.name;
+      if(fill) fill.style.width=(i/files.length*100)+'%';
       await new Promise(r=>setTimeout(r,20));
       try{
         const audio=await decodeAudio(f);
@@ -10051,6 +10070,7 @@ $('devExport').addEventListener('click', ()=>{
       }
     }
     prog.textContent='מכין ZIP…';
+    if(fill) fill.style.width='100%';
     const a=document.createElement('a');
     a.href=URL.createObjectURL(zipStore(zf));
     a.download='chordix-batch.zip';
@@ -10065,12 +10085,22 @@ $('devExport').addEventListener('click', ()=>{
   });
   const closeB=$('stockClose');
   if(closeB) closeB.addEventListener('click', ()=>{ $('stockPanel').hidden=true; });
+
+  const inp=$('stockFiles');
+  if(inp) inp.addEventListener('change', ()=>{ stockSelected=[...(inp.files||[])]; setPick(); });
+  const drop=$('stockDrop');
+  if(drop){
+    drop.addEventListener('dragover', e=>{ e.preventDefault(); drop.style.borderColor='#5b8cff'; drop.style.background='#12204a'; });
+    drop.addEventListener('dragleave', ()=>{ drop.style.borderColor='#38445a'; drop.style.background='#0f1520'; });
+    drop.addEventListener('drop', e=>{ e.preventDefault(); drop.style.borderColor='#38445a'; drop.style.background='#0f1520';
+      const fs=[...(e.dataTransfer.files||[])].filter(f=>/audio\/|\.(mp3|wav|m4a|aac|ogg|oga|opus|flac|webm)$/i.test((f.type||'')+f.name));
+      if(fs.length){ stockSelected=fs; setPick(); } });
+  }
   const runB=$('stockRun');
   if(runB) runB.addEventListener('click', async ()=>{
-    const files=[...(($('stockFiles')||{}).files||[])];
-    if(!files.length){ toast(cxT('בחר קבצים קודם')); return; }
+    if(!stockSelected.length){ toast(cxT('בחר קבצים קודם')); return; }
     runB.disabled=true;
-    try{ await runStock(files); }
+    try{ await runStock(stockSelected); }
     catch(e){ $('stockProg').textContent='שגיאה: '+((e&&e.message)||e); }
     finally{ runB.disabled=false; }
   });
