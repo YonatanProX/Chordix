@@ -4874,7 +4874,8 @@ function detectLoop(keys){
 }
 
 /* בחירת גבולות בתכנון דינמי: מקסימום עוצמת-גבול, אורכי מקטע חוקיים,
-   העדפה חזקה לכפולות של 4/8 תיבות, וקנס קבוע על כל גבול */
+   והעדפה קלה בלבד לכפולות של 4/8 תיבות. רשת הפרזות אינה ראיה
+   למעבר בפני עצמה: היא רק שוברת שוויון בין גבולות שהאודיו כבר תומך בהם. */
 function boundaryDP(strength, n, minLen, maxLen, cost, loop){
   loop = loop||4;
   const NEG=-1e9;
@@ -5620,7 +5621,8 @@ function classifyRoles(segs, dyn, aff){
         chorusScore:+chorusScore(v).toFixed(3),
         verseScore: verseScore(v)===-Infinity ? null : +verseScore(v).toFixed(3)
       })),
-      segments: segs.map((s,i)=>({ i, c:s.c, from:s.from, to:s.to }))
+      segments: segs.map((s,i)=>({ i, c:s.c, from:s.from, to:s.to })),
+      segmentation: segs._segDebug || null
     };
   }catch(e){ __ROLE_DEBUG = { error:String(e) }; }
 
@@ -5848,7 +5850,7 @@ function nameSections(segs, bars, A){
 const GENERIC = ['מקטע א','מקטע ב','מקטע ג','מקטע ד','מקטע ה','מקטע ו','מקטע ז','מקטע ח','מקטע ט','מקטע י'];
 
 const STRUCT = { minLenLong:4, minLenShort:4, cost:0.55, thresh:0.34,
-                 gridBonus:0.30, grid4:0.85, clusterThresh:0.52, lenBonus:0.22,
+                 gridBonus:0.04, grid4:0.85, clusterThresh:0.52, lenBonus:0.22,
                  threshes:[0.42,0.47,0.52,0.58,0.64] };
 
 /* ============================================================
@@ -6422,6 +6424,21 @@ function segmentSpectral(bars, energy, A, sens, opt){
   if(opt.useSnap) out=snapBoundaries(out, n, strength, loop);
   out=relabel(out);
   const res = out.filter(s=>s.to>s.from);
+  /* דיבאג הסגמנטציה: לשמור את עוצמות הגבול וההחלטות לפני/אחרי
+     האכיפה, כדי שאפשר יהיה להבחין בין חיתוך שנובע מהאודיו לבין
+     חיתוך שנוצר מהעדפת רשת פרזות. */
+  try{
+    const vals=Array.from(strength.slice(1,n)).sort((a,b)=>a-b);
+    const at=q=>vals[Math.min(vals.length-1, Math.max(0, Math.round(q*(vals.length-1))))]||0;
+    const cutInfo=cuts.map(x=>({ bar:x, strength:+(strength[x]||0).toFixed(3) }));
+    Object.defineProperty(res, '_segDebug', { value:{
+      loop, minLen, maxLen, cost:+cost.toFixed(3),
+      strength:{ p50:+at(.50).toFixed(3), p75:+at(.75).toFixed(3), p90:+at(.90).toFixed(3) },
+      dpCuts:cutInfo,
+      afterMerge:merged.map(s=>({from:s.from,to:s.to,c:s.c})),
+      final:res.map(s=>({from:s.from,to:s.to,c:s.c}))
+    }, enumerable:false, configurable:true, writable:true });
+  }catch(e){}
   /* השיכון הספקטרלי לכל תיבה נשמר על מערך המקטעים. שכבת הזהות
      משתמשת בו כערוץ נוסף: הוא רואה דמיון שלא עובר דרך אקורדים
      או גוון, ולכן הוא מוסיף מידע — גם אם לבדו הוא כלי גרוע
