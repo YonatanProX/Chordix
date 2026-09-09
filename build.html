@@ -6215,7 +6215,11 @@ function enforcePeriod(segs, n, loop){
   const lens=segs.map(s=>s.to-s.from).sort((a,b)=>a-b);
   if(!lens.length) return segs;
   const med=lens[lens.length>>1];
-  const unit=Math.max(4, Math.min(med, 16));
+  /* רצפת יחידת-הפרזה = 8 תיבות (האורך הסטנדרטי של בית/פזמון בפופ).
+     דיבאג v5 הראה שהרצפה הקודמת (4) פיצלה כל מקטע של 8 תיבות ל-4+4
+     וגרמה לפיצול-יתר (רואי: 14→19). עם רצפה 8, מקטע 8 תיבות נשאר
+     שלם ורק 16+ מתפצל ל-8+8. */
+  const unit=Math.max(8, Math.min(med, 16));
   const out=[];
   for(const s of segs){
     const L=s.to-s.from;
