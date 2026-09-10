@@ -10092,7 +10092,14 @@ $('devExport').addEventListener('click', ()=>{
           key: state.key ? noteName(state.key.root, flat)+(state.key.minor?'m':'') : '?',
           bpm: state.bpm?Math.round(state.bpm):null,
           meter: state.meter?state.meter.label:'4/4',
-          roleDebug: __ROLE_DEBUG };
+          roleDebug: __ROLE_DEBUG,
+          frameEmb: (function(){
+            if(!__EMB || !__EMB.data) return null;
+            const D=__EMB.dim, n=__EMB.n, data=__EMB.data, step=Math.max(1,Math.round(n/400)), rows=[];
+            for(let t=0;t<n;t+=step){ const r=new Array(D), o=t*D;
+              for(let k=0;k<D;k++) r[k]=+data[o+k].toFixed(3); rows.push(r); }
+            return { dim:D, n, step, dur: state.duration||0, rows };
+          })() };
         zf.push({name:base+'-site.md', data:enc.encode(md)});
         zf.push({name:base+'-debug.json', data:enc.encode(JSON.stringify(dbg,null,2))});
       }catch(e){
