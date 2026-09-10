@@ -6,7 +6,7 @@
    · chordix-model.bin לא משתנה  → מטמון תחילה, בלי לגעת ברשת
    הגרסה מוטבעת בשם המטמון; שינוי שלה מנקה את הישן.
    ============================================================ */
-const V = 'chordix-v6';
+const V = 'chordix-v7';
 const SHELL = ['./', './index.html', './build.html', './site.webmanifest'];
 
 self.addEventListener('install', e => {
@@ -51,7 +51,9 @@ self.addEventListener('fetch', e => {
      ייתפס מיד, עם נפילה חזרה למטמון כשאין חיבור. */
   if (sameOrigin) {
     e.respondWith(
-      fetch(req)
+      /* no-store: לא לתת למטמון-הדפדפן להגיש HTML ישן. בלי זה פרסום
+         חדש לא נתפס גם כשה-SW "רשת תחילה", כי fetch מחזיר עותק HTTP ישן. */
+      fetch(req, { cache: 'no-store' })
         .then(res => {
           const copy = res.clone();
           caches.open(V).then(c => c.put(req, copy));
