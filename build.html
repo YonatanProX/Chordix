@@ -5087,6 +5087,9 @@ const RID = { INTRO:0, VERSE:1, PRE:2, CHORUS:3, POST:4, CPART:5, SOLO:6, OUTRO:
 /* דיבאג מבנה: classifyRoles שומר כאן את המאפיינים והציונים לכל אשכול,
    וכפתור המפתחים (קוד 313d) מוריד אותם — כדי לאבחן החלפות בית↔פזמון. */
 let __ROLE_DEBUG = null;
+/* embeddings עמוקים (128-ממד לפריים) שנשאבים מהמודל דרך graph surgery —
+   לבניית מטריצת דמיון טובה בהרבה מ-chroma. נלכד ב-modelPredict, נדגם לדיבאג. */
+let __EMB = null;
 const ROLE_NAME = ['אינטרו','בית','פרה‑פזמון','פזמון','פוסט‑פזמון','C‑part','סולו / מעבר','סיום'];
 
 const roleNorm = arr => {
@@ -8321,6 +8324,7 @@ async function loadModel(){ return ensureModel(); }
 async function modelPredict(feat, nFrames, onProg, shifts){
   const sess = await loadModel();
   shifts = (shifts && shifts.length) ? shifts : [0];
+  __EMB = null;   // embeddings טריים לכל ניתוח
   const blocks = Math.ceil(nFrames/M_TIMESTEP);
   const acc = new Float32Array(nFrames*NCLS);
   const buf = new Float32Array(M_TIMESTEP*M_BINS);
@@ -8347,6 +8351,13 @@ async function modelPredict(feat, nFrames, onProg, shifts){
       }
       const out = await sess.run({ cqt: new ort.Tensor('float32', input, [1,M_TIMESTEP,M_BINS]) });
       const logits = out[Object.keys(out)[0]].data;
+      /* לכידת ה-embedding (רק בהרצה הראשונה — פריימים גולמיים בלי גלגול) */
+      if(sh===shifts[0] && out['embedding']){
+        const eo=out['embedding'], D=eo.dims[eo.dims.length-1], ed=eo.data;
+        if(!__EMB) __EMB={ dim:D, n:nFrames, data:new Float32Array(nFrames*D) };
+        for(let t=a;t<z;t++){ const so=(t-a)*D, dof=t*D;
+          for(let k=0;k<D;k++) __EMB.data[dof+k]=ed[so+k]; }
+      }
       const NCo = Math.min(NCLS, logits.length/M_TIMESTEP|0);
       for(let t=a;t<z;t++){
         const off=(t-a)*(logits.length/M_TIMESTEP|0);
@@ -10005,7 +10016,15 @@ $('devExport').addEventListener('click', ()=>{
       key: state.key ? noteName(state.key.root, flat)+(state.key.minor?'m':'') : '?',
       bpm: state.bpm ? Math.round(state.bpm) : null,
       meter: state.meter ? state.meter.label : '4/4',
-      roleDebug: __ROLE_DEBUG
+      roleDebug: __ROLE_DEBUG,
+      /* embeddings עמוקים דגומים (~400 שורות) + משך, למיפוי-זמן אחיד אופליין */
+      frameEmb: (function(){
+        if(!__EMB || !__EMB.data) return null;
+        const {data,dim,n}=__EMB, step=Math.max(1,Math.round(n/400)), rows=[];
+        for(let t=0;t<n;t+=step){ const r=new Array(dim), o=t*dim;
+          for(let k=0;k<dim;k++) r[k]=+data[o+k].toFixed(3); rows.push(r); }
+        return { dim, n, step, dur: state.duration||0, rows };
+      })()
     };
     downloadText(safeName()+'-debug.json', JSON.stringify(payload,null,2), 'application/json');
     toast(cxT('דיבאג מבנה יוצא'));
