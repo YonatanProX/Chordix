@@ -5252,7 +5252,20 @@ function segDescriptors(segs, bars, A){
       if(cc){ let q=0; for(let k=0;k<m;k++){ emb[k]/=cc; q+=emb[k]*emb[k]; }
               q=Math.sqrt(q)||1; for(let k=0;k<m;k++) emb[k]/=q; }
     }
-    return { ch, tm, emb, e:e/c, act:act/c, dens:dens/c, len:n,
+    /* embedding עמוק (נוירוני, 128-ממד) לכל מקטע — מיפוי זמן→פריים
+       זהה ל-barFeatures. מקור דמיון חזק בהרבה לזיהוי חזרות (אומת:
+       0.95 בין פזמונים חוזרים מול ~0.03 של chroma). */
+    let demb=null;
+    if(typeof __EMB!=='undefined' && __EMB && __EMB.data && A && A.cfps && bars[s.from] && bars[s.to-1]){
+      const Dd=__EMB.dim, off=A.toff||0;
+      const fa=Math.max(0, Math.round((bars[s.from].t0-off)*A.cfps));
+      const fz=Math.min(__EMB.n, Math.max(fa+1, Math.round((bars[s.to-1].t1-off)*A.cfps)));
+      demb=new Float64Array(Dd); let dc=0;
+      for(let f=fa;f<fz;f++){ const o=f*Dd; for(let k=0;k<Dd;k++) demb[k]+=__EMB.data[o+k]; dc++; }
+      if(dc){ let q=0; for(let k=0;k<Dd;k++){ demb[k]/=dc; q+=demb[k]*demb[k]; }
+              q=Math.sqrt(q)||1; for(let k=0;k<Dd;k++) demb[k]/=q; }
+    }
+    return { ch, tm, emb, demb, e:e/c, act:act/c, dens:dens/c, len:n,
              seq:segChordSeq(bars,s), from:s.from, to:s.to };
   });
   /* מירכוז הכרומה על פני השיר. בלי זה כל שני וקטורי כרומה
@@ -5313,9 +5326,16 @@ function segAffinity(D){
        ביותר כי הוא הערוץ החזק ביותר בפועל — אבל לבדו הוא מפספס
        בדיוק את מה שהמשתמש מתלונן עליו (פזמון שעולה בטון, חזרה
        על אותה התקדמות בעיבוד אחר), ושם נכנסים השלושה האחרים. */
-    const core = emb===null
-      ? (0.44*seqN + 0.24*chr + 0.28*tim)
-      : (0.25*seqN + 0.10*chr + 0.15*tim + 0.50*emb);
+    /* ערוץ חמישי: embedding עמוק נוירוני. חזק מאוד לזיהוי חזרות, אבל
+       נותן דמיון גבוה גם בין בית לפזמון החולקים הרמוניה — לכן משקל
+       מתון (0.25) שמחזק את הקיבוץ בלי לגבור על המפרידים (seq+tim),
+       אחרת בית ופזמון ימוזגו. */
+    const demb = (D[i].demb && D[j].demb) ? Math.max(0, dot(D[i].demb, D[j].demb)) : null;
+    const core = demb!==null
+      ? (0.30*seqN + 0.13*chr + 0.17*tim + 0.15*(emb||0) + 0.25*demb)
+      : (emb===null
+          ? (0.44*seqN + 0.24*chr + 0.28*tim)
+          : (0.25*seqN + 0.10*chr + 0.15*tim + 0.50*emb));
     const s = Math.max(0, core * lenF - 0.16*eDif);
     M[i*N+j]=M[j*N+i]=s;
   }
