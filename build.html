@@ -5252,20 +5252,7 @@ function segDescriptors(segs, bars, A){
       if(cc){ let q=0; for(let k=0;k<m;k++){ emb[k]/=cc; q+=emb[k]*emb[k]; }
               q=Math.sqrt(q)||1; for(let k=0;k<m;k++) emb[k]/=q; }
     }
-    /* embedding עמוק (נוירוני, 128-ממד) לכל מקטע — מיפוי זמן→פריים זהה
-       ל-barFeatures. משמש רק למיזוג-אשכולות (mergeByEmbedding), לא ב-affinity
-       (שם הוא מיזג בית↔פזמון — v9). */
-    let demb=null;
-    if(typeof __EMB!=='undefined' && __EMB && __EMB.data && A && A.cfps && bars[s.from] && bars[s.to-1]){
-      const Dd=__EMB.dim, off=A.toff||0;
-      const fa=Math.max(0, Math.round((bars[s.from].t0-off)*A.cfps));
-      const fz=Math.min(__EMB.n, Math.max(fa+1, Math.round((bars[s.to-1].t1-off)*A.cfps)));
-      demb=new Float64Array(Dd); let dcnt=0;
-      for(let f=fa;f<fz;f++){ const o=f*Dd; for(let k=0;k<Dd;k++) demb[k]+=__EMB.data[o+k]; dcnt++; }
-      if(dcnt){ let q=0; for(let k=0;k<Dd;k++){ demb[k]/=dcnt; q+=demb[k]*demb[k]; }
-                q=Math.sqrt(q)||1; for(let k=0;k<Dd;k++) demb[k]/=q; }
-    }
-    return { ch, tm, emb, demb, e:e/c, act:act/c, dens:dens/c, len:n,
+    return { ch, tm, emb, e:e/c, act:act/c, dens:dens/c, len:n,
              seq:segChordSeq(bars,s), from:s.from, to:s.to };
   });
   /* מירכוז הכרומה על פני השיר. בלי זה כל שני וקטורי כרומה
@@ -5535,61 +5522,12 @@ function clusterSegments(segs, bars, A){
   }
 
   segs.forEach((s,i)=>s.c=best[i]);
-  /* מיזוג-embedding: אשכולות שה-embedding העמוק שלהם כמעט זהה (>0.94)
-     ו-רמת האנרגיה דומה (Δ<0.6z) הם אותו סקשן שפוצל — ממזגים אותם.
-     הסף הכפול מונע מיזוג בית↔פזמון (הרמוניה דומה אך אנרגיה שונה) —
-     הלקח מ-v9. פותר את "חצי-פזמון שיצא אשכול נפרד וקיבל תווית בית". */
-  mergeByEmbedding(segs, D);
   /* המטריצה נשמרת לשכבת התפקידים — "כמה זהה המקטע לעצמו בכל
      מופע" הוא אחד הסימנים הטובים ביותר לפזמון, ואין טעם לחשב
      אותו פעמיים. */
   Object.defineProperty(segs, '_aff', { value:{M, D, N:segs.length},
                                         enumerable:false, configurable:true, writable:true });
   return segs;
-}
-
-/* ============================================================
-   מיזוג אשכולות לפי embedding עמוק + שער אנרגיה
-   ------------------------------------------------------------
-   ה-embedding העמוק (מהמודל, graph surgery) נותן דמיון ~0.95 בין
-   מופעי אותו סקשן (מול ~0.03 של chroma) — פותר את חוסר-הקיבוץ שגרם
-   ל"חצי-פזמון שיצא אשכול נפרד ותויג בית". אבל הוא נותן ~0.89 גם בין
-   בית↔פזמון (הרמוניה משותפת), ולכן אסור להזין אותו כערוץ-דמיון (v9).
-   כאן משתמשים בו רק למיזוג, עם שער אנרגיה: ממזגים שני אשכולות רק אם
-   ה-embedding כמעט זהה (>0.94) *וגם* האנרגיה דומה (<0.6z) — כך מופעי
-   פזמון מתמזגים, אך בית (אנרגיה נמוכה) לא נבלע לפזמון (אנרגיה גבוהה).
-   ============================================================ */
-function mergeByEmbedding(segs, D){
-  const N=segs.length; if(N<2) return;
-  const cl=new Map();
-  segs.forEach((s,i)=>{ if(!cl.has(s.c)) cl.set(s.c,[]); cl.get(s.c).push(i); });
-  const ids=[...cl.keys()];
-  const stat=new Map();
-  for(const c of ids){
-    const idx=cl.get(c); let dim=0;
-    for(const i of idx){ if(D[i] && D[i].demb){ dim=D[i].demb.length; break; } }
-    if(!dim){ stat.set(c,null); continue; }
-    const m=new Float64Array(dim); let e=0, cc=0;
-    for(const i of idx){ const d=D[i]&&D[i].demb; if(!d) continue;
-      for(let k=0;k<dim;k++) m[k]+=d[k]; e+=(D[i]?D[i].e:0)||0; cc++; }
-    if(!cc){ stat.set(c,null); continue; }
-    let q=0; for(let k=0;k<dim;k++){ m[k]/=cc; q+=m[k]*m[k]; } q=Math.sqrt(q)||1;
-    for(let k=0;k<dim;k++) m[k]/=q;
-    stat.set(c,{emb:m, e:e/cc});
-  }
-  const parent=new Map(); ids.forEach(c=>parent.set(c,c));
-  const find=x=>{ while(parent.get(x)!==x){ parent.set(x,parent.get(parent.get(x))); x=parent.get(x); } return x; };
-  const EMB_TH=0.94, E_TH=0.6;
-  for(let a=0;a<ids.length;a++) for(let b=a+1;b<ids.length;b++){
-    const sa=stat.get(ids[a]), sb=stat.get(ids[b]); if(!sa||!sb) continue;
-    let d=0; for(let k=0;k<sa.emb.length;k++) d+=sa.emb[k]*sb.emb[k];
-    if(d>EMB_TH && Math.abs(sa.e-sb.e)<E_TH){
-      const ra=find(ids[a]), rb=find(ids[b]); if(ra!==rb) parent.set(ra,rb);
-    }
-  }
-  const canon=new Map(); let nl=0;
-  for(const c of ids){ const r=find(c); if(!canon.has(r)) canon.set(r,nl++); }
-  segs.forEach(s=>{ s.c=canon.get(find(s.c)); });
 }
 
 /* ============================================================
