@@ -3,11 +3,11 @@
    ------------------------------------------------------------
    שתי אסטרטגיות שונות, כי לשני סוגי הנכסים יש התנהגות הפוכה:
    · index.html משתנה בכל פרסום  → רשת תחילה, מטמון כגיבוי
-   · chordix-model.bin לא משתנה  → מטמון תחילה, בלי לגעת ברשת
+   · קובץ המודל לא משתנה  → מטמון תחילה, בלי לגעת ברשת
    הגרסה מוטבעת בשם המטמון; שינוי שלה מנקה את הישן.
    ============================================================ */
-const V = 'chordix-v7';
-const SHELL = ['./', './index.html', './build.html', './site.webmanifest'];
+const V = 'chordix-v8';
+const SHELL = ['./', './index.html', './site.webmanifest'];
 
 self.addEventListener('install', e => {
   self.skipWaiting();
@@ -31,7 +31,7 @@ self.addEventListener('fetch', e => {
 
   /* המודל וקבצי ה-wasm: מטמון תחילה. הם גדולים, בלתי משתנים,
      וזה מה שמאפשר לנתח שירים גם בלי רשת. */
-  if (url.pathname.endsWith('chordix-model.bin') ||
+  if (/\/chordix-model(?:-e1)?\.bin$/.test(url.pathname) ||
       url.pathname.endsWith('.wasm') ||
       url.hostname === 'cdn.jsdelivr.net' ||
       url.hostname === 'fonts.gstatic.com') {

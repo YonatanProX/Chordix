@@ -11,14 +11,14 @@ Drag this entire folder onto Netlify. All files must sit together at the site ro
 2. הריצו ב-Supabase (SQL Editor ← New query ← Run):
      supabase-credits.sql    ← חשוב: מאפשר החזר קרדיטים אוטומטי
      supabase-waitlist.sql
-3. ודאו ש-chordix-model.bin באמת עלה לשרת, לצד index.html, באותה תיקייה בדיוק
+3. ודאו ש-chordix-model-e1.bin באמת עלה לשרת, לצד index.html, באותה תיקייה בדיוק
    (לא בתיקיית build/ נפרדת, לא ב-CDN אחר — ליד index.html, אותו path).
    אם הוא חסר, הניתוח ייכשל ב-404 (המשתמש לא יחויב, אבל גם לא יקבל דף).
    מהגרסה הזו ואילך יש גם באנר אזהרה אוטומטי בדף עצמו אם הבדיקה נכשלת,
    כך שהבעיה תתגלה מיד ולא רק כשמישהו ינסה לנתח שיר.
 
    בדיקה מהירה אחרי כל פרסום — שני דברים, לא רק "200":
-     curl -sI https://<הדומיין>/chordix-model.bin
+     curl -sI https://<הדומיין>/chordix-model-e1.bin
    ודאו: HTTP 200 (לא 404, לא redirect ל-index.html!)
          Content-Length: 2836277   ← בדיוק. אם שונה — הקובץ נחתך/הוחלף.
 
@@ -26,7 +26,7 @@ Drag this entire folder onto Netlify. All files must sit together at the site ro
    קובץ בגודל 2.7MB נתפס לפעמים ע"י .gitignore גורף (למשל כלל *.bin),
    או נדחה בשקט אם מוגדר Git LFS בלי שהוא מותקן בסביבת ה-build של Netlify —
    ואז ה-build "מצליח" (כי שום דבר לא תלוי בקובץ בזמן build), הזיפ שיש לכם
-   מקומית כן מכיל אותו, אבל האתר החי לא. ודאו במפורש ש-chordix-model.bin
+   מקומית כן מכיל אותו, אבל האתר החי לא. ודאו במפורש ש-chordix-model-e1.bin
    מופיע ב-git status / git ls-files ולא ברשימת ה-ignore, ושאין לכם
    Git LFS דולק על סוג הקובץ הזה בלי Netlify LFS support.
 
@@ -41,7 +41,7 @@ Drag this entire folder onto Netlify. All files must sit together at the site ro
 קבצים
 -----
 index.html                      הדף
-chordix-model.bin               מודל הזיהוי (gzip), נטען לפי דרישה
+chordix-model-e1.bin               מודל הזיהוי (gzip), נטען לפי דרישה
 sw.js                           service worker
 site.webmanifest                מניפסט PWA
 og-cover.png                    תמונת שיתוף
