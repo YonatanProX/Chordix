@@ -5658,7 +5658,30 @@ function classifyRoles(segs, dyn, aff){
           const A=cl.get(ks[x]), B=cl.get(ks[y]); let s=0,n=0;
           for(const p of A) for(const q of B){ s+=M[p*N+q]; n++; }
           if(n) o[ks[x]+'-'+ks[y]]=+(s/n).toFixed(3); } } return o; })(),
-      segmentation: segs._segDebug || null
+      segmentation: segs._segDebug || null,
+      /* ייצוא ערוצי-דמיון גולמיים לכל זוג מקטעים — לכיול אופליין של משקלי
+         segAffinity (פאזה 1). export-only, לא משפיע על שום לוגיקה חיה. */
+      segChannels: (function(){
+        const DD = aff && aff.D; if(!DD || DD.length!==N) return null;
+        const o=[];
+        for(let i=0;i<N;i++) for(let j=i+1;j<N;j++){
+          const ss=seqScoreTI(DD[i].seq, DD[j].seq);
+          const seqN=Math.max(0,(ss.score-0.35)/0.65);
+          const chr=Math.max(0,cosine(DD[i].ch, rot12(DD[j].ch, ss.shift)));
+          const tim=Math.max(0,cosine(DD[i].tm, DD[j].tm));
+          const eDif=Math.min(1, Math.abs(DD[i].e-DD[j].e)/1.6);
+          const emb=(DD[i].emb&&DD[j].emb)?Math.max(0,dot(DD[i].emb,DD[j].emb)):null;
+          o.push({i,j,seqN:+seqN.toFixed(3),chr:+chr.toFixed(3),tim:+tim.toFixed(3),
+                  eDif:+eDif.toFixed(3),emb:emb===null?null:+emb.toFixed(3)});
+        }
+        return o;
+      })(),
+      segFeatures: (function(){
+        const DD = aff && aff.D; if(!DD || DD.length!==N) return null;
+        return segs.map((s,i)=>({ i, e:+DD[i].e.toFixed(3), act:+DD[i].act.toFixed(3),
+          dens:+DD[i].dens.toFixed(3), len:s.to-s.from,
+          tm:[...DD[i].tm].map(x=>+x.toFixed(3)) }));
+      })()
     };
   }catch(e){ __ROLE_DEBUG = { error:String(e) }; }
 
