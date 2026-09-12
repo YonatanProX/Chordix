@@ -2001,6 +2001,40 @@ button.primary,.mini-cta,#authIn button.chip.buy{background:var(--grad);box-shad
 button.primary:hover,.mini-cta:hover,#authIn button.chip.buy:hover{filter:saturate(1.12) brightness(1.06);transform:translateY(-1px)}
 @media(max-width:760px){header.top{padding-top:52px}.drop{padding:50px 18px;border-radius:20px}.drop::before{inset:7px}.why,.faq{margin-top:54px}.brand{font-size:42px}}
 
+
+/* ============================================================
+   Chordix editorial compact — restored violet palette
+   ============================================================ */
+:root{
+ --bg-deep:#17132b;--bg-deep2:#211b3d;--bg-panel:rgba(34,28,62,.9);--bg-sunken:#100d20;
+ --panel-edge:#4b3d70;--brass:#d8b06a;--brass-soft:#b8a4e8;--text-main:#f6f2ff;--text-dim:#b6adce;--text-faint:#82789f;
+ --focus-ring:#e8c981;--grad:linear-gradient(135deg,#e0bd78,#a990df);
+ --a1:#d8b06a;--a2:#b8a4e8;--a3:#d99bb2;--a4:#8fc8bb;
+}
+html.theme-light{
+ --bg-deep:#eeeafa;--bg-deep2:#e3dcf3;--bg-panel:rgba(255,255,255,.92);--bg-sunken:#d9d0ee;
+ --panel-edge:#c5b9e0;--brass:#91651d;--brass-soft:#5b43a0;--text-main:#211a3b;--text-dim:#5d5579;--text-faint:#777091;
+ --focus-ring:#6d4cb4;--grad:linear-gradient(135deg,#a87624,#6d55b5);
+ --a1:#91651d;--a2:#5b43a0;--a3:#a04d70;--a4:#24796b;
+}
+body{background:var(--bg-deep);background-image:radial-gradient(900px 420px at 50% -180px,color-mix(in srgb,var(--a2) 15%,transparent),transparent 70%)}
+.site-head{background:color-mix(in srgb,var(--bg-deep) 92%,transparent);border-bottom-color:color-mix(in srgb,var(--panel-edge) 70%,transparent)}
+.head-in{padding-block:8px}.head-nav{gap:2px}.head-nav a{font-size:13px;padding:7px 11px;border-radius:8px}.head-nav a:hover{background:color-mix(in srgb,var(--a2) 12%,transparent)}
+.hero{padding:38px 0 0}.hero::before{width:620px;height:250px;background:radial-gradient(closest-side,color-mix(in srgb,var(--a2) 17%,transparent),transparent 72%);filter:blur(24px)}
+.hero .eyebrow{margin-bottom:11px;color:var(--text-faint);font-size:10px;letter-spacing:3px}.hero .eyebrow::before,.hero .eyebrow::after{background:var(--panel-edge)}
+.hero-title{gap:7px}.hero-brand{font-size:clamp(36px,6vw,54px);background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}.hero-claim{font-size:clamp(18px,2.7vw,25px);font-weight:700;max-width:25ch}
+.hero-lead{margin-top:13px;max-width:610px;font-size:14px;line-height:1.7}.trust-row{margin-top:15px;gap:6px}.trust-row li{font-size:11.5px;padding:5px 11px;background:color-mix(in srgb,var(--bg-panel) 84%,transparent);border-color:var(--panel-edge)}
+.stage{margin-top:22px}.drop{max-width:780px;padding:42px 22px;border:1px dashed color-mix(in srgb,var(--a2) 65%,var(--panel-edge));border-radius:16px;background:var(--bg-panel);box-shadow:0 14px 36px rgba(0,0,0,.18)}
+.drop::before,.drop::after{display:none}.drop:hover,.drop.hot{transform:none;border-color:var(--brass);box-shadow:0 0 0 4px color-mix(in srgb,var(--brass) 12%,transparent),0 14px 36px rgba(0,0,0,.22)}.drop h2{font-size:21px}.drop p{font-size:13px}.drop .fmt{font-size:10.5px;margin-top:12px;color:var(--text-faint)}
+.opt-row{max-width:780px;margin-top:10px;padding:9px 14px;border-radius:10px;background:transparent;border-color:var(--panel-edge)}.cost-badge{margin-top:7px}
+.band{padding:42px 0;border-top:1px solid color-mix(in srgb,var(--panel-edge) 45%,transparent)}.band + .band{padding-top:42px}.sec-eyebrow{font-size:10px;letter-spacing:.2em;color:var(--brass-soft)}.sec-title{font-size:clamp(22px,3vw,29px)}.sec-lead{margin-top:9px;font-size:13.5px;line-height:1.7}
+.steps,.feat-grid{margin-top:22px;gap:11px}.step-card,.feat-card,.plan{border-radius:12px;padding:19px 18px;background:var(--bg-panel);border-color:var(--panel-edge);box-shadow:none}.step-card h3,.feat-card h3{font-size:15px}.step-card p,.feat-card p{font-size:13px;line-height:1.65}.step-num{top:-12px;width:26px;height:26px;border-radius:8px;font-size:12px}
+.sample-paper{margin-top:22px;border-radius:12px;padding:18px 17px;box-shadow:0 10px 26px rgba(0,0,0,.2)}.plans{margin-top:22px;gap:11px}.plan{padding:20px 17px}.plan.best{box-shadow:0 0 0 2px color-mix(in srgb,var(--brass) 28%,transparent)}
+.soon-banner{margin-top:17px;padding:9px 14px;font-size:12.5px}.why,.faq{margin-top:42px}.why-grid{gap:11px;margin-top:18px}.why article{min-height:0;padding:17px 18px;border-radius:12px;box-shadow:none}.why h2,.faq h2{font-size:26px}.why h3{font-size:15px}.why p{font-size:13px;line-height:1.65}.why article:hover{transform:none;box-shadow:none}
+.install{margin:20px 0 0;border-radius:12px;padding:13px 16px}.faq-list{gap:7px}.faq-item{border-radius:10px;box-shadow:none}.faq-item summary{padding:12px 15px;font-size:14px}.faq-a{font-size:13px;line-height:1.7}
+footer.site{margin-top:46px;padding-top:22px}.wrap{max-width:1080px}
+@media(max-width:760px){.hero{padding-top:30px}.band{padding:32px 0}.band+.band{padding-top:32px}.drop{padding:34px 16px}.trust-row li{flex:1 1 42%}.steps,.feat-grid{grid-template-columns:1fr}.plans{grid-template-columns:1fr}}
+
 </style>
 </head>
 <body>
