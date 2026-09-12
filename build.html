@@ -1963,6 +1963,20 @@ body{background-image:none}
 footer.site{margin-top:44px;padding-bottom:68px}
 @media(max-width:760px){.hero{padding-top:28px}.band{padding:32px 0}.band+.band{padding-top:0}.drop{padding:32px 16px}.why,.faq{margin-top:32px}}
 
+
+/* ---------- cursor glow ---------- */
+.cursor-glow{position:fixed;z-index:0;pointer-events:none;width:260px;height:260px;border-radius:50%;
+  left:0;top:0;opacity:0;transform:translate(-50%,-50%);
+  background:radial-gradient(circle,color-mix(in srgb,var(--brass) 13%,transparent) 0%,color-mix(in srgb,var(--brass-soft) 7%,transparent) 34%,transparent 70%);
+  filter:blur(18px);transition:opacity .35s ease;will-change:transform}
+body.cursor-active .cursor-glow{opacity:.72}
+body.cursor-active::after{content:'';position:fixed;z-index:0;pointer-events:none;inset:0;
+  background:radial-gradient(420px circle at var(--cursor-x,50%) var(--cursor-y,30%),color-mix(in srgb,var(--brass) 5%,transparent),transparent 70%)}
+body>*{position:relative;z-index:1}
+.site-head{z-index:120!important}.modal-backdrop,#consentGate{z-index:2100!important}
+html.a11y-reduced-motion .cursor-glow,html.a11y-reduced-motion body.cursor-active::after{display:none}
+@media (hover:none),(pointer:coarse){.cursor-glow,body.cursor-active::after{display:none}}
+
 </style>
 </head>
 <body>
@@ -11915,6 +11929,18 @@ const SUPABASE_ANON_KEY = 'sb_publishable_o_OZ0MF9F3eN-7727-cQkA_oihPH1pH';
       const t = await authErrText(e, cxT("לא הצלחנו לבדוק את מצב ההתחברות"));
       console.error(cxT("[Chordix] getSession נכשל —"), t);
     });
+})();
+</script>
+<script>
+/* ---------- cursor glow runtime ---------- */
+(()=>{
+  if(matchMedia('(hover: none), (pointer: coarse)').matches || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const glow=document.createElement('div'); glow.className='cursor-glow'; glow.setAttribute('aria-hidden','true'); document.body.appendChild(glow);
+  let tx=0,ty=0,x=0,y=0,shown=false,raf=0;
+  const move=e=>{tx=e.clientX;ty=e.clientY;if(!shown){x=tx;y=ty;shown=true;document.body.classList.add('cursor-active');} document.documentElement.style.setProperty('--cursor-x',tx+'px');document.documentElement.style.setProperty('--cursor-y',ty+'px');if(!raf)raf=requestAnimationFrame(tick)};
+  const tick=()=>{x+=(tx-x)*.14;y+=(ty-y)*.14;glow.style.transform='translate3d('+x+'px,'+y+'px,0) translate(-50%,-50%)';raf=0;if(Math.abs(tx-x)+Math.abs(ty-y)>.2)raf=requestAnimationFrame(tick)};
+  const leave=()=>document.body.classList.remove('cursor-active');
+  document.addEventListener('pointermove',move,{passive:true}); document.addEventListener('pointerleave',leave,{passive:true});
 })();
 </script>
 </body>
