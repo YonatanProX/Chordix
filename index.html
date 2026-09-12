@@ -5877,16 +5877,17 @@ function classifyRoles(segs, dyn, aff){
    הוא הראיה החזקה לפיצול-יתר. בנוסף נשמר כלל הרסיסים הקצר שהיה קיים.
    האיחוד מתבצע רק אחרי התיוג, כך שאינו משנה את בחירת בית/פזמון. */
 function mergeRoleFragments(segs){
-  for(let i=segs.length-1;i>0;i--){
-    if(segs[i].role !== segs[i-1].role) continue;
-    const a=segs[i-1].to-segs[i-1].from, b=segs[i].to-segs[i].from;
-    const sameCluster=segs[i].c===segs[i-1].c;
-    const shortPair=Math.min(a,b)<4;
-    let run=2;
-    for(let j=i-2;j>=0 && segs[j].role===segs[i].role;j--) run++;
-    if(!sameCluster && !shortPair && run<3) continue;
-    segs[i-1].to = segs[i].to;
-    segs.splice(i,1);
+  for(let i=0;i<segs.length-1;){
+    if(segs[i].role !== segs[i+1].role){ i++; continue; }
+    let z=i+1;
+    while(z+1<segs.length && segs[z+1].role===segs[i].role) z++;
+    const run=z-i+1;
+    const shortPair = Math.min(segs[i].to-segs[i].from,
+                               segs[i+1].to-segs[i+1].from)<4;
+    const sameCluster = segs[i].c===segs[i+1].c;
+    if(run<3 && !shortPair && !sameCluster){ i++; continue; }
+    segs[i].to=segs[z].to;
+    segs.splice(i+1,z-i);
   }
   return segs;
 }
