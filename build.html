@@ -5870,14 +5870,21 @@ function classifyRoles(segs, dyn, aff){
   return out;
 }
 
-/* שני מקטעים צמודים שקיבלו אותו תפקיד, שאחד מהם קצר מפרזה שלמה,
-   הם מקטע אחד שנחתך — לא "בית 1" ו"בית 2". פזמון כפול אמיתי בסוף
-   השיר לא נבלע כאן, כי שני הצדדים בו ארוכים. */
+/* רצף ארוך של מקטעים צמודים שקיבלו אותו תפקיד הוא כמעט תמיד
+   over-segmentation: אין ביניהם הפסקה, ובמיוחד אין הצדקה להציג
+   "פזמון 3" עד "פזמון 9" כשבעה חלקים נפרדים. איחוד של זוג יחיד
+   נשאר שמרני כדי לא למחוק פזמון כפול אמיתי בסיום; רצף של 3 ומעלה
+   הוא הראיה החזקה לפיצול-יתר. בנוסף נשמר כלל הרסיסים הקצר שהיה קיים.
+   האיחוד מתבצע רק אחרי התיוג, כך שאינו משנה את בחירת בית/פזמון. */
 function mergeRoleFragments(segs){
   for(let i=segs.length-1;i>0;i--){
     if(segs[i].role !== segs[i-1].role) continue;
     const a=segs[i-1].to-segs[i-1].from, b=segs[i].to-segs[i].from;
-    if(Math.min(a,b) >= 4) continue;
+    const sameCluster=segs[i].c===segs[i-1].c;
+    const shortPair=Math.min(a,b)<4;
+    let run=2;
+    for(let j=i-2;j>=0 && segs[j].role===segs[i].role;j--) run++;
+    if(!sameCluster && !shortPair && run<3) continue;
     segs[i-1].to = segs[i].to;
     segs.splice(i,1);
   }
