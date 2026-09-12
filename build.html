@@ -5678,6 +5678,11 @@ function classifyRoles(segs, dyn, aff){
     const chMaxE = Math.max(...[...stat.values()].map(v=>v.e));
     for(const v of stat.values()){
       if(v.c===chorus.c || v.count<2) continue;
+      /* אשכול שסוגר את השיר (closes) וחוזר רק 1-2 פעמים הוא סיום, לא
+         פזמון — בלי השער הזה אשכול-הסיום של Grenade (מופיע באמצע וגם
+         בסוף, posMean גבוה) קודם בטעות לפזמון והפיל אותו. פזמון שגם
+         סוגר את השיר חוזר ≥3 פעמים ועובר. */
+      if(v.closes>=1 && v.count<3) continue;
       if((v.posMean>=0.45 || v.late>=0.6) && v.e>=0.40*chMaxE)
         role.set(v.c, RID.CHORUS);
     }
