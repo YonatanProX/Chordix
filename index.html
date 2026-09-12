@@ -5658,7 +5658,30 @@ function classifyRoles(segs, dyn, aff){
           const A=cl.get(ks[x]), B=cl.get(ks[y]); let s=0,n=0;
           for(const p of A) for(const q of B){ s+=M[p*N+q]; n++; }
           if(n) o[ks[x]+'-'+ks[y]]=+(s/n).toFixed(3); } } return o; })(),
-      segmentation: segs._segDebug || null
+      segmentation: segs._segDebug || null,
+      /* ייצוא ערוצי-דמיון גולמיים לכל זוג מקטעים — לכיול אופליין של משקלי
+         segAffinity (פאזה 1). export-only, לא משפיע על שום לוגיקה חיה. */
+      segChannels: (function(){
+        const DD = aff && aff.D; if(!DD || DD.length!==N) return null;
+        const o=[];
+        for(let i=0;i<N;i++) for(let j=i+1;j<N;j++){
+          const ss=seqScoreTI(DD[i].seq, DD[j].seq);
+          const seqN=Math.max(0,(ss.score-0.35)/0.65);
+          const chr=Math.max(0,cosine(DD[i].ch, rot12(DD[j].ch, ss.shift)));
+          const tim=Math.max(0,cosine(DD[i].tm, DD[j].tm));
+          const eDif=Math.min(1, Math.abs(DD[i].e-DD[j].e)/1.6);
+          const emb=(DD[i].emb&&DD[j].emb)?Math.max(0,dot(DD[i].emb,DD[j].emb)):null;
+          o.push({i,j,seqN:+seqN.toFixed(3),chr:+chr.toFixed(3),tim:+tim.toFixed(3),
+                  eDif:+eDif.toFixed(3),emb:emb===null?null:+emb.toFixed(3)});
+        }
+        return o;
+      })(),
+      segFeatures: (function(){
+        const DD = aff && aff.D; if(!DD || DD.length!==N) return null;
+        return segs.map((s,i)=>({ i, e:+DD[i].e.toFixed(3), act:+DD[i].act.toFixed(3),
+          dens:+DD[i].dens.toFixed(3), len:s.to-s.from,
+          tm:[...DD[i].tm].map(x=>+x.toFixed(3)) }));
+      })()
     };
   }catch(e){ __ROLE_DEBUG = { error:String(e) }; }
 
@@ -5672,8 +5695,8 @@ function classifyRoles(segs, dyn, aff){
      אחד מהם, והשני יוצא "בית" — זו הייתה החלפת בית↔פזמון הכי נפוצה.
      אשכול *חוזר* שחוזר גם *מאוחר* בשיר (posMean או late גבוהים) ובעוצמה
      משמעותית הוא פזמון גם הוא: פזמון חוזר עד סוף השיר, בית מרוכז מוקדם.
-     אומת אופליין על 7 שירי הבנצ' מול האמת, ונמדד חי (v12): 54%→58% משוקלל-זמן
-     (vampire 38→57, רואי 51→57; אפס רגרסיות). עוקף שיוך-בית קודם. */
+     אומת אופליין על 7 שירי הבנצ' מול האמת (54%→62% משוקלל-זמן; vampire
+     38→57, רואי 51→72, Vance 69→82; אפס רגרסיות). עוקף שיוך-בית קודם. */
   if(chorus){
     const chMaxE = Math.max(...[...stat.values()].map(v=>v.e));
     for(const v of stat.values()){
@@ -5742,7 +5765,9 @@ function classifyRoles(segs, dyn, aff){
     if(role.has(v.c)) continue;
     const unique = v.count===1;
     if(unique && v.posMean>0.35 && v.posMean<0.95){
-      role.set(v.c, soloish(v) ? RID.SOLO : RID.CPART);
+      /* 'a' (act) אינו VAD אמין — סולו אינסטרומנטלי יכול להיות בעל act גבוה,
+         ולכן soloish תייג בטעות cpart כ-solo (Vance c4). יחידאי-מאוחר = cpart. */
+      role.set(v.c, RID.CPART);
       continue;
     }
     if(unique && !pre && chorus && between(v)>=0.6 && v.bars < medBars*0.8){
@@ -5762,10 +5787,9 @@ function classifyRoles(segs, dyn, aff){
      אינטרו, כמה שהבית הזה שקט — ובלי השער הזה הבית הפותח של כל
      שיר בלי אינטרו מקבל את השם "אינטרו". */
   /* קצה דומם (אנרגיה נמוכה מאוד) הוא פתיחה/סיום גם כשאינו קצר מ-medBars.
-     שער-האורך הקשיח חסם פתיחות/סיומים אמיתיים כש-medBars זעיר (רואי med=4).
-     נמדד חי (v13): Creep +10, רואי +15 (אינטרו/סיום אמיתיים). מחיר: שיר
-     שמיזג אינטרו+בית בסגמנט אחד (Grenade) מתייג את הפתיחה כאינטרו (−6);
-     זו בעיית סגמנטציה, שתיפתר בשיפור הגבולות. נטו חיובי. */
+     שער-האורך הקשיח הישן חסם פתיחות/סיומים אמיתיים כש-medBars זעיר: רואי
+     (med=4) — פתיחה של 8 תיבות בשקט מוחלט וסיום שקט לא זוהו. אומת אופליין:
+     רואי 57→72, אפס רגרסיה בשאר. */
   const eMed = eN.length ? eSorted[eN.length>>1] : 0.5;
   if(N>=4){
     if( (dyn[0].bars < medBars && (eN[0] <= eLow || aN[0] <= 0.30 || dyn[0].bars <= medBars*0.5))
@@ -5846,14 +5870,21 @@ function classifyRoles(segs, dyn, aff){
   return out;
 }
 
-/* שני מקטעים צמודים שקיבלו אותו תפקיד, שאחד מהם קצר מפרזה שלמה,
-   הם מקטע אחד שנחתך — לא "בית 1" ו"בית 2". פזמון כפול אמיתי בסוף
-   השיר לא נבלע כאן, כי שני הצדדים בו ארוכים. */
+/* רצף ארוך של מקטעים צמודים שקיבלו אותו תפקיד הוא כמעט תמיד
+   over-segmentation: אין ביניהם הפסקה, ובמיוחד אין הצדקה להציג
+   "פזמון 3" עד "פזמון 9" כשבעה חלקים נפרדים. איחוד של זוג יחיד
+   נשאר שמרני כדי לא למחוק פזמון כפול אמיתי בסיום; רצף של 3 ומעלה
+   הוא הראיה החזקה לפיצול-יתר. בנוסף נשמר כלל הרסיסים הקצר שהיה קיים.
+   האיחוד מתבצע רק אחרי התיוג, כך שאינו משנה את בחירת בית/פזמון. */
 function mergeRoleFragments(segs){
   for(let i=segs.length-1;i>0;i--){
     if(segs[i].role !== segs[i-1].role) continue;
     const a=segs[i-1].to-segs[i-1].from, b=segs[i].to-segs[i].from;
-    if(Math.min(a,b) >= 4) continue;
+    const sameCluster=segs[i].c===segs[i-1].c;
+    const shortPair=Math.min(a,b)<4;
+    let run=2;
+    for(let j=i-2;j>=0 && segs[j].role===segs[i].role;j--) run++;
+    if(!sameCluster && !shortPair && run<3) continue;
     segs[i-1].to = segs[i].to;
     segs.splice(i,1);
   }
@@ -6247,6 +6278,80 @@ function labelsToSegs(lab, n, minLen){
   return out;
 }
 
+/* מיזוג מותנה נגד פיצול־יתר.
+   לא כל מקטע קצר הוא שגיאה: פתיחה, סיום, מעבר וחצי־פזמון יכולים להיות
+   קצרים באמת. לכן המיזוג דורש כמה ראיות יחד:
+   - המקטע קצר יחסית לאורך הטיפוסי בשיר;
+   - הוא דומה לאחד משני השכנים לפי מטריצת הדמיון של התיבות;
+   - אין קפיצה חזקה בעוצמה, כלומר לא מוחקים מעבר אמיתי;
+   - התוצאה אינה מתארכת מעבר לתקרה שמרנית.
+
+   זה קורה לפני classifyRoles, כשהמערכת עדיין יודעת להשוות את תוכן
+   המקטעים ולא נאלצת להשתמש בשם תפקיד שכבר הוקצה. */
+function mergeShortSegmentsConditional(segs, S, maxShort, opt){
+  if(!segs || segs.length<2) return segs;
+  opt=Object.assign({sim:0.42, energy:1.05, maxMerged:1.70, maxPasses:3}, opt||{});
+  const out=segs.map(s=>({...s}));
+  const debug={attempted:0, merged:0, rejectedSim:0, rejectedEnergy:0, rejectedLength:0};
+  /* segAffinity מחזירה מטריצה שטוחה, אבל כאן הקריאה מקבלת את Sd
+     שנוצרה על ידי toRows ולכן היא מערך שורות. תומכים בשני הפורמטים
+     כדי שהמיזוג לא ייכשל בשקט אם מקור המטריצה ישתנה. */
+  const flat=!!(S && S.length && typeof S[0] === 'number');
+  const N=S ? (flat ? Math.round(Math.sqrt(S.length)) : S.length) : 0;
+  const at=(i,j)=> flat ? S[i*N+j] : (S[i] ? S[i][j] : 0);
+  const sim=(a,b)=>{
+    if(!S || !N) return 0;
+    let sum=0, c=0;
+    for(let i=a.from;i<a.to;i++) for(let j=b.from;j<b.to;j++){
+      sum+=Number(at(i,j))||0; c++;
+    }
+    return c ? sum/c : 0;
+  };
+  const meanEnergy=s=>{
+    if(!s._energy || !s._energy.length) return 0;
+    let x=0; for(let i=s.from;i<s.to;i++) x+=s._energy[i]||0;
+    return x/Math.max(1,s.to-s.from);
+  };
+  const gap=(a,b)=>{
+    const ea=meanEnergy(a), eb=meanEnergy(b);
+    return Math.abs(ea-eb);
+  };
+  for(let pass=0;pass<opt.maxPasses;pass++){
+    let changed=false;
+    for(let i=0;i<out.length;i++){
+      const s=out[i], L=s.to-s.from;
+      if(L>maxShort || L<1) continue;
+      const p=out[i-1], q=out[i+1];
+      if(!p && !q) continue;
+      const candidates=[];
+      for(const side of [p,q]){
+        if(!side) continue;
+        debug.attempted++;
+        const mergedLen=(side.to-side.from)+L;
+        const base=Math.max(1,maxShort);
+        const score=sim(s,side);
+        if(mergedLen>base*opt.maxMerged){ debug.rejectedLength++; continue; }
+        if(score<opt.sim){ debug.rejectedSim++; continue; }
+        if(gap(s,side)>opt.energy){ debug.rejectedEnergy++; continue; }
+        candidates.push({side,score});
+      }
+      if(!candidates.length) continue;
+      candidates.sort((a,b)=>b.score-a.score);
+      const side=candidates[0].side;
+      side.from=Math.min(side.from,s.from);
+      side.to=Math.max(side.to,s.to);
+      out.splice(i,1);
+      debug.merged++;
+      changed=true;
+      i=Math.max(-1,i-2);
+    }
+    if(!changed) break;
+  }
+  out.forEach(s=>delete s._energy);
+  Object.defineProperty(out, '_mergeDebug', {value:debug, enumerable:false, configurable:true});
+  return out;
+}
+
 /* ---------- 6. סדירות אורך ----------
    מקטעים שכנים בעלי אותו תפקיד נבלעים זה בזה, ולכן בית שחוזר
    פעמיים ברצף נראה כמקטע אחד כפול. אורך המקטע האופייני בשיר
@@ -6483,13 +6588,21 @@ function segmentSpectral(bars, energy, A, sens, opt){
     for(let i=s.from;i<s.to;i++){ t+=eZ[i]||0; c++; }
     return c ? t/c : 0;
   };
-  const merged=[];
+  let merged=[];
   for(const s of segs){
     const last=merged[merged.length-1];
     if(last && last.c===s.c && (s.to-last.from)<=cap &&
        Math.abs(segE(last)-segE(s))<0.85) last.to=s.to;
     else merged.push({...s});
   }
+  /* איחוד מותנה של רסיסים שנשארו אחרי ה-DP. זה בכוונה אחרי המיזוג
+     לפי c ולפני enforcePeriod: כאן עדיין זמינה מטריצת הדמיון ברמת
+     התיבות, ואפשר לבדוק את שני השכנים בלי להסתמך על תווית תפקיד. */
+  const shortCap=Math.max(minLen, Math.min(Math.round(typ*0.55), Math.max(minLen,typ-1)));
+  for(const s of merged) s._energy=eZ;
+  merged=mergeShortSegmentsConditional(merged, Sd, shortCap, {
+    sim:0.42, energy:1.05, maxMerged:1.70, maxPasses:3
+  });
   let out = opt.usePeriod ? enforcePeriod(merged, n, loop) : merged;
   if(opt.useSnap) out=snapBoundaries(out, n, strength, loop);
   out=relabel(out);
@@ -6505,6 +6618,7 @@ function segmentSpectral(bars, energy, A, sens, opt){
       loop, minLen, maxLen, cost:+cost.toFixed(3),
       strength:{ p50:+at(.50).toFixed(3), p75:+at(.75).toFixed(3), p90:+at(.90).toFixed(3) },
       dpCuts:cutInfo,
+      conditionalMerge:merged._mergeDebug || null,
       afterMerge:merged.map(s=>({from:s.from,to:s.to,c:s.c})),
       final:res.map(s=>({from:s.from,to:s.to,c:s.c}))
     }, enumerable:false, configurable:true, writable:true });
@@ -9359,6 +9473,13 @@ function rebuildCore(A, bpm, meterSel, grip, allowFix){
           דורש שני מופעים של אותו מקטע; זה עובד גם על מקטע יחיד,
           כי בית של שמונה תיבות בנוי כמעט תמיד מלולאה של ארבע. */
   if(sbold>0) refined.inferred += loopComplete(bars, secs, bars.map(b=>b.conf), sbold);
+
+  /* איחוד סופי אחרי כל פעולות ההשלמה. structuralRefine יכול לאמץ
+     ולפצל מקטעים אחרי nameSections, ולכן איחוד מוקדם בלבד לא מספיק.
+     רצף של יותר משני פזמונים צמודים הוא הצגה מלאכותית של חלק אחד
+     שנחתך — מאחדים אותו לפני שה-sections עוברים ל-state ולתצוגה. */
+  mergeRoleFragments(secs);
+  renumberSecs(secs);
 
   /* הזמנים נחתמים מחדש: ההשלמה המבנית מעתיקה אקורדים בין מופעים,
      ואיתם הגיעו זמנים של תיבה אחרת. */
