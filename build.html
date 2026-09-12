@@ -9474,6 +9474,13 @@ function rebuildCore(A, bpm, meterSel, grip, allowFix){
           כי בית של שמונה תיבות בנוי כמעט תמיד מלולאה של ארבע. */
   if(sbold>0) refined.inferred += loopComplete(bars, secs, bars.map(b=>b.conf), sbold);
 
+  /* איחוד סופי אחרי כל פעולות ההשלמה. structuralRefine יכול לאמץ
+     ולפצל מקטעים אחרי nameSections, ולכן איחוד מוקדם בלבד לא מספיק.
+     רצף של יותר משני פזמונים צמודים הוא הצגה מלאכותית של חלק אחד
+     שנחתך — מאחדים אותו לפני שה-sections עוברים ל-state ולתצוגה. */
+  mergeRoleFragments(secs);
+  renumberSecs(secs);
+
   /* הזמנים נחתמים מחדש: ההשלמה המבנית מעתיקה אקורדים בין מופעים,
      ואיתם הגיעו זמנים של תיבה אחרת. */
   stampChordTimes(bars, beats, A.duration);
