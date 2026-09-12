@@ -5765,7 +5765,9 @@ function classifyRoles(segs, dyn, aff){
     if(role.has(v.c)) continue;
     const unique = v.count===1;
     if(unique && v.posMean>0.35 && v.posMean<0.95){
-      role.set(v.c, soloish(v) ? RID.SOLO : RID.CPART);
+      /* 'a' (act) אינו VAD אמין — סולו אינסטרומנטלי יכול להיות בעל act גבוה,
+         ולכן soloish תייג בטעות cpart כ-solo (Vance c4). יחידאי-מאוחר = cpart. */
+      role.set(v.c, RID.CPART);
       continue;
     }
     if(unique && !pre && chorus && between(v)>=0.6 && v.bars < medBars*0.8){
@@ -5784,12 +5786,19 @@ function classifyRoles(segs, dyn, aff){
   /* האורך הוא שער קשיח על שניהם. שיר שנפתח היישר לבית מלא אין לו
      אינטרו, כמה שהבית הזה שקט — ובלי השער הזה הבית הפותח של כל
      שיר בלי אינטרו מקבל את השם "אינטרו". */
-  if(N>=4 && dyn[0].bars < medBars){
-    if(eN[0] <= eLow || aN[0] <= 0.30 || dyn[0].bars <= medBars*0.5) out[0] = RID.INTRO;
-  }
-  if(N>=4 && dyn[N-1].bars < medBars){
+  /* קצה דומם (אנרגיה נמוכה מאוד) הוא פתיחה/סיום גם כשאינו קצר מ-medBars.
+     שער-האורך הקשיח הישן חסם פתיחות/סיומים אמיתיים כש-medBars זעיר: רואי
+     (med=4) — פתיחה של 8 תיבות בשקט מוחלט וסיום שקט לא זוהו. אומת אופליין:
+     רואי 57→72, אפס רגרסיה בשאר. */
+  const eMed = eN.length ? eSorted[eN.length>>1] : 0.5;
+  if(N>=4){
+    if( (dyn[0].bars < medBars && (eN[0] <= eLow || aN[0] <= 0.30 || dyn[0].bars <= medBars*0.5))
+        || eN[0] < 0.6*eMed )
+      out[0] = RID.INTRO;
     const q=N-1;
-    if(eN[q] <= eLow || aN[q] <= 0.30 || dyn[q].bars <= medBars*0.5) out[q] = RID.OUTRO;
+    if( (dyn[q].bars < medBars && (eN[q] <= eLow || aN[q] <= 0.30 || dyn[q].bars <= medBars*0.5))
+        || eN[q] < 0.15 )
+      out[q] = RID.OUTRO;
   }
 
   /* ---- 7. תיקון רצף ---- */
