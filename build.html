@@ -6262,6 +6262,70 @@ function labelsToSegs(lab, n, minLen){
   return out;
 }
 
+/* מיזוג מותנה נגד פיצול־יתר.
+   לא כל מקטע קצר הוא שגיאה: פתיחה, סיום, מעבר וחצי־פזמון יכולים להיות
+   קצרים באמת. לכן המיזוג דורש כמה ראיות יחד:
+   - המקטע קצר יחסית לאורך הטיפוסי בשיר;
+   - הוא דומה לאחד משני השכנים לפי מטריצת הדמיון של התיבות;
+   - אין קפיצה חזקה בעוצמה, כלומר לא מוחקים מעבר אמיתי;
+   - התוצאה אינה מתארכת מעבר לתקרה שמרנית.
+
+   זה קורה לפני classifyRoles, כשהמערכת עדיין יודעת להשוות את תוכן
+   המקטעים ולא נאלצת להשתמש בשם תפקיד שכבר הוקצה. */
+function mergeShortSegmentsConditional(segs, S, maxShort, opt){
+  if(!segs || segs.length<2) return segs;
+  opt=Object.assign({sim:0.58, energy:0.90, maxMerged:1.70, maxPasses:3}, opt||{});
+  const out=segs.map(s=>({...s}));
+  /* S היא מטריצה שטוחה n×n, לא מערך שורות. */
+  const N=S && Math.round(Math.sqrt(S.length));
+  const sim=(a,b)=>{
+    if(!S || !N) return 0;
+    let sum=0, c=0;
+    for(let i=a.from;i<a.to;i++) for(let j=b.from;j<b.to;j++){
+      sum+=S[i*N+j]; c++;
+    }
+    return c ? sum/c : 0;
+  };
+  const meanEnergy=s=>{
+    if(!s._energy || !s._energy.length) return 0;
+    let x=0; for(let i=s.from;i<s.to;i++) x+=s._energy[i]||0;
+    return x/Math.max(1,s.to-s.from);
+  };
+  const gap=(a,b)=>{
+    const ea=meanEnergy(a), eb=meanEnergy(b);
+    return Math.abs(ea-eb);
+  };
+  for(let pass=0;pass<opt.maxPasses;pass++){
+    let changed=false;
+    for(let i=0;i<out.length;i++){
+      const s=out[i], L=s.to-s.from;
+      if(L>maxShort || L<1) continue;
+      const p=out[i-1], q=out[i+1];
+      if(!p && !q) continue;
+      const candidates=[];
+      for(const side of [p,q]){
+        if(!side) continue;
+        const mergedLen=(side.to-side.from)+L;
+        const base=Math.max(1,maxShort);
+        const score=sim(s,side);
+        if(mergedLen<=base*opt.maxMerged && score>=opt.sim && gap(s,side)<=opt.energy)
+          candidates.push({side,score});
+      }
+      if(!candidates.length) continue;
+      candidates.sort((a,b)=>b.score-a.score);
+      const side=candidates[0].side;
+      side.from=Math.min(side.from,s.from);
+      side.to=Math.max(side.to,s.to);
+      out.splice(i,1);
+      changed=true;
+      i=Math.max(-1,i-2);
+    }
+    if(!changed) break;
+  }
+  out.forEach(s=>delete s._energy);
+  return out;
+}
+
 /* ---------- 6. סדירות אורך ----------
    מקטעים שכנים בעלי אותו תפקיד נבלעים זה בזה, ולכן בית שחוזר
    פעמיים ברצף נראה כמקטע אחד כפול. אורך המקטע האופייני בשיר
@@ -6498,13 +6562,21 @@ function segmentSpectral(bars, energy, A, sens, opt){
     for(let i=s.from;i<s.to;i++){ t+=eZ[i]||0; c++; }
     return c ? t/c : 0;
   };
-  const merged=[];
+  let merged=[];
   for(const s of segs){
     const last=merged[merged.length-1];
     if(last && last.c===s.c && (s.to-last.from)<=cap &&
        Math.abs(segE(last)-segE(s))<0.85) last.to=s.to;
     else merged.push({...s});
   }
+  /* איחוד מותנה של רסיסים שנשארו אחרי ה-DP. זה בכוונה אחרי המיזוג
+     לפי c ולפני enforcePeriod: כאן עדיין זמינה מטריצת הדמיון ברמת
+     התיבות, ואפשר לבדוק את שני השכנים בלי להסתמך על תווית תפקיד. */
+  const shortCap=Math.max(minLen, Math.min(Math.round(typ*0.55), Math.max(minLen,typ-1)));
+  for(const s of merged) s._energy=eZ;
+  merged=mergeShortSegmentsConditional(merged, Sd, shortCap, {
+    sim:0.58, energy:0.90, maxMerged:1.70, maxPasses:3
+  });
   let out = opt.usePeriod ? enforcePeriod(merged, n, loop) : merged;
   if(opt.useSnap) out=snapBoundaries(out, n, strength, loop);
   out=relabel(out);
