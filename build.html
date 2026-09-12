@@ -6283,15 +6283,20 @@ function labelsToSegs(lab, n, minLen){
    המקטעים ולא נאלצת להשתמש בשם תפקיד שכבר הוקצה. */
 function mergeShortSegmentsConditional(segs, S, maxShort, opt){
   if(!segs || segs.length<2) return segs;
-  opt=Object.assign({sim:0.58, energy:0.90, maxMerged:1.70, maxPasses:3}, opt||{});
+  opt=Object.assign({sim:0.42, energy:1.05, maxMerged:1.70, maxPasses:3}, opt||{});
   const out=segs.map(s=>({...s}));
-  /* S היא מטריצה שטוחה n×n, לא מערך שורות. */
-  const N=S && Math.round(Math.sqrt(S.length));
+  const debug={attempted:0, merged:0, rejectedSim:0, rejectedEnergy:0, rejectedLength:0};
+  /* segAffinity מחזירה מטריצה שטוחה, אבל כאן הקריאה מקבלת את Sd
+     שנוצרה על ידי toRows ולכן היא מערך שורות. תומכים בשני הפורמטים
+     כדי שהמיזוג לא ייכשל בשקט אם מקור המטריצה ישתנה. */
+  const flat=!!(S && S.length && typeof S[0] === 'number');
+  const N=S ? (flat ? Math.round(Math.sqrt(S.length)) : S.length) : 0;
+  const at=(i,j)=> flat ? S[i*N+j] : (S[i] ? S[i][j] : 0);
   const sim=(a,b)=>{
     if(!S || !N) return 0;
     let sum=0, c=0;
     for(let i=a.from;i<a.to;i++) for(let j=b.from;j<b.to;j++){
-      sum+=S[i*N+j]; c++;
+      sum+=Number(at(i,j))||0; c++;
     }
     return c ? sum/c : 0;
   };
@@ -6314,11 +6319,14 @@ function mergeShortSegmentsConditional(segs, S, maxShort, opt){
       const candidates=[];
       for(const side of [p,q]){
         if(!side) continue;
+        debug.attempted++;
         const mergedLen=(side.to-side.from)+L;
         const base=Math.max(1,maxShort);
         const score=sim(s,side);
-        if(mergedLen<=base*opt.maxMerged && score>=opt.sim && gap(s,side)<=opt.energy)
-          candidates.push({side,score});
+        if(mergedLen>base*opt.maxMerged){ debug.rejectedLength++; continue; }
+        if(score<opt.sim){ debug.rejectedSim++; continue; }
+        if(gap(s,side)>opt.energy){ debug.rejectedEnergy++; continue; }
+        candidates.push({side,score});
       }
       if(!candidates.length) continue;
       candidates.sort((a,b)=>b.score-a.score);
@@ -6326,12 +6334,14 @@ function mergeShortSegmentsConditional(segs, S, maxShort, opt){
       side.from=Math.min(side.from,s.from);
       side.to=Math.max(side.to,s.to);
       out.splice(i,1);
+      debug.merged++;
       changed=true;
       i=Math.max(-1,i-2);
     }
     if(!changed) break;
   }
   out.forEach(s=>delete s._energy);
+  Object.defineProperty(out, '_mergeDebug', {value:debug, enumerable:false, configurable:true});
   return out;
 }
 
@@ -6584,7 +6594,7 @@ function segmentSpectral(bars, energy, A, sens, opt){
   const shortCap=Math.max(minLen, Math.min(Math.round(typ*0.55), Math.max(minLen,typ-1)));
   for(const s of merged) s._energy=eZ;
   merged=mergeShortSegmentsConditional(merged, Sd, shortCap, {
-    sim:0.58, energy:0.90, maxMerged:1.70, maxPasses:3
+    sim:0.42, energy:1.05, maxMerged:1.70, maxPasses:3
   });
   let out = opt.usePeriod ? enforcePeriod(merged, n, loop) : merged;
   if(opt.useSnap) out=snapBoundaries(out, n, strength, loop);
@@ -6601,6 +6611,7 @@ function segmentSpectral(bars, energy, A, sens, opt){
       loop, minLen, maxLen, cost:+cost.toFixed(3),
       strength:{ p50:+at(.50).toFixed(3), p75:+at(.75).toFixed(3), p90:+at(.90).toFixed(3) },
       dpCuts:cutInfo,
+      conditionalMerge:merged._mergeDebug || null,
       afterMerge:merged.map(s=>({from:s.from,to:s.to,c:s.c})),
       final:res.map(s=>({from:s.from,to:s.to,c:s.c}))
     }, enumerable:false, configurable:true, writable:true });
