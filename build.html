@@ -11670,13 +11670,9 @@ const SUPABASE_ANON_KEY = 'sb_publishable_o_OZ0MF9F3eN-7727-cQkA_oihPH1pH';
       (window.cxLog||console).warn?.(cxT("begin_analysis לא קיים במסד — מסלול תאימות"));
     }
 
-    const { data, error } = await sb.rpc('spend_credits', { p_amount: amount });
-    if(error){
-      if(String(error.message||'').includes('INSUFFICIENT_CREDITS')) return insufficientResult();
-      return { ok:false, reason:'error', message:error.message };
-    }
-    paintCredits(data);
-    return { ok:true, amount, holdId:null, remaining:data, refundable:'unknown' };
+    // Do not fall back to client-callable spend/refund RPCs.
+    // A browser-callable refund can be abused to mint credits.
+    return { ok:false, reason:'configuration', message:'SECURE_CREDIT_HOLD_REQUIRED' };
   };
 
   /* מחזיר true רק אם ההחזר באמת בוצע. אסור להחזיר true "לכל מקרה" —
@@ -11695,16 +11691,10 @@ const SUPABASE_ANON_KEY = 'sb_publishable_o_OZ0MF9F3eN-7727-cQkA_oihPH1pH';
       return true;
     }
 
-    if(ok) return true;                 // הצלחה במסלול הישן — אין מה לסגור
-
-    // מסלול ישן: מנסים refund_credits אם הותקן
-    const { data, error } = await sb.rpc('refund_credits', { p_amount: charge.amount });
-    if(error){
-      (window.cxLog||console).error?.(cxT("אין מסלול החזר זמין"), { message:error.message, amount:charge.amount });
-      return false;
-    }
-    paintCredits(data);
-    return true;
+    // Legacy charges are deliberately not refundable from the browser.
+    // This prevents forging a refund RPC call to mint credits.
+    (window.cxLog||console).error?.(cxT("מסלול חיוב ישן נחסם מטעמי אבטחה"), { amount:charge.amount, ok });
+    return false;
   };
 
   /* נשמר לתאימות: קוד ישן שקורא ל-__spendCredits ימשיך לעבוד */
