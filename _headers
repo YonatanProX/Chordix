@@ -6,7 +6,8 @@
   X-Content-Type-Options: nosniff
   X-Frame-Options: SAMEORIGIN
   Referrer-Policy: strict-origin-when-cross-origin
-  Permissions-Policy: geolocation=(), camera=(), microphone=(), interest-cohort=()
+  Permissions-Policy: geolocation=(), camera=(), microphone=(), payment=(), usb=(), interest-cohort=()
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; connect-src 'self' https://qksqaqpgmvrpxonpzgxc.supabase.co; img-src 'self' data: https:; style-src 'self' 'unsafe-inline' https:; font-src 'self' data: https:; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; frame-ancestors 'self'; form-action 'self'; upgrade-insecure-requests
   Cross-Origin-Opener-Policy: same-origin
 
 # ה-HTML משתנה בכל פרסום — תמיד לאמת מול השרת
@@ -36,3 +37,16 @@
 
 /sw.js
   Cache-Control: public, max-age=0, must-revalidate
+
+# Development/benchmark entrypoint must not be publicly served.
+/bench.html
+  X-Robots-Tag: noindex, nofollow, noarchive
+  Cache-Control: no-store
+  Content-Security-Policy: default-src 'none'
+
+# Never publish source maps or hidden source-control metadata.
+/*.map
+  X-Robots-Tag: noindex, nofollow, noarchive
+
+/.git/*
+  X-Robots-Tag: noindex, nofollow, noarchive
