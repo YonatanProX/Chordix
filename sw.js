@@ -6,7 +6,7 @@
    · קובץ המודל לא משתנה  → מטמון תחילה, בלי לגעת ברשת
    הגרסה מוטבעת בשם המטמון; שינוי שלה מנקה את הישן.
    ============================================================ */
-const V = 'chordix-v8';
+const V = 'chordix-v9-free-launch';
 const SHELL = ['./', './index.html', './site.webmanifest'];
 
 self.addEventListener('install', e => {
