@@ -1485,6 +1485,9 @@ html.a11y-reduced-motion .google-btn{transition:none}
 .email-sent-note{font-size:13px;color:var(--muted);margin:0 0 8px}
 .email-back{margin-top:8px;font-size:12.5px}
 
+/* אחוז ההתקדמות בזמן הניתוח */
+.work-pct{font-size:32px;font-weight:800;color:var(--text-main);font-variant-numeric:tabular-nums;line-height:1;text-align:center;margin:4px 0 10px}
+
 /* הערות מתחת לכפתור הכניסה */
 .login-note{
   margin:10px 0 0;font-size:12.5px;line-height:1.7;color:var(--text-dim);text-align:center}
@@ -2140,6 +2143,7 @@ html.a11y-reduced-motion .coupon-btn:hover{transform:none}
 <div class="wrap results-wrap" data-rv="home">
   <div class="work" id="work" hidden>
     <h3 data-i18n="work.h3.1" id="workTitle">מנתח את השיר</h3>
+    <div class="work-pct" id="workPct">0%</div>
     <div class="bar"><i id="barFill"></i></div>
     <div data-i18n="work.div.1" class="step" id="step">קורא את הקובץ…</div>
   </div>
@@ -9146,7 +9150,9 @@ function trackPlayback(){
    4. הרצת הניתוח
    ============================================================ */
 function setProgress(p, label){
-  $('barFill').style.width = Math.round(clamp(p,0,1)*100)+'%';
+  const pct = Math.round(clamp(p,0,1)*100);
+  $('barFill').style.width = pct+'%';
+  const pe = $('workPct'); if(pe) pe.textContent = pct+'%';
   if(label) $('step').textContent = label;
 }
 
