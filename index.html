@@ -1961,15 +1961,15 @@ html.a11y-reduced-motion .coupon-btn:hover{transform:none}
 <a data-i18n="a.1" class="skip-link" href="#main">דילוג לתוכן הראשי</a>
 <header class="site-head" id="siteHead">
   <div class="head-in">
-    <a data-i18n-attr="aria-label:siteHead.a.attr_label.1" class="brand" href="#top" aria-label="Chordix — לראש הדף">
+    <a data-i18n-attr="aria-label:siteHead.a.attr_label.1" class="brand" data-route href="/" aria-label="Chordix — לדף הבית">
       <img class="brand-mark" id="brandMark" alt="" width="34" height="34" decoding="async">
       <span class="wordmark">Chord<span class="wm-x">ix</span></span>
     </a>
 
     <nav data-i18n-attr="aria-label:siteHead.nav.attr_label.1" class="head-nav" id="headNav" aria-label="ניווט ראשי">
-      <a data-i18n="headNav.a.1" href="#how">איך זה עובד</a>
-      <a data-i18n="headNav.a.2" href="#features">יכולות</a>
-      <a data-i18n="headNav.a.4" href="#faq">שאלות נפוצות</a>
+      <a data-i18n="headNav.a.1" data-route href="/how">איך זה עובד</a>
+      <a data-i18n="headNav.a.2" data-route href="/features">יכולות</a>
+      <a data-i18n="headNav.a.4" data-route href="/faq">שאלות נפוצות</a>
     </nav>
 
     <div class="head-tools">
@@ -2048,7 +2048,7 @@ html.a11y-reduced-motion .coupon-btn:hover{transform:none}
 <span id="top" aria-hidden="true"></span>
 
 <!-- ============ HERO ============ -->
-<section class="hero" aria-labelledby="heroH">
+<section class="hero" data-rv="home" aria-labelledby="heroH">
   <div class="wrap hero-in">
     <p class="eyebrow" data-i18n="main.1">שמע ← אקורדים · הכול רץ בדפדפן</p>
 
@@ -2115,7 +2115,7 @@ html.a11y-reduced-motion .coupon-btn:hover{transform:none}
   </div>
 </section>
 
-<div class="wrap results-wrap">
+<div class="wrap results-wrap" data-rv="home">
   <div class="work" id="work" hidden>
     <h3 data-i18n="work.h3.1" id="workTitle">מנתח את השיר</h3>
     <div class="bar"><i id="barFill"></i></div>
@@ -2313,7 +2313,7 @@ html.a11y-reduced-motion .coupon-btn:hover{transform:none}
 </div>
 
 <!-- ============ איך זה עובד ============ -->
-<section class="band how" id="how" data-marketing aria-labelledby="howH">
+<section class="band how" id="how" data-rv="how" data-marketing aria-labelledby="howH">
   <div class="wrap">
     <p class="sec-eyebrow" data-i18n="main.10">התהליך</p>
     <h2 id="howH" class="sec-title" data-i18n="main.11">שלושה שלבים, בלי לחפש בשום מאגר שירים</h2>
@@ -2338,7 +2338,7 @@ html.a11y-reduced-motion .coupon-btn:hover{transform:none}
 </section>
 
 <!-- ============ יכולות ============ -->
-<section class="band features" id="features" data-marketing aria-labelledby="featH">
+<section class="band features" id="features" data-rv="features" data-marketing aria-labelledby="featH">
   <div class="wrap">
     <p class="sec-eyebrow" data-i18n="main.12">יכולות</p>
     <h2 id="featH" class="sec-title" data-i18n="main.13">מה מקבלים בפועל</h2>
@@ -2378,7 +2378,7 @@ html.a11y-reduced-motion .coupon-btn:hover{transform:none}
 </section>
 
 <!-- ============ דוגמת פלט ============ -->
-<section class="band sample" id="sample" data-marketing aria-labelledby="sampH">
+<section class="band sample" id="sample" data-rv="home" data-marketing aria-labelledby="sampH">
   <div class="wrap">
     <p class="sec-eyebrow" data-i18n="main.26">דוגמה</p>
     <h2 id="sampH" class="sec-title" data-i18n="main.27">איך נראה הדף שיוצא</h2>
@@ -2415,7 +2415,7 @@ html.a11y-reduced-motion .coupon-btn:hover{transform:none}
 <!-- ============ מחירים ============ -->
 <!-- ============ שירות חינמי ============ -->
 <!-- ============ התקנה כאפליקציה ============ -->
-<section class="install band-thin" id="installBar" data-marketing aria-labelledby="instH">
+<section class="install band-thin" id="installBar" data-rv="home" data-marketing aria-labelledby="instH">
   <div class="wrap install-in">
     <span class="install-ico" aria-hidden="true">⤓</span>
     <p class="install-txt" data-i18n="main.38"><b id="instH">להתקין כאפליקציה</b> — נפתח בחלון נקי בלי סרגלי הדפדפן, וזמין גם בלי חיבור.</p>
@@ -2425,7 +2425,7 @@ html.a11y-reduced-motion .coupon-btn:hover{transform:none}
 </section>
 
 <!-- ============ שאלות נפוצות ============ -->
-<section class="band faq" id="faq" data-marketing aria-labelledby="faqH">
+<section class="band faq" id="faq" data-rv="faq" data-marketing aria-labelledby="faqH">
   <div class="wrap">
     <p class="sec-eyebrow" data-i18n="main.39">שאלות נפוצות</p>
     <h2 id="faqH" class="sec-title" data-i18n="main.40">מה שכולם שואלים</h2>
@@ -2459,15 +2459,6 @@ html.a11y-reduced-motion .coupon-btn:hover{transform:none}
   </div>
 </section>
 
-<!-- ============ קריאה לפעולה ============ -->
-<section class="band cta-final" data-marketing aria-labelledby="ctaH">
-  <div class="wrap cta-in">
-    <h2 id="ctaH" data-i18n="main.62">יש לכם הקלטה? יש לכם דף אקורדים.</h2>
-    <p data-i18n="main.63">גררו קובץ ותוך שניות תדעו באילו אקורדים השיר מנוגן.</p>
-    <button data-i18n="band.button.1" type="button" class="primary big" data-scroll="#app">להעלאת הקלטה</button>
-  </div>
-</section>
-
 </main>
 
 <footer class="site">
@@ -2491,10 +2482,10 @@ html.a11y-reduced-motion .coupon-btn:hover{transform:none}
     <div class="foot-col">
       <h3 data-i18n="foot.4">המוצר</h3>
       <ul>
-        <li data-i18n="foot.5"><a href="#how">איך זה עובד</a></li>
-        <li data-i18n="foot.6"><a href="#features">יכולות</a></li>
-        <li data-i18n="foot.8"><a href="#sample">דוגמת פלט</a></li>
-        <li data-i18n="foot.9"><a href="#faq">שאלות נפוצות</a></li>
+        <li data-i18n="foot.5"><a data-route href="/how">איך זה עובד</a></li>
+        <li data-i18n="foot.6"><a data-route href="/features">יכולות</a></li>
+        <li data-i18n="foot.8"><a data-route href="/">דוגמת פלט</a></li>
+        <li data-i18n="foot.9"><a data-route href="/faq">שאלות נפוצות</a></li>
       </ul>
     </div>
 
@@ -10971,18 +10962,34 @@ renderBundles();
     if(drop && b.dataset.scroll === '#app') setTimeout(()=>drop.focus({preventScroll:true}), 420);
   });
 
-  /* סימון הפריט הפעיל בתפריט לפי המקטע שנראה במסך */
-  const links = [...document.querySelectorAll('.head-nav a[href^="#"]')];
-  const secs  = links.map(a=>document.querySelector(a.getAttribute('href'))).filter(Boolean);
-  if(secs.length && 'IntersectionObserver' in window){
-    const io = new IntersectionObserver(entries=>{
-      entries.forEach(en=>{
-        if(!en.isIntersecting) return;
-        links.forEach(a=>a.classList.toggle('active', a.getAttribute('href') === '#'+en.target.id));
-      });
-    }, { rootMargin:'-45% 0px -50% 0px' });
-    secs.forEach(s=>io.observe(s));
+  /* ---------- ניתוב-עמודים בצד-לקוח: /how /features /faq ----------
+     כל סקשן מתויג data-rv (home/how/features/faq). לחיצה בסרגל פותחת
+     עמוד משלו למעלה במקום לגלול: הראוטר מציג רק את סקשני המסלול,
+     מעדכן את ה-URL, וגולל לראש. Cloudflare מגיש את index.html לכל
+     נתיב, כך שרענון של /how עובד. */
+  const CX_ROUTES = { '/how':'how', '/features':'features', '/faq':'faq' };
+  const navLinks = [...document.querySelectorAll('.head-nav a[data-route]')];
+  function cxShowRoute(path, push){
+    const rv = CX_ROUTES[path] || 'home';
+    document.querySelectorAll('[data-rv]').forEach(el=>{ el.hidden = (el.dataset.rv !== rv); });
+    navLinks.forEach(a=>a.classList.toggle('active', CX_ROUTES[a.getAttribute('href')] === rv));
+    if(push){ try{ history.pushState({ rv }, '', path); }catch(e){} }
+    window.scrollTo(0, 0);
+    if(rv !== 'home'){
+      const h = document.querySelector('[data-rv="'+rv+'"] h1, [data-rv="'+rv+'"] h2');
+      if(h){ h.setAttribute('tabindex','-1'); try{ h.focus({ preventScroll:true }); }catch(e){} }
+    }
   }
+  document.addEventListener('click', e=>{
+    const a = e.target.closest('a[data-route]');
+    if(!a) return;
+    const href = a.getAttribute('href') || '';
+    if(href[0] !== '/') return;
+    e.preventDefault();
+    cxShowRoute(href, true);
+  });
+  addEventListener('popstate', ()=> cxShowRoute(location.pathname, false));
+  cxShowRoute(location.pathname, false);
 
   /* ---------- 5. חבילות: רשימת המתנה וקופונים ----------
      נמצא כאן ולא בסקריפט של Supabase, כדי שכפתורי המחירים יגיבו
