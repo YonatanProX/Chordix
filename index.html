@@ -1946,38 +1946,11 @@ html.a11y-reduced-motion .coupon-btn:hover{transform:none}
 .stat-chip .stat-num{font-size:17px;font-weight:800;letter-spacing:.01em}
 
 
-/* ============================================================
-   Chordix quiet layout — reduce visual load without changing content
-   ============================================================ */
-body{background-image:none}
-.site-head{box-shadow:none}
-.head-in{padding-block:8px}
-.head-nav a{padding-inline:9px}
-.hero{padding-top:38px;padding-bottom:0}.hero::before{opacity:.5;filter:blur(30px)}
-.hero-lead{max-width:590px;font-size:14px;line-height:1.68}.trust-row{margin-top:14px;gap:5px}.trust-row li{padding:4px 10px;font-size:11.5px;background:transparent}
-.stage{margin-top:22px}.drop{padding:38px 22px;border-radius:14px;box-shadow:none}.drop:hover,.drop.hot{box-shadow:0 0 0 3px color-mix(in srgb,var(--brass) 12%,transparent);transform:none}
-.opt-row{margin-top:8px;padding:7px 12px;border-color:color-mix(in srgb,var(--panel-edge) 70%,transparent)}
-.band{padding:42px 0}.band+.band{padding-top:0}.sec-lead{margin-top:8px}.steps,.feat-grid{margin-top:20px;gap:10px}.step-card,.feat-card{padding:18px 17px;border-radius:12px;box-shadow:none}.step-card p,.feat-card p{line-height:1.65}
-.sample-paper{margin-top:20px;box-shadow:none}.plans{margin-top:20px;gap:10px}.plan{padding:19px 17px;border-radius:13px;box-shadow:none}.plan.best{box-shadow:0 0 0 2px color-mix(in srgb,var(--brass) 22%,transparent)}
-.soon-banner{margin-top:15px}.install{margin-top:20px;box-shadow:none}.why,.faq{margin-top:40px}.why-grid{margin-top:17px;gap:10px}.why article{padding:16px 17px;border-radius:12px;box-shadow:none}.faq-list{gap:6px}.faq-item{box-shadow:none}
-footer.site{margin-top:44px;padding-bottom:68px}
-@media(max-width:760px){.hero{padding-top:28px}.band{padding:32px 0}.band+.band{padding-top:0}.drop{padding:32px 16px}.why,.faq{margin-top:32px}}
+/* בלוק "quiet layout" של Manus הוסר — חזרה לעיצוב המקורי (רקע, צללים,
+   גדלי-פונט ומרווחים כפי שהיו לפני שינויי ההשקה). */
 
 
-/* ---------- cursor glow ---------- */
-.cursor-glow{position:fixed;z-index:0;pointer-events:none;width:132px;height:132px;border-radius:50%;
-  left:0;top:0;opacity:0;transform:translate(-50%,-50%);
-  background:radial-gradient(circle,color-mix(in srgb,var(--brass) 20%,transparent) 0%,color-mix(in srgb,var(--brass-soft) 10%,transparent) 38%,transparent 72%);
-  filter:blur(9px);transition:opacity .18s ease;will-change:transform}
-.cursor-glow::before{content:'♪  ♫  ♩';position:absolute;inset:0;display:flex;align-items:center;justify-content:center;gap:5px;color:var(--brass);font-family:Georgia,serif;font-size:19px;letter-spacing:1px;text-shadow:0 0 10px color-mix(in srgb,var(--brass) 70%,transparent);opacity:.8;transform:rotate(-8deg)}
-.cursor-glow::after{content:'·  ♫';position:absolute;top:9px;inset-inline-end:8px;color:var(--brass-soft);font-size:11px;opacity:.7;transform:rotate(12deg)}
-body.cursor-active .cursor-glow{opacity:.82}
-body.cursor-active::after{content:'';position:fixed;z-index:0;pointer-events:none;inset:0;
-  background:radial-gradient(220px circle at var(--cursor-x,50%) var(--cursor-y,30%),color-mix(in srgb,var(--brass) 5%,transparent),transparent 72%)}
-body>*{position:relative;z-index:1}
-.site-head{z-index:120!important}.modal-backdrop,#consentGate{z-index:2100!important}
-html.a11y-reduced-motion .cursor-glow,html.a11y-reduced-motion body.cursor-active::after{display:none}
-@media (hover:none),(pointer:coarse){.cursor-glow,body.cursor-active::after{display:none}}
+/* אפקט cursor-glow (תווי-מוזיקה עוקבי-עכבר + זוהר) של Manus הוסר לבקשת המשתמש. */
 
 </style>
 <style id="freeModeStyles">
@@ -11813,18 +11786,6 @@ const SUPABASE_ANON_KEY = 'sb_publishable_o_OZ0MF9F3eN-7727-cQkA_oihPH1pH';
       const t = await authErrText(e, cxT("לא הצלחנו לבדוק את מצב ההתחברות"));
       console.error(cxT("[Chordix] getSession נכשל —"), t);
     });
-})();
-</script>
-<script>
-/* ---------- cursor glow runtime ---------- */
-(()=>{
-  if(matchMedia('(hover: none), (pointer: coarse)').matches || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-  const glow=document.createElement('div'); glow.className='cursor-glow'; glow.setAttribute('aria-hidden','true'); document.body.appendChild(glow);
-  let tx=0,ty=0,x=0,y=0,shown=false,raf=0;
-  const move=e=>{tx=e.clientX;ty=e.clientY;if(!shown){x=tx;y=ty;shown=true;document.body.classList.add('cursor-active');} document.documentElement.style.setProperty('--cursor-x',tx+'px');document.documentElement.style.setProperty('--cursor-y',ty+'px');if(!raf)raf=requestAnimationFrame(tick)};
-  const tick=()=>{x+=(tx-x)*.34;y+=(ty-y)*.34;glow.style.transform='translate3d('+x+'px,'+y+'px,0) translate(-50%,-50%)';raf=0;if(Math.abs(tx-x)+Math.abs(ty-y)>.2)raf=requestAnimationFrame(tick)};
-  const leave=()=>document.body.classList.remove('cursor-active');
-  document.addEventListener('pointermove',move,{passive:true}); document.addEventListener('pointerleave',leave,{passive:true});
 })();
 </script>
 </body>
