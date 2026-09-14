@@ -11412,7 +11412,10 @@ const SUPABASE_ANON_KEY = 'sb_publishable_o_OZ0MF9F3eN-7727-cQkA_oihPH1pH';
     if(!token){ msg.textContent = cxT("הזינו את הקוד שקיבלתם באימייל."); return; }
     const btn=$('verifyCodeBtn'); if(btn) btn.disabled=true; msg.textContent=cxT("מאמת…");
     try{
-      const { error } = await sb.auth.verifyOtp({ email, token, type:'email' });
+      /* משתמש קיים מאמת כ-'email'; משתמש חדש (signInWithOtp יצר אותו) כ-'signup'.
+         מנסים קודם 'email', ואם נכשל נופלים ל-'signup', כדי ששני המצבים יעבדו. */
+      let { error } = await sb.auth.verifyOtp({ email, token, type:'email' });
+      if(error){ const r = await sb.auth.verifyOtp({ email, token, type:'signup' }); error = r.error; }
       if(error) throw error;   /* הצלחה: onAuthStateChange ימשיך */
     }catch(e){ if(btn) btn.disabled=false; msg.textContent = await authErrText(e, cxT("הקוד שגוי או שפג תוקפו")); }
   }
