@@ -45,6 +45,17 @@ http.createServer((req, res) => {
   const filePath = path.join(DIST, urlPath);
   // מניעת path traversal
   if (!filePath.startsWith(DIST)) { res.writeHead(403); return res.end('forbidden'); }
+  // HEAD: כותרות בלבד, בלי גוף (אחרת הדפדפן מבטל — ERR_ABORTED)
+  if (req.method === 'HEAD') {
+    fs.stat(filePath, (e, st) => {
+      const ext = path.extname(filePath).toLowerCase();
+      if (e) { res.writeHead(404, { ...HEADERS }); return res.end(); }
+      res.writeHead(200, { ...HEADERS, 'Content-Type': TYPES[ext] || 'application/octet-stream',
+        'Content-Length': st.size, 'Accept-Ranges': 'bytes' });
+      res.end();
+    });
+    return;
+  }
   fs.readFile(filePath, (err, data) => {
     const base = { ...HEADERS };
     if (err) {
