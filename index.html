@@ -1475,6 +1475,16 @@ html.a11y-reduced-motion .google-btn{transition:none}
 .acct-hi{font-size:13.5px;font-weight:600;color:var(--text-main);white-space:nowrap;margin-inline-end:6px}
 @media(max-width:560px){.acct-hi{display:none}}
 
+/* התחברות עם אימייל וקוד חד-פעמי */
+.or-sep{display:flex;align-items:center;gap:10px;margin:14px 0 10px;color:var(--muted);font-size:12.5px}
+.or-sep::before,.or-sep::after{content:"";flex:1;height:1px;background:var(--line)}
+.email-in{width:100%;box-sizing:border-box;padding:11px 12px;border:1px solid var(--line);border-radius:10px;background:var(--bg-sunken);color:var(--text-main);font-size:15px;font-family:inherit}
+.email-in:focus{outline:none;border-color:var(--focus-ring);box-shadow:0 0 0 3px var(--focus-ring)}
+.otp-in{text-align:center;letter-spacing:.4em;font-weight:700;font-variant-numeric:tabular-nums}
+.email-btn{margin-top:8px}
+.email-sent-note{font-size:13px;color:var(--muted);margin:0 0 8px}
+.email-back{margin-top:8px;font-size:12.5px}
+
 /* הערות מתחת לכפתור הכניסה */
 .login-note{
   margin:10px 0 0;font-size:12.5px;line-height:1.7;color:var(--text-dim);text-align:center}
@@ -2616,7 +2626,7 @@ html.a11y-reduced-motion .coupon-btn:hover{transform:none}
     </div>
     <div class="modal-body">
       <div id="authOut">
-        <p data-i18n="authOut.p.1" class="login-hint">הכניסה היא עם חשבון Google או Discord — בלי סיסמה לנהל ובלי טופס למלא.</p>
+        <p data-i18n="authOut.p.1" class="login-hint">כניסה עם Google, Discord, או קוד לאימייל — בלי סיסמה לזכור.</p>
         <button type="button" class="google-btn" id="googleBtn">
           <svg class="g-mark" viewBox="0 0 18 18" aria-hidden="true" focusable="false">
             <path fill="#4285F4" d="M17.64 9.2c0-.64-.06-1.25-.16-1.84H9v3.48h4.84a4.14 4.14 0 0 1-1.8 2.72v2.26h2.92c1.7-1.57 2.68-3.88 2.68-6.62z"/>
@@ -2632,6 +2642,19 @@ html.a11y-reduced-motion .coupon-btn:hover{transform:none}
           </svg>
           <span>התחברות עם Discord</span>
         </button>
+
+        <div class="or-sep"><span>או עם אימייל</span></div>
+        <div id="emailStep1" class="email-step">
+          <input type="email" id="emailInput" class="email-in" placeholder="כתובת אימייל" autocomplete="email" inputmode="email" dir="ltr">
+          <button type="button" class="google-btn email-btn" id="sendCodeBtn"><span>שליחת קוד לאימייל</span></button>
+        </div>
+        <div id="emailStep2" class="email-step" hidden>
+          <p class="email-sent-note">שלחנו קוד ל‑<b id="emailSentTo"></b>. הזינו אותו כאן:</p>
+          <input type="text" id="otpInput" class="email-in otp-in" placeholder="קוד בן 6 ספרות" inputmode="numeric" autocomplete="one-time-code" maxlength="6" dir="ltr">
+          <button type="button" class="google-btn email-btn" id="verifyCodeBtn"><span>אימות והתחברות</span></button>
+          <button type="button" class="link-btn email-back" id="emailBack">שליחה לאימייל אחר</button>
+        </div>
+
         <p data-i18n="authOut.p.2" class="login-note">
           מהחשבון שתבחר מגיעים אלינו <b>השם, כתובת המייל ותמונת הפרופיל</b> בלבד. אין לנו גישה
           לסיסמה שלך, לתיבת הדואר או לכל דבר אחר בחשבון.
@@ -2794,7 +2817,7 @@ html.a11y-reduced-motion .coupon-btn:hover{transform:none}
   <p>השימוש מותר למי שמלאו לו 18 שנים, או לקטין באישור אחראי עליו. שימוש בשירות מהווה הצהרה כי אתה עומד בתנאי זה.</p>
 
   <h3>3א. חשבון משתמש והתחברות</h3>
-  <p>חלק מיכולות השירות — ניתוח שיר ושמירת היסטוריה — מחייבות חשבון. <b>ההתחברות אפשרית באמצעות חשבון Google או חשבון Discord</b>, ואין בשירות סיסמה נפרדת. השימוש בהתחברות כפוף גם לתנאי השימוש של הספק שבחרת.</p>
+  <p>חלק מיכולות השירות — ניתוח שיר ושמירת היסטוריה — מחייבות חשבון. <b>ההתחברות אפשרית באמצעות חשבון Google, חשבון Discord, או כתובת אימייל עם קוד חד‑פעמי</b>, ואין בשירות סיסמה נפרדת. בהתחברות דרך ספק חיצוני, השימוש כפוף גם לתנאי השימוש של אותו ספק.</p>
   <p>אתה אחראי לשמירה על חשבון ה‑Google שלך ולכל פעולה שתיעשה בשירות באמצעותו. חשבון אחד מיועד לאדם אחד; אין להעביר, למכור או לשתף חשבון. המפעיל רשאי להשעות או לסגור חשבון שנעשה בו שימוש לרעה, שימוש בניגוד לתנאים אלה או שימוש בלתי חוקי.</p>
   <p>אתה רשאי לבקש את מחיקת חשבונך בכל עת בפנייה ל‑<a href="mailto:chordix.business@gmail.com">chordix.business@gmail.com</a>. מחיקת החשבון מוחקת גם את היסטוריית הניתוחים.</p>
 
@@ -2855,7 +2878,7 @@ html.a11y-reduced-motion .coupon-btn:hover{transform:none}
   <p><b>החשבון והתוצאה כן נשמרים בשרת.</b> כדי לנהל את החשבון ולשמור היסטוריה, המפעיל מנהל מאגר מידע. נוסח קודם של מדיניות זו טען שאין מאגר כלל — הדבר נכון היה לגרסה שלא כללה חשבונות, ואינו נכון עוד. הפירוט המלא בסעיף 3.</p>
 
   <h3>3. איזה מידע נאסף בפועל</h3>
-  <p><b>א. פרטי הזהות מספק ההתחברות.</b> הכניסה לשירות אפשרית באמצעות חשבון Google או חשבון Discord. בעת ההתחברות הספק שבחרת מוסר לנו את <b>שמך, כתובת הדוא"ל, כתובת תמונת הפרופיל ומזהה החשבון אצל הספק</b>. אין לנו גישה לסיסמתך, לתיבת הדואר שלך או לכל מידע אחר בחשבון. השם והתמונה מוצגים לך בממשק ונקראים מתוך אסימון ההתחברות; הם אינם נשמרים בטבלאות שלנו.</p>
+  <p><b>א. פרטי הזהות מההתחברות.</b> הכניסה לשירות אפשרית באמצעות חשבון Google, חשבון Discord, או כתובת אימייל עם קוד חד‑פעמי. בהתחברות דרך Google או Discord נמסרים לנו <b>שמך, כתובת הדוא"ל, כתובת תמונת הפרופיל ומזהה החשבון אצל הספק</b>; בהתחברות עם אימייל נמסרת <b>כתובת הדוא"ל</b> בלבד. אין לנו גישה לסיסמתך, לתיבת הדואר שלך או לכל מידע אחר בחשבון. השם והתמונה מוצגים לך בממשק ונקראים מתוך אסימון ההתחברות; הם אינם נשמרים בטבלאות שלנו.</p>
   <p><b>ב. פרטי החשבון.</b> נשמרים מזהה המשתמש, כתובת הדוא"ל ומועד ההצטרפות.</p>
   <p><b>ג. היסטוריית הניתוחים.</b> בסיום ניתוח מוצלח, וכשאתה מחובר, נשמרים בחשבונך <b>שם הקובץ שבחרת, הסולם, הקצב, מספר התיבות, אורך השיר, חלוקת המקטעים ורצף האקורדים שהופק</b>. כלומר: תוצאת הניתוח נשמרת, ההקלטה עצמה לא.</p>
   <p>מסירת המידע נעשית מרצונך. אינך חייב על פי דין למסור אותו, אך בלעדיו לא ניתן לפתוח חשבון או לשמור היסטוריה.</p>
@@ -11345,6 +11368,7 @@ const SUPABASE_ANON_KEY = 'sb_publishable_o_OZ0MF9F3eN-7727-cQkA_oihPH1pH';
   const loginModal = $('loginModal');
   function openLogin(){
     msg.textContent = '';
+    try{ resetEmailForm(); }catch(_){}
     loginModal.classList.remove('hidden');
     setTimeout(()=>{ const g = $('googleBtn'); if(g) g.focus(); }, 40);
   }
@@ -11359,6 +11383,44 @@ const SUPABASE_ANON_KEY = 'sb_publishable_o_OZ0MF9F3eN-7727-cQkA_oihPH1pH';
 
   $('googleBtn').addEventListener('click', signInWithGoogle);
   { const _d = $('discordBtn'); if(_d) _d.addEventListener('click', signInWithDiscord); }
+
+  /* ---------- התחברות עם אימייל וקוד חד-פעמי (OTP) ---------- */
+  function resetEmailForm(){
+    const s1=$('emailStep1'), s2=$('emailStep2');
+    if(s1) s1.hidden=false;
+    if(s2) s2.hidden=true;
+    const oi=$('otpInput'); if(oi) oi.value='';
+  }
+  async function sendEmailCode(){
+    const email = (($('emailInput')||{}).value||'').trim();
+    if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)){ msg.textContent = cxT("הזינו כתובת אימייל תקינה."); return; }
+    const btn=$('sendCodeBtn'); if(btn) btn.disabled=true; msg.textContent=cxT("שולח קוד…");
+    try{
+      const { error } = await sb.auth.signInWithOtp({ email, options:{ shouldCreateUser:true } });
+      if(error) throw error;
+      const to=$('emailSentTo'); if(to) to.textContent = email;
+      if($('emailStep1')) $('emailStep1').hidden=true;
+      if($('emailStep2')) $('emailStep2').hidden=false;
+      const oi=$('otpInput'); if(oi) oi.focus();
+      msg.textContent='';
+    }catch(e){ msg.textContent = await authErrText(e, cxT("שליחת הקוד נכשלה")); }
+    finally{ if(btn) btn.disabled=false; }
+  }
+  async function verifyEmailCode(){
+    const email = (($('emailInput')||{}).value||'').trim();
+    const token = (($('otpInput')||{}).value||'').trim();
+    if(!token){ msg.textContent = cxT("הזינו את הקוד שקיבלתם באימייל."); return; }
+    const btn=$('verifyCodeBtn'); if(btn) btn.disabled=true; msg.textContent=cxT("מאמת…");
+    try{
+      const { error } = await sb.auth.verifyOtp({ email, token, type:'email' });
+      if(error) throw error;   /* הצלחה: onAuthStateChange ימשיך */
+    }catch(e){ if(btn) btn.disabled=false; msg.textContent = await authErrText(e, cxT("הקוד שגוי או שפג תוקפו")); }
+  }
+  { const b=$('sendCodeBtn'); if(b) b.addEventListener('click', sendEmailCode); }
+  { const b=$('verifyCodeBtn'); if(b) b.addEventListener('click', verifyEmailCode); }
+  { const b=$('emailBack'); if(b) b.addEventListener('click', ()=>{ resetEmailForm(); const e=$('emailInput'); if(e) e.focus(); }); }
+  { const e=$('emailInput'); if(e) e.addEventListener('keydown', ev=>{ if(ev.key==='Enter'){ ev.preventDefault(); sendEmailCode(); } }); }
+  { const o=$('otpInput'); if(o) o.addEventListener('keydown', ev=>{ if(ev.key==='Enter'){ ev.preventDefault(); verifyEmailCode(); } }); }
   $('logoutBtn').addEventListener('click', async () => {
     try{ await sb.auth.signOut(); }
     catch(e){ msg.textContent = await authErrText(e, cxT("היציאה נכשלה")); }
