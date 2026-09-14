@@ -1,0 +1,13 @@
+{
+  "name": "chordix-build",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Build step for Chordix: obfuscates the app logic in index.html into dist/. Source index.html stays human-readable.",
+  "scripts": {
+    "build": "node build/obfuscate.mjs"
+  },
+  "devDependencies": {
+    "javascript-obfuscator": "4.1.1"
+  }
+}

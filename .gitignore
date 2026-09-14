@@ -1,0 +1,5 @@
+# תלויות בנייה — לא נדחפות (Cloudflare מריץ npm ci מתוך package-lock)
+node_modules/
+
+# פלט הבנייה — נוצר ע"י `npm run build` (Cloudflare מייצר ומגיש אותו)
+dist/
