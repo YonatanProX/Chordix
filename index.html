@@ -1471,6 +1471,10 @@ html.a11y-reduced-motion .google-btn{transition:none}
 .discord-btn:active{background:#454fce}
 .discord-btn .g-mark{color:#fff}
 
+/* ברכת שלום ליד תמונת הפרופיל בכותרת */
+.acct-hi{font-size:13.5px;font-weight:600;color:var(--text-main);white-space:nowrap;margin-inline-end:6px}
+@media(max-width:560px){.acct-hi{display:none}}
+
 /* הערות מתחת לכפתור הכניסה */
 .login-note{
   margin:10px 0 0;font-size:12.5px;line-height:1.7;color:var(--text-dim);text-align:center}
@@ -2018,6 +2022,7 @@ html.a11y-reduced-motion .coupon-btn:hover{transform:none}
         <button data-i18n="authBar.button.1" type="button" class="head-login" id="loginOpen">כניסה</button>
         <div id="authIn" hidden>
           <div class="acct-wrap">
+            <span class="acct-hi" id="userHi" hidden></span>
             <button data-i18n-attr="aria-label:authIn.button.attr_label.1" type="button" class="icon-btn acct-btn" id="acctBtn" aria-haspopup="menu"
                     aria-expanded="false" aria-controls="acctMenu" aria-label="החשבון שלי">
               <img id="acctAvatar" class="acct-avatar" alt="" hidden
@@ -11392,6 +11397,14 @@ const SUPABASE_ANON_KEY = 'sb_publishable_o_OZ0MF9F3eN-7727-cQkA_oihPH1pH';
     if(nameEl) nameEl.textContent = id.name;
     $('userEmail').textContent = id.email;
 
+    /* ברכת שלום בכותרת — שם פרטי בלבד */
+    const hi = $('userHi');
+    if(hi){
+      const first = (id.name || '').trim().split(/\s+/)[0] || '';
+      if(first){ hi.textContent = cxT("שלום, {0}", first); hi.hidden = false; }
+      else { hi.textContent = ''; hi.hidden = true; }
+    }
+
     const btn = $('acctBtn');
     if(btn) btn.setAttribute('aria-label', id.name ? cxT("החשבון של {0}", id.name) : cxT("החשבון שלי"));
 
@@ -11696,6 +11709,7 @@ const SUPABASE_ANON_KEY = 'sb_publishable_o_OZ0MF9F3eN-7727-cQkA_oihPH1pH';
     catch(_){ return new Set(); }
   }
   async function maybeWelcome(session){
+    return; /* מודל הברכה הוסר — השירות חינמי, אין מתנת-קרדיטים להכריז עליה */
     if(!session || !session.user) return;
     const created = Date.parse(session.user.created_at || '');
     if(!created || (Date.now() - created) > NEW_ACCOUNT_WINDOW_MS) return;
