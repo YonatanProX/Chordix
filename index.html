@@ -9258,6 +9258,7 @@ async function analyze(file, ttaOverride, pre){
   if(state.url) URL.revokeObjectURL(state.url);
   state.url = URL.createObjectURL(file);
   $('player').src = state.url;
+  $('player').hidden = false;
   $('trVal').textContent = '0';
   $('result').scrollIntoView({behavior:'smooth', block:'start'});
   cxLog.info(cxT("ניתוח הושלם"), { bars: state.bars.length, bpm: Math.round(state.bpm), tta: state.usedTta });
@@ -9986,7 +9987,8 @@ window.__loadSavedAnalysis = function(row){
   if(!d || !d.bars || !d.bars.length) return;
   state.an = null;
   if(state.url){ URL.revokeObjectURL(state.url); state.url = null; }
-  $('player').removeAttribute('src');
+  /* אין אודיו בכניסה מהיסטוריה — מסתירים את הנגן, נשאר רק דף האקורדים */
+  { const _p = $('player'); if(_p){ _p.removeAttribute('src'); _p.hidden = true; } }
   state.title = d.title || row.title || cxT("דף אקורדים");
   state.key = d.key || null;
   state.bpm = d.bpm || row.bpm || 120;
