@@ -22,6 +22,7 @@ const DIST = path.join(ROOT, 'dist');
 const COPY_SKIP = new Set([
   'dist', 'build', 'node_modules', '.git',
   'package.json', 'package-lock.json', 'index.html',
+  '.gitignore', '.node-version',
 ]);
 
 /* בלוק-script יוחרג מהערפול אם הוא נתונים/‏bootstrap-מוקדם/vendor.
