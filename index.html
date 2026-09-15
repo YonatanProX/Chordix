@@ -1550,6 +1550,11 @@ html.doc-mode #result{background:var(--bg-panel);border:1px solid var(--panel-ed
   border-radius:8px;padding:16px 20px 26px;box-shadow:0 18px 50px -26px rgba(0,0,0,.5)}
 html.doc-mode #result .controls{justify-content:center;flex-wrap:wrap;gap:8px;margin-bottom:6px}
 
+/* הוסרו מהממשק: "האקורדים לא מדויקים? מעקב אקורדים רץ" ו"אפשרויות דף
+   האקורדים וייצוא". נשארים ב-DOM (מוסתרים) כדי שהמנוע ימשיך לקרוא מהם
+   ברירות-מחדל בזמן הניתוח והרינדור. */
+#tune, #sheetOpts{display:none!important}
+
 /* התחברות עם אימייל וקוד חד-פעמי */
 .or-sep{display:flex;align-items:center;gap:10px;margin:14px 0 10px;color:var(--muted);font-size:12.5px}
 .or-sep::before,.or-sep::after{content:"";flex:1;height:1px;background:var(--line)}
@@ -2735,11 +2740,6 @@ html.a11y-reduced-motion .coupon-btn:hover{transform:none}
     <a href="mailto:chordix.business@gmail.com">chordix.business@gmail.com</a>
   </p>
 </footer>
-
-<div style="text-align:center;padding:14px 0 36px">
-  <button id="stockBtn" type="button" title="עיבוד אצווה (מוגן בקוד)"
-    style="font-size:12px;opacity:.5;background:transparent;border:1px solid var(--panel-edge);border-radius:8px;padding:6px 14px;cursor:pointer;color:inherit">כפתור סטוק</button>
-</div>
 
 <div id="utilityStack">
   <button data-i18n-attr="title:utilityStack.button.attr_title.1,aria-label:utilityStack.button.attr_label.1" class="float-btn" id="helpToggle" title="עזרה" aria-label="עזרה והוראות" aria-expanded="false" aria-controls="helpWindow">
@@ -10319,10 +10319,15 @@ function buildTruthText(){
   return t;
 }
 $('devExport').addEventListener('click', ()=>{
-  if(!state.secs.length){ toast(cxT('קודם צריך לנתח שיר')); return; }
   const code = prompt('קוד מפתחים:');
   if(code === null) return;
   const c = code.trim();
+  if(c === 'סטוק'){   /* עיבוד אצווה — הפאנל שהיה מאחורי "כפתור סטוק" (לא דורש ניתוח קודם) */
+    const sp = $('stockPanel');
+    if(sp){ sp.hidden = false; }
+    return;
+  }
+  if(!state.secs.length){ toast(cxT('קודם צריך לנתח שיר')); return; }
   if(c === '313'){
     downloadText(safeName()+'-site.md', buildTruthText(), 'text/markdown');
     toast(cxT('הניתוח יוצא בתבנית אמת'));
@@ -10359,7 +10364,9 @@ $('devExport').addEventListener('click', ()=>{
    אחד. הפאנל הוא overlay מלא כך שדף האקורדים לא מוצג. עצמאי לגמרי
    — כותב ZIP (store, בלי דחיסה) בלי ספריות חיצוניות. */
 (function(){
-  const btn=$('stockBtn'); if(!btn) return;
+  /* אין יותר "כפתור סטוק" — הפאנל נפתח מ"כפתור מפתחים" בקוד "סטוק".
+     ה-IIFE עדיין מחווט את פקדי הפאנל עצמו. */
+  if(!$('stockPanel')) return;
 
   function crc32(b){ let c=~0; for(let i=0;i<b.length;i++){ c^=b[i];
     for(let k=0;k<8;k++) c=(c>>>1)^(0xEDB88320&-(c&1)); } return (~c)>>>0; }
@@ -10434,11 +10441,6 @@ $('devExport').addEventListener('click', ()=>{
     prog.textContent='✓ הסתיים. '+files.length+' שירים → ZIP (site.md + debug.json לכל אחד).';
   }
 
-  btn.addEventListener('click', ()=>{
-    const code=prompt('קוד סטוק:'); if(code===null) return;
-    if(code.trim()!=='יונתן'){ toast(cxT('קוד שגוי')); return; }
-    $('stockPanel').hidden=false;
-  });
   const closeB=$('stockClose');
   if(closeB) closeB.addEventListener('click', ()=>{ $('stockPanel').hidden=true; });
 
