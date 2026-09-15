@@ -6,7 +6,7 @@
    · קובץ המודל לא משתנה  → מטמון תחילה, בלי לגעת ברשת
    הגרסה מוטבעת בשם המטמון; שינוי שלה מנקה את הישן.
    ============================================================ */
-const V = 'chordix-v9-free-launch';
+const V = 'chordix-v10-hardening';
 const SHELL = ['./', './index.html', './site.webmanifest'];
 
 self.addEventListener('install', e => {
@@ -33,7 +33,6 @@ self.addEventListener('fetch', e => {
      וזה מה שמאפשר לנתח שירים גם בלי רשת. */
   if (/\/chordix-model(?:-e1)?\.bin$/.test(url.pathname) ||
       url.pathname.endsWith('.wasm') ||
-      url.hostname === 'cdn.jsdelivr.net' ||
       url.hostname === 'fonts.gstatic.com') {
     e.respondWith(
       caches.match(req).then(hit => hit || fetch(req).then(res => {
