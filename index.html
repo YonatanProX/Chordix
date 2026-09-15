@@ -1532,6 +1532,38 @@ html.a11y-reduced-motion .foot-discord:hover{transform:none}
 .email-sent-note{font-size:13px;color:var(--muted);margin:0 0 8px}
 .email-back{margin-top:8px;font-size:12.5px}
 
+/* ---------- עיצוב-מחדש: חלון התחברות חגיגי ---------- */
+#loginModal .login-modal{
+  max-width:420px;position:relative;overflow:hidden;
+  border:1px solid color-mix(in srgb,var(--brass) 26%,var(--panel-edge));
+  box-shadow:0 26px 70px #00000090,0 0 60px -22px color-mix(in srgb,var(--brass) 55%,transparent)}
+#loginModal .login-modal::before{content:'';position:absolute;inset:0 0 auto 0;height:3px;
+  background:var(--grad);z-index:1}
+#loginModal .login-head{background:transparent;padding:10px 12px 0;justify-content:flex-end;border:0}
+#loginModal .float-close{width:34px;height:34px;display:flex;align-items:center;justify-content:center;
+  border-radius:8px;font-size:15px;color:var(--text-dim);
+  background:color-mix(in srgb,var(--brass) 7%,transparent);
+  border:1px solid color-mix(in srgb,var(--brass) 20%,transparent);
+  transition:background .18s,border-color .18s,color .18s}
+#loginModal .float-close:hover{color:var(--text-main);
+  background:color-mix(in srgb,var(--brass) 15%,transparent);
+  border-color:color-mix(in srgb,var(--brass) 45%,transparent)}
+#loginModal .modal-body{padding:6px 24px 26px}
+.login-brandhead{display:flex;flex-direction:column;align-items:center;text-align:center;gap:9px;margin-bottom:16px}
+.login-clef{width:62px;height:62px;display:flex;align-items:center;justify-content:center;
+  font-size:36px;line-height:1;color:var(--brass);border-radius:50%;
+  font-family:'Segoe UI Symbol','Noto Music','Apple Symbols',serif;
+  background:radial-gradient(circle,color-mix(in srgb,var(--brass) 20%,transparent),transparent 72%);
+  text-shadow:0 0 18px color-mix(in srgb,var(--brass) 60%,transparent)}
+#loginModal #loginTitle{margin:0;font-family:var(--disp);font-weight:800;font-size:21px;color:var(--text-main)}
+.login-brandhead .login-hint{margin:0;text-align:center;max-width:34ch}
+/* כפתור האימייל — תכלת מובחן (לא כמו כפתור ה-OAuth הלבן) */
+.google-btn.email-btn{background:var(--grad-cta);color:#fff;border-color:transparent;
+  box-shadow:0 8px 22px -10px color-mix(in srgb,var(--brass) 60%,transparent)}
+.google-btn.email-btn:hover,.google-btn.email-btn:focus,
+.google-btn.email-btn:focus-visible,.google-btn.email-btn:active{color:#fff;filter:brightness(1.07)}
+.google-btn.email-btn:hover{background:var(--grad-cta)}
+
 /* אחוז ההתקדמות בזמן הניתוח */
 .work-pct{font-size:32px;font-weight:800;color:var(--text-main);font-variant-numeric:tabular-nums;line-height:1;text-align:center;margin:4px 0 10px}
 
@@ -2753,14 +2785,17 @@ html.a11y-reduced-motion .coupon-btn:hover{transform:none}
   </div>
 </div>
 <div class="modal-backdrop hidden" id="loginModal" role="dialog" aria-modal="true" aria-labelledby="loginTitle">
-  <div class="modal">
-    <div class="modal-header">
-      <h2 data-i18n="loginModal.h2.1" id="loginTitle">כניסה לחשבון</h2>
+  <div class="modal login-modal">
+    <div class="modal-header login-head">
       <button data-i18n-attr="aria-label:loginModal.button.attr_label.1" class="float-close" id="loginClose" aria-label="סגירת החלון">✕</button>
     </div>
     <div class="modal-body">
       <div id="authOut">
-        <p data-i18n="authOut.p.1" class="login-hint">כניסה עם Google, Discord, או קוד לאימייל — בלי סיסמה לזכור.</p>
+        <div class="login-brandhead">
+          <span class="login-clef" aria-hidden="true">&#119070;</span>
+          <h2 data-i18n="loginModal.h2.1" id="loginTitle">כניסה לחשבון</h2>
+          <p data-i18n="authOut.p.1" class="login-hint">כניסה עם Google, Discord, או קוד לאימייל — בלי סיסמה לזכור.</p>
+        </div>
         <button type="button" class="google-btn" id="googleBtn">
           <svg class="g-mark" viewBox="0 0 18 18" aria-hidden="true" focusable="false">
             <path fill="#4285F4" d="M17.64 9.2c0-.64-.06-1.25-.16-1.84H9v3.48h4.84a4.14 4.14 0 0 1-1.8 2.72v2.26h2.92c1.7-1.57 2.68-3.88 2.68-6.62z"/>
