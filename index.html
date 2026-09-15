@@ -1532,6 +1532,24 @@ html.a11y-reduced-motion .foot-youtube:hover{transform:none}
 .foot-social{display:flex;flex-wrap:wrap;justify-content:center;gap:10px;margin-top:16px}
 .foot-social .foot-discord,.foot-social .foot-youtube{margin-top:0}
 
+/* ---------- מצב-מסמך: פתיחת ניתוח מההיסטוריה = דף-אקורדים עריך בלבד ----------
+   מציג רק את דף-האקורדים ופעולות המסמך (תיקון/טרנספוזיציה/שמירה כ-PDF/הדפסה),
+   ומסתיר את שאר עמוד-הניתוח (העלאה, מדדים, מפת-מבנה, כוונון, ציר-זמן). */
+html.doc-mode .hero,
+html.doc-mode #result .readout,
+html.doc-mode #result .tape-wrap,
+html.doc-mode #result #tune,
+html.doc-mode #result #capoNote,
+html.doc-mode #result .views,
+html.doc-mode #result #timelineView,
+html.doc-mode #result .controls .spacer,
+html.doc-mode #devExport,
+html.doc-mode #readGuide{display:none!important}
+html.doc-mode .results-wrap{max-width:920px}
+html.doc-mode #result{background:var(--bg-panel);border:1px solid var(--panel-edge);
+  border-radius:8px;padding:16px 20px 26px;box-shadow:0 18px 50px -26px rgba(0,0,0,.5)}
+html.doc-mode #result .controls{justify-content:center;flex-wrap:wrap;gap:8px;margin-bottom:6px}
+
 /* התחברות עם אימייל וקוד חד-פעמי */
 .or-sep{display:flex;align-items:center;gap:10px;margin:14px 0 10px;color:var(--muted);font-size:12.5px}
 .or-sep::before,.or-sep::after{content:"";flex:1;height:1px;background:var(--line)}
@@ -9352,6 +9370,7 @@ async function analyze(file, ttaOverride, pre){
   const audio = pre && pre.audio;
   if(!audio) throw new Error(cxT("analyze() נקראה בלי אודיו מפוענח"));
 
+  document.documentElement.classList.remove('doc-mode');
   $('note').hidden = true;
   $('result').hidden = true;
   setMarketingVisible(false);
@@ -10040,6 +10059,7 @@ async function runAnalysisFlow(file){
     return;
   }
 
+  document.documentElement.classList.remove('doc-mode');
   $('note').hidden = true;
   $('result').hidden = true;
   setMarketingVisible(false);
@@ -10173,6 +10193,9 @@ drop.addEventListener('drop', e=>{
 window.__loadSavedAnalysis = function(row){
   const d = row.data;
   if(!d || !d.bars || !d.bars.length) return;
+  /* מצב-מסמך: פתיחה מההיסטוריה מציגה דף-אקורדים עריך בלבד (כמו מסמך
+     שאפשר לפתוח, לערוך ולשמור כ-PDF), ולא את כל עמוד הניתוח. */
+  document.documentElement.classList.add('doc-mode');
   state.an = null;
   if(state.url){ URL.revokeObjectURL(state.url); state.url = null; }
   /* אין אודיו בכניסה מהיסטוריה — מסתירים את הנגן, נשאר רק דף האקורדים */
@@ -10541,6 +10564,7 @@ function setMarketingVisible(on){
    “שיר חדש” מחזיר לאזור ההעלאה כדי שאפשר יהיה מיד לבחור שיר,
    והלוגו מחזיר לראש הדף, כי זו הציפייה מלוגו בכל אתר. */
 function exitSheet(scrollTo){
+  document.documentElement.classList.remove('doc-mode');
   $('result').hidden = true;
   setMarketingVisible(true);
   fileInput.value = '';
