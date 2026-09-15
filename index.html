@@ -1488,6 +1488,39 @@ html.a11y-reduced-motion .google-btn{transition:none}
 /* אחוז ההתקדמות בזמן הניתוח */
 .work-pct{font-size:32px;font-weight:800;color:var(--text-main);font-variant-numeric:tabular-nums;line-height:1;text-align:center;margin:4px 0 10px}
 
+/* ============================================================
+   ליטוש פרימיום עדין + הנפשות — כולן מכבדות הפחתת-תנועה
+   ============================================================ */
+.feat-card,.step-card,.faq-item{transition:transform .28s cubic-bezier(.22,.61,.36,1),box-shadow .28s ease,border-color .28s ease}
+.feat-card:hover,.step-card:hover{transform:translateY(-4px);box-shadow:0 18px 42px -20px rgba(0,0,0,.5)}
+.faq-item:hover{border-color:var(--focus-ring)}
+.primary{transition:transform .18s ease,box-shadow .22s ease,filter .18s ease}
+.primary:hover{transform:translateY(-2px);box-shadow:0 14px 32px -12px rgba(0,0,0,.5)}
+.primary:active{transform:translateY(0) scale(.985)}
+.google-btn{transition:transform .18s ease,box-shadow .2s ease,background .2s ease,color .2s ease,border-color .2s ease}
+.google-btn:hover{transform:translateY(-1px)}
+.drop{transition:transform .3s cubic-bezier(.22,.61,.36,1),border-color .25s ease,box-shadow .3s ease,background .25s ease}
+.drop:hover,.drop:focus-visible{transform:translateY(-2px);box-shadow:0 22px 54px -24px rgba(0,0,0,.5)}
+.head-nav a{position:relative}
+.head-nav a::after{content:"";position:absolute;inset-inline:0;bottom:-3px;height:2px;background:currentColor;transform:scaleX(0);transform-origin:center;transition:transform .25s ease;opacity:.7;border-radius:2px}
+.head-nav a:hover::after,.head-nav a.active::after{transform:scaleX(1)}
+/* אנימציית-כניסה: האלמנטים גלויים כברירת-מחדל; cx-in רק מנגן fade-up.
+   אם ה-JS/IO נכשל — נשארים גלויים, בלי מצב-מוסתר קבוע. */
+@keyframes cxRise{from{transform:translateY(14px)}to{transform:none}}
+.cx-in{animation:cxRise .5s cubic-bezier(.22,.61,.36,1) both}
+/* כיבוד הפחתת-תנועה — הכל מיידי ובלי הזזה */
+@media (prefers-reduced-motion:reduce){
+  .feat-card,.step-card,.faq-item,.primary,.google-btn,.drop,.head-nav a::after{transition:none!important}
+  .feat-card:hover,.step-card:hover,.primary:hover,.google-btn:hover,.drop:hover{transform:none!important}
+  .cx-in{animation:none!important}
+}
+html.a11y-reduced-motion .feat-card,html.a11y-reduced-motion .step-card,html.a11y-reduced-motion .faq-item,
+html.a11y-reduced-motion .primary,html.a11y-reduced-motion .google-btn,html.a11y-reduced-motion .drop,
+html.a11y-reduced-motion .head-nav a::after{transition:none!important}
+html.a11y-reduced-motion .feat-card:hover,html.a11y-reduced-motion .step-card:hover,
+html.a11y-reduced-motion .primary:hover,html.a11y-reduced-motion .drop:hover{transform:none!important}
+html.a11y-reduced-motion .cx-in{animation:none!important}
+
 /* הערות מתחת לכפתור הכניסה */
 .login-note{
   margin:10px 0 0;font-size:12.5px;line-height:1.7;color:var(--text-dim);text-align:center}
@@ -11033,6 +11066,24 @@ renderBundles();
   });
   addEventListener('popstate', ()=> cxShowRoute(location.pathname, false));
   cxShowRoute(location.pathname, false);
+
+  /* אנימציית-כניסה עדינה לכרטיסים. מוסיף cx-reveal רק אם אין הפחתת-תנועה
+     ויש IntersectionObserver — כך שאם משהו נכשל, האלמנטים נשארים גלויים. */
+  (function cxReveal(){
+    try{
+      if(document.documentElement.classList.contains('a11y-reduced-motion') ||
+         (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) ||
+         !('IntersectionObserver' in window)) return;
+      const els = [...document.querySelectorAll('.feat-card, .step-card, .faq-item')];
+      const io = new IntersectionObserver(ents=>{
+        ents.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('cx-in'); io.unobserve(e.target); } });
+      }, { rootMargin:'0px 0px -8% 0px', threshold:.06 });
+      els.forEach(el=> io.observe(el));
+      /* רשת-ביטחון: אם ה-IO לא נורה מסיבה כלשהי — האלמנטים גלויים ממילא,
+         וכאן גם מקבלים את האנימציה אחרי השהיה קצרה. */
+      setTimeout(()=> els.forEach(el=> el.classList.add('cx-in')), 1500);
+    }catch(_){}
+  })();
 
   /* ---------- 5. חבילות: רשימת המתנה וקופונים ----------
      נמצא כאן ולא בסקריפט של Supabase, כדי שכפתורי המחירים יגיבו
