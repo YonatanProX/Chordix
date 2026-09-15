@@ -47,6 +47,7 @@ const HTML = {
   'faqFree.q': 'Is the service free?',
   'faqFree.a': 'Yes — the analysis is completely free, with no subscription and no limit on how many songs. Corrections, tuning, transposition, printing and export are all included.',
   'foot.discord': "Our musicians' community on Discord",
+  'foot.youtube': 'Our YouTube channel',
   'faqWho.q': 'Who is it useful for?',
   'faqWho.a': 'Whether you play alone at home or with a band, Chordix is for you. If you play on your own, you can pull the chords and details out of songs you love and play them yourself. If you play in a band, you can produce a chord sheet split into structure and bars for each player, so everyone stays in sync on the order and the chords.',
 };
