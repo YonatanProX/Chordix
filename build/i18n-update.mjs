@@ -37,6 +37,17 @@ const HTML = {
   'emailAuth.sentNote': 'We sent a code to <b id="emailSentTo"></b>. Enter it here:',
   'emailAuth.verify': 'Verify and sign in',
   'emailAuth.back': 'Use a different email',
+  /* עדכון 2026-09-15: טקסט-הירו, הסרת שם/טלפון, שאלות-FAQ חדשות */
+  'main.2': '<span class="hero-brand">Chordix</span> <span class="hero-claim">A chord sheet from any recording</span>',
+  'main.3': "Upload an audio file and get a real chord sheet: key, tempo, time signature, full chords, structure and bars. No song database — Chordix analyses the recording itself. <b>It's an analysis tool, not a song database.</b>",
+  'foot.2': 'Operated by <b>Chordix</b>',
+  'foot.3': '<a href="mailto:chordix.business@gmail.com">chordix.business@gmail.com</a>',
+  'foot.12': '© <span id="footYear">2026</span> <span class="fill">Chordix</span> · <a href="mailto:chordix.business@gmail.com">chordix.business@gmail.com</a>',
+  'a11yWindow.p.2': "Run into an accessibility problem? Write to us and we'll deal with it:<br> <a href=\"mailto:chordix.business@gmail.com\">chordix.business@gmail.com</a>",
+  'faqFree.q': 'Is the service free?',
+  'faqFree.a': 'Yes — the analysis is completely free, with no subscription and no limit on how many songs. Corrections, tuning, transposition, printing and export are all included.',
+  'faqWho.q': 'Who is it useful for?',
+  'faqWho.a': 'Whether you play alone at home or with a band, Chordix is for you. If you play on your own, you can pull the chords and details out of songs you love and play them yourself. If you play in a band, you can produce a chord sheet split into structure and bars for each player, so everyone stays in sync on the order and the chords.',
 };
 
 /* תרגומי placeholder / aria (data-i18n-attr → en.attr) */
