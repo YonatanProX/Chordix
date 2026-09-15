@@ -1550,19 +1550,29 @@ html.a11y-reduced-motion .foot-discord:hover{transform:none}
   border-color:color-mix(in srgb,var(--brass) 45%,transparent)}
 #loginModal .modal-body{padding:6px 24px 26px}
 .login-brandhead{display:flex;flex-direction:column;align-items:center;text-align:center;gap:9px;margin-bottom:16px}
-.login-clef{width:62px;height:62px;display:flex;align-items:center;justify-content:center;
-  font-size:36px;line-height:1;color:var(--brass);border-radius:50%;
-  font-family:'Segoe UI Symbol','Noto Music','Apple Symbols',serif;
-  background:radial-gradient(circle,color-mix(in srgb,var(--brass) 20%,transparent),transparent 72%);
-  text-shadow:0 0 18px color-mix(in srgb,var(--brass) 60%,transparent)}
+.login-logo{width:66px;height:66px;border-radius:16px;display:block;object-fit:cover;
+  box-shadow:0 10px 26px -8px color-mix(in srgb,var(--brass) 55%,transparent),
+             0 0 0 1px color-mix(in srgb,var(--brass) 22%,transparent),
+             0 0 34px -6px color-mix(in srgb,var(--brass) 45%,transparent)}
 #loginModal #loginTitle{margin:0;font-family:var(--disp);font-weight:800;font-size:21px;color:var(--text-main)}
 .login-brandhead .login-hint{margin:0;text-align:center;max-width:34ch}
+
+/* ---------- עיצוב כפתורי-הכניסה ---------- */
+/* אייקון-המותג צמוד לקצה + כיתוב ממורכז (דפוס OAuth רשמי), צל-מנוחה והרמה ברחיפה */
+#loginModal #authOut .google-btn{position:relative;min-height:50px;border-radius:10px;
+  font-weight:700;box-shadow:0 4px 14px -6px rgba(0,0,0,.45)}
+#loginModal #authOut .google-btn .g-mark{position:absolute;inset-inline-start:16px;top:50%;transform:translateY(-50%)}
+#loginModal #authOut .google-btn:hover{transform:translateY(-2px)}
+#loginModal #authOut .google-btn:active{transform:translateY(0)}
+.discord-btn{box-shadow:0 8px 22px -10px rgba(88,101,242,.7)}
+.discord-btn:hover{background:#4d58df;box-shadow:0 12px 28px -10px rgba(88,101,242,.95)}
 /* כפתור האימייל — תכלת מובחן (לא כמו כפתור ה-OAuth הלבן) */
 .google-btn.email-btn{background:var(--grad-cta);color:#fff;border-color:transparent;
-  box-shadow:0 8px 22px -10px color-mix(in srgb,var(--brass) 60%,transparent)}
+  box-shadow:0 8px 22px -10px color-mix(in srgb,var(--brass) 65%,transparent)}
 .google-btn.email-btn:hover,.google-btn.email-btn:focus,
 .google-btn.email-btn:focus-visible,.google-btn.email-btn:active{color:#fff;filter:brightness(1.07)}
-.google-btn.email-btn:hover{background:var(--grad-cta)}
+.google-btn.email-btn:hover{background:var(--grad-cta);box-shadow:0 12px 28px -10px color-mix(in srgb,var(--brass) 80%,transparent)}
+html.a11y-reduced-motion #loginModal #authOut .google-btn:hover{transform:none}
 
 /* אחוז ההתקדמות בזמן הניתוח */
 .work-pct{font-size:32px;font-weight:800;color:var(--text-main);font-variant-numeric:tabular-nums;line-height:1;text-align:center;margin:4px 0 10px}
@@ -2792,7 +2802,7 @@ html.a11y-reduced-motion .coupon-btn:hover{transform:none}
     <div class="modal-body">
       <div id="authOut">
         <div class="login-brandhead">
-          <span class="login-clef" aria-hidden="true">&#119070;</span>
+          <img id="loginMark" class="login-logo" alt="Chordix" width="64" height="64" decoding="async">
           <h2 data-i18n="loginModal.h2.1" id="loginTitle">כניסה לחשבון</h2>
           <p data-i18n="authOut.p.1" class="login-hint">כניסה עם Google, Discord, או קוד לאימייל — בלי סיסמה לזכור.</p>
         </div>
@@ -11344,6 +11354,8 @@ renderBundles();
   /* ---------- 5. סמל המותג בכותרת התחתונה ---------- */
   const fm = $('footMark');
   if(fm && typeof CX_ICON !== 'undefined') fm.src = CX_ICON.i64;
+  const lm = $('loginMark');
+  if(lm && typeof CX_ICON !== 'undefined') lm.src = CX_ICON.i64;
 
   /* ---------- 6. גיבוי אם Supabase לא נטען ----------
      בלי זה אזור החשבון פשוט לא מופיע, והמשתמש לא מבין למה
