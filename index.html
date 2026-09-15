@@ -1511,7 +1511,7 @@ html.a11y-reduced-motion .google-btn{transition:none}
 .discord-btn .g-mark{color:#fff}
 
 /* ברכת שלום ליד תמונת הפרופיל בכותרת */
-.acct-hi{font-size:13.5px;font-weight:600;color:var(--text-main);white-space:nowrap}
+.acct-hi{order:1;font-size:13.5px;font-weight:600;color:var(--text-main);white-space:nowrap}
 @media(max-width:560px){.acct-hi{display:none}}
 
 /* קישור קהילת Discord בפוטר */
@@ -1528,6 +1528,9 @@ html.a11y-reduced-motion .foot-discord:hover{transform:none}
 @media (prefers-reduced-motion:reduce){.foot-youtube{transition:none}.foot-youtube:hover{transform:none}}
 html.a11y-reduced-motion .foot-youtube{transition:none}
 html.a11y-reduced-motion .foot-youtube:hover{transform:none}
+/* שורת קישורים חברתיים בפוטר — Discord + YouTube זה לצד זה */
+.foot-social{display:flex;flex-wrap:wrap;justify-content:center;gap:10px;margin-top:16px}
+.foot-social .foot-discord,.foot-social .foot-youtube{margin-top:0}
 
 /* התחברות עם אימייל וקוד חד-פעמי */
 .or-sep{display:flex;align-items:center;gap:10px;margin:14px 0 10px;color:var(--muted);font-size:12.5px}
@@ -2677,18 +2680,20 @@ html.a11y-reduced-motion .coupon-btn:hover{transform:none}
       <p class="contact" data-i18n="foot.3">
         <a href="mailto:chordix.business@gmail.com">chordix.business@gmail.com</a>
       </p>
-      <a class="foot-discord" href="https://discord.gg/VEyXfPJgB" target="_blank" rel="noopener noreferrer">
-        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false">
-          <path d="M20.317 4.369A19.79 19.79 0 0 0 16.558 3.2a.07.07 0 0 0-.073.035c-.211.375-.444.864-.608 1.249a18.27 18.27 0 0 0-5.487 0 12.6 12.6 0 0 0-.617-1.25.07.07 0 0 0-.073-.034A19.736 19.736 0 0 0 3.677 4.37a.064.064 0 0 0-.03.027C.533 9.046-.32 13.58.099 18.057a.08.08 0 0 0 .031.055 19.9 19.9 0 0 0 5.993 3.03.07.07 0 0 0 .076-.027c.462-.63.874-1.295 1.226-1.994a.07.07 0 0 0-.038-.098 13.1 13.1 0 0 1-1.872-.892.07.07 0 0 1-.007-.117c.126-.094.252-.192.372-.291a.07.07 0 0 1 .07-.01c3.927 1.793 8.18 1.793 12.061 0a.07.07 0 0 1 .072.009c.12.099.245.198.372.292a.07.07 0 0 1-.006.117c-.598.35-1.22.645-1.873.891a.07.07 0 0 0-.037.099c.36.698.772 1.362 1.225 1.993a.07.07 0 0 0 .076.028 19.84 19.84 0 0 0 6.002-3.03.07.07 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.06.06 0 0 0-.03-.028zM8.02 15.331c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.211 0 2.176 1.096 2.157 2.42 0 1.333-.955 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.211 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/>
-        </svg>
-        <span data-i18n="foot.discord">קהילת המוזיקאים שלנו ב‑Discord</span>
-      </a>
-      <a class="foot-youtube" href="https://www.youtube.com/channel/UChFasx8ggl498iBCslXaWlQ" target="_blank" rel="noopener noreferrer">
-        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false">
-          <path d="M23.5 6.2a3 3 0 0 0-2.11-2.12C19.5 3.55 12 3.55 12 3.55s-7.5 0-9.39.53A3 3 0 0 0 .5 6.2 31.2 31.2 0 0 0 0 12a31.2 31.2 0 0 0 .5 5.8 3 3 0 0 0 2.11 2.12C4.5 20.45 12 20.45 12 20.45s7.5 0 9.39-.53A3 3 0 0 0 23.5 17.8 31.2 31.2 0 0 0 24 12a31.2 31.2 0 0 0-.5-5.8zM9.55 15.57V8.43L15.82 12l-6.27 3.57z"/>
-        </svg>
-        <span data-i18n="foot.youtube">הערוץ שלנו ב‑YouTube</span>
-      </a>
+      <div class="foot-social">
+        <a class="foot-discord" href="https://discord.gg/VEyXfPJgB" target="_blank" rel="noopener noreferrer">
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false">
+            <path d="M20.317 4.369A19.79 19.79 0 0 0 16.558 3.2a.07.07 0 0 0-.073.035c-.211.375-.444.864-.608 1.249a18.27 18.27 0 0 0-5.487 0 12.6 12.6 0 0 0-.617-1.25.07.07 0 0 0-.073-.034A19.736 19.736 0 0 0 3.677 4.37a.064.064 0 0 0-.03.027C.533 9.046-.32 13.58.099 18.057a.08.08 0 0 0 .031.055 19.9 19.9 0 0 0 5.993 3.03.07.07 0 0 0 .076-.027c.462-.63.874-1.295 1.226-1.994a.07.07 0 0 0-.038-.098 13.1 13.1 0 0 1-1.872-.892.07.07 0 0 1-.007-.117c.126-.094.252-.192.372-.291a.07.07 0 0 1 .07-.01c3.927 1.793 8.18 1.793 12.061 0a.07.07 0 0 1 .072.009c.12.099.245.198.372.292a.07.07 0 0 1-.006.117c-.598.35-1.22.645-1.873.891a.07.07 0 0 0-.037.099c.36.698.772 1.362 1.225 1.993a.07.07 0 0 0 .076.028 19.84 19.84 0 0 0 6.002-3.03.07.07 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.06.06 0 0 0-.03-.028zM8.02 15.331c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.211 0 2.176 1.096 2.157 2.42 0 1.333-.955 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.211 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/>
+          </svg>
+          <span data-i18n="foot.discord">קהילת המוזיקאים שלנו ב‑Discord</span>
+        </a>
+        <a class="foot-youtube" href="https://www.youtube.com/channel/UChFasx8ggl498iBCslXaWlQ" target="_blank" rel="noopener noreferrer">
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false">
+            <path d="M23.5 6.2a3 3 0 0 0-2.11-2.12C19.5 3.55 12 3.55 12 3.55s-7.5 0-9.39.53A3 3 0 0 0 .5 6.2 31.2 31.2 0 0 0 0 12a31.2 31.2 0 0 0 .5 5.8 3 3 0 0 0 2.11 2.12C4.5 20.45 12 20.45 12 20.45s7.5 0 9.39-.53A3 3 0 0 0 23.5 17.8 31.2 31.2 0 0 0 24 12a31.2 31.2 0 0 0-.5-5.8zM9.55 15.57V8.43L15.82 12l-6.27 3.57z"/>
+          </svg>
+          <span data-i18n="foot.youtube">הערוץ שלנו ב‑YouTube</span>
+        </a>
+      </div>
     </div>
 
     <div class="foot-col">
