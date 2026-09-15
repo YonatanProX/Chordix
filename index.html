@@ -1611,11 +1611,12 @@ html.a11y-reduced-motion .cx-in{animation:none!important}
 
 /* ---------- כותרת תחתונה ---------- */
 footer.site{margin-top:0;padding-top:44px}
-.foot-grid{display:grid;gap:28px;grid-template-columns:1.4fr 1fr 1fr;
-  max-width:1120px;margin:0 auto;padding-inline:22px;text-align:start}
-.foot-col h3{font-family:var(--disp);font-size:13px;font-weight:700;letter-spacing:.04em;
-  color:var(--text-main);margin:0 0 12px}
-.foot-col ul{list-style:none;margin:0;padding:0;display:grid;gap:9px}
+.foot-grid{display:flex;flex-direction:column;align-items:center;gap:30px;
+  max-width:820px;margin:0 auto;padding-inline:22px;text-align:center}
+.foot-col{width:100%;display:flex;flex-direction:column;align-items:center}
+.foot-col h3{font-family:var(--disp);font-size:13px;font-weight:700;letter-spacing:.06em;
+  color:var(--text-main);margin:0 0 14px;text-transform:uppercase;opacity:.9}
+.foot-col ul{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;justify-content:center;gap:9px}
 .foot-col a,.foot-col button{background:none;border:0;padding:0;color:var(--text-dim);
   font-family:var(--body);font-size:13.5px;text-align:start;cursor:pointer;text-decoration:none}
 .foot-col a:hover,.foot-col button:hover{color:var(--text-main);text-decoration:underline}
@@ -1625,8 +1626,8 @@ footer.site{margin-top:0;padding-top:44px}
    וסמן chevron בקצה. הכול נגזר מ-var(--brass) כך שמתחלף עם ה-theme. */
 .foot-col ul{gap:8px}
 .foot-col ul li a,.foot-col ul li button{
-  display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;
-  padding:11px 14px;border-radius:8px;color:var(--text-main);font-weight:600;
+  display:flex;align-items:center;justify-content:center;gap:9px;width:auto;
+  padding:10px 16px;border-radius:8px;color:var(--text-main);font-weight:600;white-space:nowrap;
   background:color-mix(in srgb,var(--brass) 7%,transparent);
   border:1px solid color-mix(in srgb,var(--brass) 24%,transparent);
   box-shadow:0 0 22px -8px color-mix(in srgb,var(--brass) 30%,transparent);
