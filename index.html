@@ -277,6 +277,38 @@ body{
   -webkit-font-smoothing:antialiased;
   transition:background .3s,color .3s;
 }
+/* ---------- רקע מוזיקלי נע (מינימליסטי) ----------
+   שכבה קבועה מאחורי התוכן: אורבי-תכלת רכים נודדים + תווי-מוזיקה
+   ומפתחות-סול צפים בעדינות. z-index:-1 יושב בין רקע ה-body לתוכן. */
+#bgFx{position:fixed;inset:0;z-index:-1;overflow:hidden;pointer-events:none}
+#bgFx .orb{position:absolute;border-radius:50%;filter:blur(34px);opacity:.55}
+#bgFx .orb.o1{width:360px;height:360px;top:-70px;inset-inline-start:-50px;
+  background:radial-gradient(circle,color-mix(in srgb,var(--brass) 20%,transparent),transparent 70%);
+  animation:orbDrift1 27s ease-in-out infinite alternate}
+#bgFx .orb.o2{width:300px;height:300px;top:40%;inset-inline-start:78%;
+  background:radial-gradient(circle,color-mix(in srgb,var(--a2) 18%,transparent),transparent 70%);
+  animation:orbDrift2 32s ease-in-out infinite alternate}
+#bgFx .orb.o3{width:260px;height:260px;top:82%;inset-inline-start:24%;
+  background:radial-gradient(circle,color-mix(in srgb,var(--a3) 16%,transparent),transparent 70%);
+  animation:orbDrift1 24s ease-in-out infinite alternate-reverse}
+#bgFx .note{position:absolute;color:var(--brass);opacity:0;line-height:1;
+  font-family:'Segoe UI Symbol','Noto Music','Apple Symbols',serif;
+  text-shadow:0 0 14px color-mix(in srgb,var(--brass) 45%,transparent);
+  animation:noteFloat var(--d,20s) ease-in-out var(--delay,0s) infinite;
+  will-change:transform,opacity}
+@keyframes noteFloat{
+  0%{transform:translateY(12px) rotate(-6deg);opacity:0}
+  22%{opacity:var(--op,.1)}
+  50%{transform:translateY(-16px) rotate(6deg)}
+  78%{opacity:var(--op,.1)}
+  100%{transform:translateY(12px) rotate(-6deg);opacity:0}}
+@keyframes orbDrift1{from{transform:translate(0,0)}to{transform:translate(46px,34px)}}
+@keyframes orbDrift2{from{transform:translate(0,0)}to{transform:translate(-38px,44px)}}
+@media (prefers-reduced-motion:reduce){
+  #bgFx .note{animation:none;opacity:var(--op,.08)}
+  #bgFx .orb{animation:none}}
+html.a11y-reduced-motion #bgFx .note{animation:none;opacity:var(--op,.08)}
+html.a11y-reduced-motion #bgFx .orb{animation:none}
 h1,h2,h3{font-family:var(--disp)}
 a{color:var(--brass-soft)}
 .wrap{max-width:1080px;margin:0 auto;padding:0 20px 40px}
@@ -2059,6 +2091,24 @@ html.a11y-reduced-motion .coupon-btn:hover{transform:none}
 </head>
 <body>
 <a data-i18n="a.1" class="skip-link" href="#main">דילוג לתוכן הראשי</a>
+<div id="bgFx" aria-hidden="true">
+  <span class="orb o1"></span>
+  <span class="orb o2"></span>
+  <span class="orb o3"></span>
+  <span class="note" style="top:14%;inset-inline-start:9%;font-size:34px;--d:22s;--delay:-2s;--op:.12">𝄞</span>
+  <span class="note" style="top:22%;inset-inline-start:82%;font-size:22px;--d:18s;--delay:-6s;--op:.10">♪</span>
+  <span class="note" style="top:38%;inset-inline-start:16%;font-size:20px;--d:20s;--delay:-9s;--op:.08">♫</span>
+  <span class="note" style="top:30%;inset-inline-start:68%;font-size:28px;--d:24s;--delay:-4s;--op:.10">♩</span>
+  <span class="note" style="top:52%;inset-inline-start:88%;font-size:26px;--d:26s;--delay:-11s;--op:.09">♬</span>
+  <span class="note" style="top:60%;inset-inline-start:6%;font-size:30px;--d:23s;--delay:-7s;--op:.10">𝄞</span>
+  <span class="note" style="top:70%;inset-inline-start:40%;font-size:18px;--d:19s;--delay:-13s;--op:.07">♪</span>
+  <span class="note" style="top:12%;inset-inline-start:48%;font-size:20px;--d:21s;--delay:-15s;--op:.07">♬</span>
+  <span class="note" style="top:78%;inset-inline-start:74%;font-size:24px;--d:25s;--delay:-3s;--op:.09">♫</span>
+  <span class="note" style="top:84%;inset-inline-start:22%;font-size:22px;--d:20s;--delay:-8s;--op:.08">♩</span>
+  <span class="note" style="top:46%;inset-inline-start:52%;font-size:16px;--d:17s;--delay:-5s;--op:.06">♪</span>
+  <span class="note" style="top:6%;inset-inline-start:70%;font-size:18px;--d:22s;--delay:-10s;--op:.07">♩</span>
+  <span class="note" style="top:90%;inset-inline-start:56%;font-size:20px;--d:24s;--delay:-12s;--op:.07">♫</span>
+</div>
 <header class="site-head" id="siteHead">
   <div class="head-in">
     <a data-i18n-attr="aria-label:siteHead.a.attr_label.1" class="brand" data-route href="/" aria-label="Chordix — לדף הבית">
