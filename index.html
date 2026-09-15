@@ -11707,13 +11707,14 @@ const SUPABASE_ANON_KEY = 'sb_publishable_o_OZ0MF9F3eN-7727-cQkA_oihPH1pH';
     }
     showFoot(true);
     historyRows = data;
+    const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
     historyBody.innerHTML = data.map((r, i) => {
       const d = new Date(r.created_at);
       const dateStr = d.toLocaleDateString(dateLocale()) + ' ' + d.toLocaleTimeString(dateLocale(), {hour:'2-digit', minute:'2-digit'});
       const canOpen = r.data && r.data.bars && r.data.bars.length;
       return '<div class="hist-row">'
-        + '<span><span class="hist-title">' + (r.title || cxT("ללא שם")) + '</span><br>'
-        + '<span class="hist-meta">' + (r.key_name || '—') + ' · ' + Math.round(r.bpm||0) + ' BPM · ' + (r.bars||0) + cxT(" תיבות · {0}</span></span>", dateStr)
+        + '<span><span class="hist-title">' + esc(r.title || cxT("ללא שם")) + '</span><br>'
+        + '<span class="hist-meta">' + esc(r.key_name || '—') + ' · ' + Math.round(r.bpm||0) + ' BPM · ' + (r.bars||0) + cxT(" תיבות · {0}</span></span>", dateStr)
         + '<span class="hist-actions">'
         + (canOpen ? cxT("<button type=\"button\" class=\"mini hist-open\" data-i=\"{0}\">פתיחה</button>", i) : '')
         + cxT("<button type=\"button\" class=\"hist-del\" data-i=\"{0}\" aria-label=\"מחיקת הניתוח הזה\" title=\"מחיקת הניתוח הזה\">🗑</button>", i)
