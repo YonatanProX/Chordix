@@ -13,7 +13,10 @@ const FILE = path.join(ROOT, 'index.html');
 
 /* תיקוני אנגלית למחרוזות ששונו בעברית (data-i18n → en.html) */
 const HTML = {
-  'main.7': '<span aria-hidden="true">💵</span> Completely free',
+  'main.4': 'File never leaves your device',
+  'main.5': 'Results in seconds',
+  'main.6': 'Ready to print and export',
+  'main.7': 'Completely free',
   'how.p.1': 'MP3, WAV, M4A, OGG or FLAC, up to 10 minutes.',
   'how.p.3': 'Bars with barlines, split into the full structure — ready to print or save as PDF.',
   'main.24': 'Live chord tracking',
@@ -51,12 +54,12 @@ const HTML = {
   'headNav.library': 'My song library',
   'historyModal.h2.1': 'My song library',
   'acctMenu.button.1': 'My song library',
-  'result.button.saveLib': '💾 Save to library',
+  'result.button.saveLib': 'Save to library',
   'historyFoot.button.1': 'Clear the whole library',
   'historyFoot.span.1': 'Clear the whole library? This cannot be undone.',
   'library.title': 'My song library',
   'library.hint': 'Click a song to open and edit · right-click a song to delete',
-  'libCtx.del': '🗑 Delete song',
+  'libCtx.del': 'Delete song',
   'faqWho.q': 'Who is it useful for?',
   'faqWho.a': 'Whether you play alone at home or with a band, Chordix is for you. If you play on your own, you can pull the chords and details out of songs you love and play them yourself. If you play in a band, you can produce a chord sheet split into structure and bars for each player, so everyone stays in sync on the order and the chords.',
 };
@@ -85,6 +88,7 @@ const JS = {
   'כניסה': 'Log in',
   '<p class="hist-empty">הספרייה ריקה. נתחו שיר ולחצו שמירה בספרייה כדי לשמור אותו כאן.</p>': '<p class="hist-empty">Your library is empty. Analyze a song and tap Save to library to keep it here.</p>',
   '🎵 ניתוח לשיר עד 10 דקות': '🎵 A chord sheet for a song up to 10 minutes',
+  'ניתוח לשיר עד 10 דקות': 'A chord sheet for a song up to 10 minutes',
   '🎵 ניתוח חינמי · דיוק מוגבר · עד 10 דקות לשיר': '🎵 Free analysis · higher accuracy · up to 10 minutes per song',
 };
 
