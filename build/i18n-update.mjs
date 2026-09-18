@@ -52,6 +52,8 @@ const HTML = {
   'historyModal.h2.1': 'My song library',
   'acctMenu.button.1': 'My song library',
   'result.button.saveLib': '💾 Save to library',
+  'historyFoot.button.1': 'Clear the whole library',
+  'historyFoot.span.1': 'Clear the whole library? This cannot be undone.',
   'faqWho.q': 'Who is it useful for?',
   'faqWho.a': 'Whether you play alone at home or with a band, Chordix is for you. If you play on your own, you can pull the chords and details out of songs you love and play them yourself. If you play in a band, you can produce a chord sheet split into structure and bars for each player, so everyone stays in sync on the order and the chords.',
 };
