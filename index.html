@@ -243,16 +243,16 @@ const CX_ICON = { i192:"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMAAAADACA
    בתכלת-עמוק (brass-soft) שעומד ב-AA מול לבן.
    ============================================================ */
 html.theme-light{
-  --bg-deep:#f4fbfc;
-  --bg-deep2:#e7f5f8;
+  --bg-deep:#d7ebf1;
+  --bg-deep2:#e6f4f8;
   --bg-panel:#ffffff;
-  --bg-sunken:#d9f0f5;
-  --panel-edge:#8fd6e6;
+  --bg-sunken:#c4dfe9;
+  --panel-edge:#7cbdd3;
   --brass:#13b6e4;
   --brass-soft:#0b6f90;
   --text-main:#0f3b57;
-  --text-dim:#3f6277;
-  --text-faint:#6a8494;
+  --text-dim:#345a6f;
+  --text-faint:#557486;
   --success:#0d6b42;
   --error:#c0512e;
   --focus-ring:#13b6e4;
@@ -260,7 +260,7 @@ html.theme-light{
   --paper-line:#d4eef4;
   --staff:#2a5266;
   --ink:#0f3b57;
-  --panel-2:#eaf7fa;
+  --panel-2:#e0f0f5;
   /* גוונים כהים-מספיק ל-AA כשמשמשים כטקסט בכרטיסים; a4 = קורל. */
   --a1:#0e7ea0; --a2:#0f6d90; --a3:#127c8c; --a4:#c0512e;
   --wordmark-grad:linear-gradient(100deg,#13b6e4,#0e7ea0 60%,#0b6f90);
@@ -1737,6 +1737,17 @@ html.a11y-reduced-motion .cx-in{animation:none!important}
 footer.site{margin-top:0;padding-top:44px}
 /* בערכה הבהירה הפוטר הוא איזור Deep Ocean כהה (לפי פלטת המותג),
    ולכן הטקסט/קישורים בתוכו הופכים לבהירים. */
+/* צל-מנוחה עדין לכרטיסים בערכה הבהירה — כדי שהלבן יצוף מעל הרקע
+   המעט-מגוון ולא יימחק (במצב כהה הגבול לבדו מספיק, אין צל). */
+html.theme-light .feat-card,
+html.theme-light .step-card,
+html.theme-light .faq-item,
+html.theme-light .drop,
+html.theme-light .cta-in,
+html.theme-light .lib-tile,
+html.theme-light .plan,
+html.theme-light .bundle,
+html.theme-light .install-in{box-shadow:0 6px 20px -12px rgba(15,59,87,.28)}
 html.theme-light footer.site{background:#0f3b57;padding-bottom:32px}
 html.theme-light footer.site{color:#c3dde7}
 html.theme-light footer.site .foot-col h3{color:#f4fbfc}
@@ -2131,10 +2142,11 @@ html.theme-light .danger-btn.solid{color:#fff}
 /* בערכה הבהירה רקע חד-גוני נראה שטוח. שלוש הילות רכות
    בשלושה מבטאים שונים נותנות עומק בלי להפריע לקריאות. */
 html.theme-light body{
+  background-color:var(--bg-deep);
   background-image:
-    radial-gradient(820px 460px at 14% -140px,color-mix(in srgb,var(--a1) 22%,transparent),transparent 68%),
-    radial-gradient(760px 430px at 86% -80px, color-mix(in srgb,var(--a2) 18%,transparent),transparent 70%),
-    radial-gradient(900px 480px at 50% 108%, color-mix(in srgb,var(--a4) 14%,transparent),transparent 70%);
+    radial-gradient(820px 460px at 14% -140px,color-mix(in srgb,#48c9e9 16%,transparent),transparent 66%),
+    radial-gradient(760px 430px at 86% -80px, color-mix(in srgb,#86dbe9 14%,transparent),transparent 68%),
+    radial-gradient(900px 480px at 50% 108%, color-mix(in srgb,#ace7ea 18%,transparent),transparent 70%);
 }
 html.theme-light .plan,
 html.theme-light .feat-card,
