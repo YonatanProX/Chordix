@@ -6056,8 +6056,14 @@ function classifyRoles(segs, dyn, aff){
       role.set(v.c, RID.PRE); pre=v; continue;
     }
     const dc = chorus ? Math.abs(v.e-chorus.e) : 9;
-    const dv = verse  ? Math.abs(v.e-verse.e)  : 9;
-    role.set(v.c, dc<dv ? RID.CHORUS : RID.VERSE);
+    /* אשכול ה"בית" שנבחר למעלה יכול היה לעלות בינתיים לפזמון (שלב 1ב). אז הוא
+       כבר לא נקודת-ייחוס לבית: ההשוואה הייתה בין שני פזמונים, וכל מה שנשאר —
+       כולל הבתים האמיתיים — נפל ל"פזמון" על חודו של הפרש אנרגיה של 0.01. שיר
+       שלם יצא "פזמון" (נמדד: רואי 72→47, Song1 65→40 בהרצה עם TTA). מה שנשאר
+       כאן נכשל במבחן הפזמון פעמיים; בלי בית חי להשוות אליו, הוא הבית. */
+    const verseLive = verse && role.get(verse.c)===RID.VERSE;
+    const dv = verseLive ? Math.abs(v.e-verse.e) : 9;
+    role.set(v.c, (verseLive && dc<dv) ? RID.CHORUS : RID.VERSE);
   }
 
   /* ---- 6. תפקיד לכל מקטע, ואז עקיפות לפי מיקום ---- */
