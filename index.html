@@ -130,8 +130,8 @@ window.CX_I18N_DICT = {"en":{"html":{"a.1":"Skip to main content","headNav.a.1":
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="application-name" content="Chordix">
 <meta name="color-scheme" content="dark light">
-<meta name="theme-color" content="#0d1219" media="(prefers-color-scheme: dark)">
-<meta name="theme-color" content="#e9f2fb" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0a1f2b" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#f4fbfc" media="(prefers-color-scheme: light)">
 
 <!-- ---------- שיתוף ברשתות ---------- -->
 <meta property="og:type" content="website">
@@ -167,10 +167,12 @@ const CX_ICON = { i192:"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMAAAADACA
   try{
     var p = JSON.parse(localStorage.getItem('maftea-prefs') || '{}');
     var t = localStorage.getItem('cx_theme');
-    var light = (t === 'light') || (t === null && p['theme-light'] === true) ||
-                (t === null && p['theme-light'] === undefined &&
-                 window.matchMedia('(prefers-color-scheme: light)').matches);
-    if(light) document.documentElement.classList.add('theme-light');
+    /* ברירת-המחדל היא הערכה הבהירה (פלטת המותג). כהה רק אם המשתמש
+       בחר בכך ידנית, או שאין העדפה שמורה ומערכת-ההפעלה מעדיפה כהה. */
+    var dark = (t === 'dark') || (t === null && p['theme-light'] === false) ||
+               (t === null && p['theme-light'] === undefined &&
+                window.matchMedia('(prefers-color-scheme: dark)').matches);
+    if(!dark) document.documentElement.classList.add('theme-light');
     ['a11y-high-contrast','a11y-readable','a11y-colorblind',
      'a11y-reduced-motion','a11y-keyboard-focus'].forEach(function(c){
       if(p[c]) document.documentElement.classList.add(c);
@@ -182,23 +184,25 @@ const CX_ICON = { i192:"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMAAAADACA
 <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebSite","@id":"https://chordix.netlify.app/#website","url":"https://chordix.netlify.app/","name":"Chordix","inLanguage":"he","description":"מחולל דפי אקורדים מקובץ שמע, בעברית, ישירות בדפדפן.","publisher":{"@id":"https://chordix.netlify.app/#person"}},{"@type":"Person","@id":"https://chordix.netlify.app/#person","name":"Chordix","email":"chordix.business@gmail.com"},{"@type":"SoftwareApplication","@id":"https://chordix.netlify.app/#app","name":"Chordix","url":"https://chordix.netlify.app/","applicationCategory":"MultimediaApplication","applicationSubCategory":"זיהוי אקורדים","operatingSystem":"Web — Chrome, Edge, Firefox, Safari","inLanguage":"he","browserRequirements":"WebAssembly, DecompressionStream","description":"מעלים הקלטה ומקבלים דף אקורדים מלא: תיבות, בתים ופזמונים, סולם, קצב וקאפו. הפענוח רץ כולו בדפדפן.","featureList":["זיהוי אקורדים מהקלטה","זיהוי קצב וסולם","חלוקה למקטעים","טרנספוזיציה והצעת קאפו","ייצוא PDF, טקסט, ChordPro ו-JSON","עיבוד מקומי בדפדפן ללא העלאת קבצים"]},{"@type":"FAQPage","@id":"https://chordix.netlify.app/#faq","inLanguage":"he","mainEntity":[{"@type":"Question","name":"האקורדים לא מדויקים? מעקב אקורדים רץ","acceptedAnswer":{"@type":"Answer","text":"אתרי אקורדים מכסים רק את מה שמישהו טרח להעלות, והרבה שירים ובעיקר שירים ישראלים פשוט לא נמצאים שם — שירים חדשים, אמנים עצמאיים, ביצועים חיים, קאברים והקלטות מחזרות. Chordix לא מחפש במאגר אלא מנתח את ההקלטה עצמה. האתר הוא כלי ניתוח, לא מאגר שירים מה שיוצא הוא דף אקורדים אמיתי — תיבות בין קווי תיבה, מחולק לבתים, פזמונים ו‑C‑part, עם סולם, קצב והצעת קאפו — הכול בעברית ובכיוון הנכון."}},{"@type":"Question","name":"האם השיר שלי נשלח לשרת כלשהו?","acceptedAnswer":{"@type":"Answer","text":"לא. כל הפענוח רץ בדפדפן שלכם, על המעבד של המכשיר. קובץ השמע לא עוזב את המחשב ואף אחד מלבדכם לא שומע אותו. המכשיר שלכם עושה את העבודה."}},{"@type":"Question","name":"כמה מדויק זה באמת?","acceptedAnswer":{"@type":"Answer","text":"87% הצלחה בזיהוי אקורדים — זהו הממוצע שנמדד על מאגר הבדיקה שלנו, ובפועל התוצאה תלויה בהקלטה. גיטרה או פסנתר ברורים עם קצב יציב יוצאים הרבה מעל הממוצע; מיקסים עמוסים, שירה בלי ליווי, קצב חופשי או הקלטות רועשות יוצאים פחות. כל תיבה שהזיהוי בה פחות בטוח מסומנת בקו מקווקו — שם כדאי לאמת באוזן — והכלי חינמי לחלוטין בלחיצה. נתמכים MP3, WAV, M4A, OGG ו‑FLAC, עד עשר דקות לשיר."}},{"@type":"Question","name":"אפשר להשתמש בזה לשירים בזכויות יוצרים?","acceptedAnswer":{"@type":"Answer","text":"Chordix מפיק ניתוח הרמוני מהקלטה שכבר יש לכם, ולא מפיץ ולא מאחסן את ההקלטה. השימוש בדף האקורדים ביחס ליצירות מוגנות — ובכלל זה הפצה, הדפסה מסחרית או העלאה לרשת — הוא באחריות המשתמש בלבד ובכפוף לדין החל. יש להשתמש אך ורק בהקלטה שיש לכם זכויות עליה."}},{"@type":"Question","name":"מה זה “דיוק מוגבר” ומתי כדאי להדליק אותו?","acceptedAnswer":{"@type":"Answer","text":"במצב הזה אותה הקלטה מנותחת שלוש פעמים בהיסטים שונים של גובה הצליל, והתוצאות ממוזגות. זה עוזר בעיקר בהקלטות שהמודל מתלבט בהן: מיקסים צפופים, גיטרה מעוותת, או שירה דומיננטית מעל ליווי חלש. בשיר שיצא טוב בלי המצב הזה, אין לו הרבה מה להוסיף."}}]}]}</script>
 <style>
 :root{
-  --bg-deep:#0d1219;
-  --bg-deep2:#141b26;
-  --bg-panel:#151d29f0;
-  --bg-sunken:#0a0e14;
-  --panel-edge:#2b3a4d;
-  --brass:#38bdf8;
-  --brass-soft:#7dd3fc;
-  --text-main:#ecf3fc;
-  --text-dim:#a9bacb;
-  --text-faint:#728499;
+  /* ערכה כהה — משפחת המותג (Java/Picton/Seagull תכלת) על רקע
+     טיל-נייבי כהה. הברירת-מחדל של האתר היא הערכה הבהירה (למטה). */
+  --bg-deep:#0a1f2b;
+  --bg-deep2:#0f2c3b;
+  --bg-panel:#123240f0;
+  --bg-sunken:#07161e;
+  --panel-edge:#255468;
+  --brass:#48c9e9;
+  --brass-soft:#86dbe9;
+  --text-main:#eaf7fb;
+  --text-dim:#a7c6d2;
+  --text-faint:#6f93a1;
   --success:#5cba86;
-  --error:#f0806a;
-  --focus-ring:#38bdf8;
-  --paper:#f4f9fe;
-  --paper-line:#d3deea;
-  --staff:#33465c;
-  --ink:#132030;
+  --error:#f59e7a;
+  --focus-ring:#48c9e9;
+  --paper:#f4fbfc;
+  --paper-line:#cfeaf1;
+  --staff:#2a5266;
+  --ink:#0f3b57;
   --disp:'Heebo','Assistant',system-ui,sans-serif;
   --body:'Assistant','Rubik',system-ui,-apple-system,sans-serif;
   --mono:'Assistant','Rubik',system-ui,sans-serif;
@@ -207,16 +211,13 @@ const CX_ICON = { i192:"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMAAAADACA
   --muted:var(--text-dim);
   --line:var(--panel-edge);
   --panel:var(--bg-panel);
-  --panel-2:#1c2735;
-  /* מבטא תכלת חגיגי — משפחת כחול-שמיים/ציאן קרירה. אין גרדיאנט-קשת:
-     ארבעת הגוונים כולם באותה משפחה (שמיים/ציאן/אזור/טורקיז), כך
-     שהגרדיאנט נקרא כצבע אחד עם עומק, ולא כשלל צבעים "מלאכותי". */
-  --a1:#38bdf8;  --a2:#22d3ee;  --a3:#56a8ff;  --a4:#2dd4bf;
-  --grad:linear-gradient(100deg,var(--a3),var(--a1) 55%,var(--a2));
-  /* הכיתוב "Chordix" בלבד נשאר בסגול המקורי (זהות המותג), בעוד
-     שאר האתר תכלת חגיגי. */
-  --wordmark-grad:linear-gradient(100deg,#f0568c,#8b5cf6 42%,#4f7df6 78%,#2dd4bf);
-  --wordmark-ink:#8b5cf6;
+  --panel-2:#173a49;
+  /* מבטא תכלת (פלטת המותג). ארבעת הגוונים באותה משפחה קרה + קורל
+     חם יחיד (a4) לנקודות מבטא, כך שהגרדיאנט נקרא כצבע אחד עם עומק. */
+  --a1:#13b6e4;  --a2:#48c9e9;  --a3:#86dbe9;  --a4:#f59e7a;
+  --grad:linear-gradient(100deg,#86dbe9,#48c9e9 50%,#13b6e4);
+  --wordmark-grad:linear-gradient(100deg,#86dbe9,#48c9e9 50%,#13b6e4);
+  --wordmark-ink:#48c9e9;
 }
 /* ============================================================
    ערכת נושא בהירה
@@ -232,36 +233,42 @@ const CX_ICON = { i192:"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMAAAADACA
    כמעט בלתי נראית — ל-3.04:1 מול הרקע גבולות הכרטיסים
    נקראים עכשיו כגבולות.
    ============================================================ */
+/* ============================================================
+   ערכת נושא בהירה — ברירת-המחדל של האתר (פלטת המותג)
+   ------------------------------------------------------------
+   Ice White (#f4fbfc) רקע · Deep Ocean (#0f3b57) טקסט · Java
+   (#13b6e4) מבטא ראשי · Soft Coral (#f59e7a) מבטא-אזהרה חם.
+   ניגודיות: תכלת בהיר על לבן נמוך-ניגודיות לטקסט, לכן Java משמש
+   למילויי-אייקונים/מסגרות/מבטאים, הטקסט ב-Deep Ocean, והקישורים
+   בתכלת-עמוק (brass-soft) שעומד ב-AA מול לבן.
+   ============================================================ */
 html.theme-light{
-  --bg-deep:#dce9f5;
-  --bg-deep2:#e9f2fb;
-  --bg-panel:#f4f9fdf2;
-  --bg-sunken:#cfe0f0;
-  --panel-edge:#4f8ac2;
-  --brass:#0369a1;
-  --brass-soft:#075985;
-  --text-main:#132030;
-  --text-dim:#3f5163;
-  --text-faint:#5a6d80;
+  --bg-deep:#f4fbfc;
+  --bg-deep2:#e7f5f8;
+  --bg-panel:#ffffff;
+  --bg-sunken:#d9f0f5;
+  --panel-edge:#8fd6e6;
+  --brass:#13b6e4;
+  --brass-soft:#0b6f90;
+  --text-main:#0f3b57;
+  --text-dim:#3f6277;
+  --text-faint:#6a8494;
   --success:#0d6b42;
-  --error:#ab3117;
-  --focus-ring:#0369a1;
-  --paper:#f7fbff;
-  --paper-line:#cfddeb;
-  --staff:#2a3b4d;
-  --ink:#132030;
-  --panel-2:#dbe9f6;
-  /* ארבעת המבטאים נשארו רוויים במכוון. הם משמשים כטקסט כמעט רק
-     בתוך כרטיסים (סימני ה-✓ ברשימות החבילות, חצי ה-FAQ, כותרות),
-     ושם כולם עומדים ב-AA מלא; על רקע הדף ובתוך שקעים הם צבע
-     ולא טקסט, ושם הרף הוא 3:1. דרישה של 4.5 מול השקע הכהה ביותר
-     שיטחה אותם קודם לאותה בהירות בדיוק והפכה אותם לבוציים. */
-  --a1:#0369a1; --a2:#0e7490; --a3:#1d4ed8; --a4:#0f766e;
-  --wordmark-grad:linear-gradient(100deg,#b41956,#6429db 42%,#1a51cf 78%,#01695d);
-  --wordmark-ink:#6429db;
+  --error:#c0512e;
+  --focus-ring:#13b6e4;
+  --paper:#ffffff;
+  --paper-line:#d4eef4;
+  --staff:#2a5266;
+  --ink:#0f3b57;
+  --panel-2:#eaf7fa;
+  /* גוונים כהים-מספיק ל-AA כשמשמשים כטקסט בכרטיסים; a4 = קורל. */
+  --a1:#0e7ea0; --a2:#0f6d90; --a3:#127c8c; --a4:#c0512e;
+  --wordmark-grad:linear-gradient(100deg,#13b6e4,#0e7ea0 60%,#0b6f90);
+  --wordmark-ink:#0b6f90;
 }
 *{box-sizing:border-box}
-html{color-scheme:dark}
+html{color-scheme:light}
+html:not(.theme-light){color-scheme:dark}
 html.theme-light{color-scheme:light}
 html,body{margin:0;padding:0}
 body{
@@ -600,7 +607,7 @@ button.n:hover::after{content:' ✂'}
   content:'';position:absolute;top:1px;inset-inline-end:2px;width:17px;height:17px;border-radius:50%;
   background:var(--text-dim);transition:all .15s;
 }
-.toggle.on{background:#25405a}
+.toggle.on{background:var(--brass)}
 .toggle.on::after{background:var(--brass-soft);inset-inline-end:20px}
 
 /* ---------- legal modal ---------- */
@@ -728,7 +735,7 @@ html.a11y-colorblind .sec-tag{box-shadow:inset 0 0 0 2px #0d1219}
 
 /* סיכום אקורדים ומקטע חוזר בתוך הדף */
 .sec-sum{font-family:var(--mono);font-size:11.5px;color:#566a7e;margin:-2px 0 8px;direction:ltr;text-align:start}
-.sec-rep{font-family:var(--mono);font-size:11.5px;color:#5f8bb0;margin:0 0 5px;direction:ltr;text-align:start;letter-spacing:.02em}
+.sec-rep{font-family:var(--mono);font-size:11.5px;color:var(--text-faint);margin:0 0 5px;direction:ltr;text-align:start;letter-spacing:.02em}
 .sec-same{font-size:13px;color:#29384a;background:#ecf3fc;border:1px dashed var(--paper-line);
   border-radius:8px;padding:9px 12px}
 .sec-same b{font-family:var(--disp)}
@@ -913,7 +920,7 @@ html.a11y-zoomed .brand-mark{width:52px;height:52px}
     --pr-faint:#97a3b0;
     --pr-rule:#c6d4e2;       /* קווי תיבה */
     --pr-rule-soft:#dfe9f3;
-    --pr-accent:#0369a1;
+    --pr-accent:#0b6f90;
   }
   /* המסגרת השחורה סביב הדף המודפס.
      ------------------------------------------------------------
@@ -1407,7 +1414,7 @@ html.a11y-reduced-motion .feat-card:hover{transform:none}
 .sample-sec{margin-bottom:16px}
 .sample-tag{display:inline-block;font-family:var(--mono);font-size:10.5px;font-weight:700;
   letter-spacing:.12em;padding:3px 11px;border-radius:7px;margin-bottom:8px;
-  background:#e9f1fb;color:#0369a1}
+  background:#e7f5f8;color:#0b6f90}
 .sample-tag.chorus{background:#e0f2f0;color:#136b62}
 .sample-grid{display:grid;grid-template-columns:repeat(4,1fr);
   border-inline-end:2px solid var(--staff)}
@@ -1728,6 +1735,28 @@ html.a11y-reduced-motion .cx-in{animation:none!important}
 
 /* ---------- כותרת תחתונה ---------- */
 footer.site{margin-top:0;padding-top:44px}
+/* בערכה הבהירה הפוטר הוא איזור Deep Ocean כהה (לפי פלטת המותג),
+   ולכן הטקסט/קישורים בתוכו הופכים לבהירים. */
+html.theme-light footer.site{background:#0f3b57;padding-bottom:32px}
+html.theme-light footer.site{color:#c3dde7}
+html.theme-light footer.site .foot-col h3{color:#f4fbfc}
+html.theme-light footer.site .foot-about,
+html.theme-light footer.site .operator,
+html.theme-light footer.site .contact a,
+html.theme-light footer.site .fine,
+html.theme-light footer.site .fine a{color:#a9cdda}
+html.theme-light footer.site .foot-brand span,
+html.theme-light footer.site .fill{color:#86dbe9}
+html.theme-light footer.site .foot-col ul li a,
+html.theme-light footer.site .foot-col ul li button{color:#f4fbfc;
+  background:color-mix(in srgb,#48c9e9 12%,transparent);
+  border-color:color-mix(in srgb,#48c9e9 32%,transparent)}
+html.theme-light footer.site .foot-col ul li a::after,
+html.theme-light footer.site .foot-col ul li button::after{border-color:#86dbe9}
+html.theme-light footer.site .foot-col ul li a:hover,
+html.theme-light footer.site .foot-col ul li button:hover{
+  background:color-mix(in srgb,#48c9e9 22%,transparent);
+  border-color:color-mix(in srgb,#48c9e9 55%,transparent)}
 .foot-grid{display:flex;flex-direction:column;align-items:center;gap:30px;
   max-width:820px;margin:0 auto;padding-inline:22px;text-align:center}
 .foot-col{width:100%;display:flex;flex-direction:column;align-items:center}
@@ -1864,8 +1893,8 @@ footer.site .fine a{display:inline-block;padding:6px 2px}
    ולקישוטים שאין עליהם טקסט.
    ============================================================ */
 :root, html.theme-light{
-  --grad-cta:linear-gradient(100deg,#0ea5e9,#0284c7 46%,#0369a1);
-  --cta-solid:#0284c7;
+  --grad-cta:linear-gradient(100deg,#0d82a6,#0b6f90);
+  --cta-solid:#0d82a6;
 }
 button.primary,
 .head-login,
@@ -2352,9 +2381,9 @@ html.a11y-reduced-motion .coupon-btn:hover{transform:none}
           <div id="stockPick" style="margin-top:8px;color:#c7d0e0;font-size:14px">גררו לכאן קבצים, או לחצו לבחירה</div>
           <input type="file" id="stockFiles" multiple accept="audio/*,.mp3,.wav,.m4a,.ogg,.flac" hidden>
         </label>
-        <button id="stockRun" type="button" style="width:100%;margin-top:16px;background:linear-gradient(120deg,#38bdf8,#22d3ee);color:#132030;border:0;border-radius:8px;padding:14px;font-weight:800;font-size:16px;cursor:pointer">עבד הכל</button>
+        <button id="stockRun" type="button" style="width:100%;margin-top:16px;background:linear-gradient(120deg,#13b6e4,#48c9e9);color:#0f3b57;border:0;border-radius:8px;padding:14px;font-weight:800;font-size:16px;cursor:pointer">עבד הכל</button>
         <div id="stockBar" style="height:8px;background:#0b0e13;border-radius:7px;margin-top:16px;overflow:hidden;display:none">
-          <div id="stockBarFill" style="height:100%;width:0;background:linear-gradient(90deg,#56a8ff,#38bdf8);transition:width .3s"></div>
+          <div id="stockBarFill" style="height:100%;width:0;background:linear-gradient(90deg,#48c9e9,#13b6e4);transition:width .3s"></div>
         </div>
         <div id="stockProg" style="margin-top:12px;font-size:13.5px;color:#cfd6e4;white-space:pre-line;font-variant-numeric:tabular-nums"></div>
       </div>
@@ -11202,7 +11231,7 @@ renderBundles();
       }
     }
     const meta = document.querySelector('meta[name="theme-color"]:not([media])');
-    if(meta) meta.setAttribute('content', light ? '#eaf2fb' : '#0d1219');
+    if(meta) meta.setAttribute('content', light ? '#f4fbfc' : '#0a1f2b');
   }
   function setTheme(light, persist){
     root.classList.toggle('theme-light', light);
