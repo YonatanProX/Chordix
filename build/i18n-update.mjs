@@ -90,6 +90,10 @@ const JS = {
   '🎵 ניתוח לשיר עד 10 דקות': '🎵 A chord sheet for a song up to 10 minutes',
   'ניתוח לשיר עד 10 דקות': 'A chord sheet for a song up to 10 minutes',
   '🎵 ניתוח חינמי · דיוק מוגבר · עד 10 דקות לשיר': '🎵 Free analysis · higher accuracy · up to 10 minutes per song',
+  /* שינוי שם מקטע שמתפשט לאחים באותו אשכול */
+  'השם עודכן גם ב־{0} מקטעים דומים': 'Renamed {0} similar sections too',
+  'השם עודכן גם במקטע דומה אחד': 'Renamed 1 similar section too',
+  'רק המקטע הזה': 'Only this one',
 };
 
 const src = fs.readFileSync(FILE, 'utf8');
