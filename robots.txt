@@ -6,4 +6,4 @@ Allow: /
 Disallow: /chordix-model.bin
 Disallow: /i18n-keys.json
 
-Sitemap: https://chordix.netlify.app/sitemap.xml
+Sitemap: https://chordix.pages.dev/sitemap.xml

@@ -23,7 +23,11 @@ const COPY_SKIP = new Set([
   'dist', 'build', 'node_modules', '.git',
   'package.json', 'package-lock.json', 'index.html',
   '.gitignore', '.node-version',
+  /* מסמכים פנימיים — לא נכסי-שירות. עד 2026-09-19 הם פורסמו לכולם (כולל יומן תיקוני-הבאגים). */
+  'README.md', 'README.txt', 'i18n-keys.json', 'bench.html',
 ]);
+/* כל דבר שנראה כמו תיעוד/מקור/נתונים פנימיים נשאר בחוץ, גם אם יתווסף בעתיד */
+const COPY_DENY = [/^CHANGELOG.*\.md$/i, /\.(sql|map|mjs|env|log)$/i, /^\.env/i];
 
 /* בלוק-script יוחרג מהערפול אם הוא נתונים/‏bootstrap-מוקדם/vendor.
    הזיהוי לפי מארקרים בתוכן — כל שינוי מבני צריך לעדכן כאן. */
@@ -97,6 +101,8 @@ function medConfig(reservedNames) {
 function copyRecursive(srcDir, dstDir, rel = '') {
   for (const entry of fs.readdirSync(srcDir, { withFileTypes: true })) {
     if (rel === '' && COPY_SKIP.has(entry.name)) continue;
+    /* רק בשורש: תחת vendor/ יש קובצי .mjs שהם נכסי-שירות אמיתיים (onnxruntime) */
+    if (rel === '' && COPY_DENY.some(re => re.test(entry.name))) continue;
     const s = path.join(srcDir, entry.name);
     const d = path.join(dstDir, entry.name);
     if (entry.isDirectory()) {
@@ -168,6 +174,37 @@ function main() {
   copyRecursive(ROOT, DIST);
   fs.writeFileSync(path.join(DIST, appName), obfCode, 'utf8');
   fs.writeFileSync(path.join(DIST, 'index.html'), outHtml, 'utf8');
+
+  /* CSP: במקום 'unsafe-inline' — hash לכל סקריפט מוטמע שנשאר ב-HTML הסופי. כך סקריפט שהוזרק
+     (XSS) לא ירוץ גם אם חמק מהניטרול. סקריפטי-נתונים (ld+json וכד') לא מורצים ולא צריכים hash. */
+  const inlineRe = /<script\b([^>]*)>([\s\S]*?)<\/script>/gi;
+  const hashes = [];
+  let im;
+  while ((im = inlineRe.exec(outHtml)) !== null) {
+    if (/\bsrc\s*=/.test(im[1])) continue;
+    const type = (/\btype\s*=\s*["']?([^"'\s>]+)/i.exec(im[1]) || [])[1] || '';
+    if (type && !/^(text\/javascript|application\/javascript|module)$/i.test(type)) continue;
+    hashes.push(`'sha256-${crypto.createHash('sha256').update(im[2], 'utf8').digest('base64')}'`);
+  }
+  /* מטפל-אירוע מוטמע בתוך תגית (לא בתוך סקריפט/סגנון) ייחסם ע"י ה-CSP — עדיף להיכשל כאן */
+  const markupOnly = outHtml.replace(/<script\b[\s\S]*?<\/script>/gi, '').replace(/<style\b[\s\S]*?<\/style>/gi, '');
+  if (/<[a-z][^<>]*\son[a-z]+\s*=\s*["']/i.test(markupOnly))
+    throw new Error('CSP: נמצא מטפל-אירוע מוטמע (on*=) ב-HTML — הוא ייחסם. להעביר ל-addEventListener.');
+  const hdrPath = path.join(DIST, '_headers');
+  let hdr = fs.readFileSync(hdrPath, 'utf8');
+  /* רק בשורת הכותרת עצמה (לא בהערות של _headers) */
+  const cspRe = /(Content-Security-Policy:[^\r\n]*?script-src[^;\r\n]*?)\s*'unsafe-inline'/;
+  if (!cspRe.test(hdr)) throw new Error("CSP: לא נמצא 'unsafe-inline' ב-script-src של _headers להחלפה");
+  hdr = hdr.replace(cspRe, (m, pre) => `${pre} ${hashes.join(' ')}`);
+  fs.writeFileSync(hdrPath, hdr, 'utf8');
+  console.log(`[obfuscate] CSP: 'unsafe-inline' הוחלף ב-${hashes.length} hashes`);
+
+  /* Service Worker: גרסת-המטמון נגזרת מהפרסום עצמו */
+  const swPath = path.join(DIST, 'sw.js');
+  if (fs.existsSync(swPath)) {
+    const build = crypto.createHash('sha256').update(outHtml).update(obfCode).digest('hex').slice(0, 10);
+    fs.writeFileSync(swPath, fs.readFileSync(swPath, 'utf8').replaceAll('__BUILD__', build), 'utf8');
+  }
 
   console.log(`\n[obfuscate] נכתב dist/  (index.html + ${appName})`);
   console.log('[obfuscate] הושלם ✔\n');

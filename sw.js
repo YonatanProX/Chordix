@@ -6,7 +6,8 @@
    · קובץ המודל לא משתנה  → מטמון תחילה, בלי לגעת ברשת
    הגרסה מוטבעת בשם המטמון; שינוי שלה מנקה את הישן.
    ============================================================ */
-const V = 'chordix-v10-hardening';
+/* ה-build מחליף את __BUILD__ ב-hash של הפרסום, כך שכל deploy מנקה את המטמון הקודם לבד. */
+const V = 'chordix-v11-__BUILD__';
 const SHELL = ['./', './index.html', './site.webmanifest'];
 
 self.addEventListener('install', e => {
@@ -53,8 +54,12 @@ self.addEventListener('fetch', e => {
          חדש לא נתפס גם כשה-SW "רשת תחילה", כי fetch מחזיר עותק HTTP ישן. */
       fetch(req, { cache: 'no-store' })
         .then(res => {
-          const copy = res.clone();
-          caches.open(V).then(c => c.put(req, copy));
+          /* למטמון נכנסות רק תשובות תקינות, מאותו מקור ובלי query: כך אי אפשר לנפח אותו
+             ב-?x=1,?x=2… או לקבע בו דף-שגיאה, ותשובה מאומתת עתידית לא תישמר בטעות. */
+          if (res.ok && res.type === 'basic' && !url.search) {
+            const copy = res.clone();
+            caches.open(V).then(c => c.put(req, copy));
+          }
           return res;
         })
         .catch(() => caches.match(req).then(hit => hit || caches.match('./index.html')))
