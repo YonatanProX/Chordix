@@ -130,8 +130,8 @@ window.CX_I18N_DICT = {"en":{"html":{"a.1":"Skip to main content","headNav.a.1":
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="application-name" content="Chordix">
 <meta name="color-scheme" content="dark light">
-<meta name="theme-color" content="#0a1f2b" media="(prefers-color-scheme: dark)">
-<meta name="theme-color" content="#f4fbfc" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#c7dde7" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#c7dde7" media="(prefers-color-scheme: light)">
 
 <!-- ---------- שיתוף ברשתות ---------- -->
 <meta property="og:type" content="website">
@@ -167,11 +167,9 @@ const CX_ICON = { i192:"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMAAAADACA
   try{
     var p = JSON.parse(localStorage.getItem('maftea-prefs') || '{}');
     var t = localStorage.getItem('cx_theme');
-    /* ברירת-המחדל היא הערכה הבהירה (פלטת המותג). כהה רק אם המשתמש
-       בחר בכך ידנית, או שאין העדפה שמורה ומערכת-ההפעלה מעדיפה כהה. */
-    var dark = (t === 'dark') || (t === null && p['theme-light'] === false) ||
-               (t === null && p['theme-light'] === undefined &&
-                window.matchMedia('(prefers-color-scheme: dark)').matches);
+    /* ברירת-המחדל היא תמיד הערכה הבהירה (פלטת המותג), גם כשמערכת-ההפעלה
+       במצב כהה. כהה רק אם המשתמש בחר בכך ידנית (כפתור השמש/ירח או נגישות). */
+    var dark = (t === 'dark') || (t === null && p['theme-light'] === false);
     if(!dark) document.documentElement.classList.add('theme-light');
     ['a11y-high-contrast','a11y-readable','a11y-colorblind',
      'a11y-reduced-motion','a11y-keyboard-focus'].forEach(function(c){
@@ -242,27 +240,31 @@ const CX_ICON = { i192:"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMAAAADACA
    למילויי-אייקונים/מסגרות/מבטאים, הטקסט ב-Deep Ocean, והקישורים
    בתכלת-עמוק (brass-soft) שעומד ב-AA מול לבן.
    ============================================================ */
+/* 2026-09-19 — "פחות לבן": אין יותר לבן טהור בערכה הבהירה. הדף ירד מבהירות
+   0.80 ל-0.70, הכרטיסים מ-1.00 ל-0.86 (גוון-קרח), והנייר של דף האקורדים 0.93.
+   כל צמדי הטקסט/רקע נבדקו מחדש: טקסט ראשי ≥8.4:1, משני ≥6.1:1, חלש ≥4.8:1,
+   קישורים ≥5.3:1, וגווני-המבטא a1–a4 ≥5.2:1 על כרטיס. */
 html.theme-light{
-  --bg-deep:#d7ebf1;
-  --bg-deep2:#e6f4f8;
-  --bg-panel:#ffffff;
-  --bg-sunken:#c4dfe9;
-  --panel-edge:#7cbdd3;
+  --bg-deep:#c7dde7;
+  --bg-deep2:#d3e5ec;
+  --bg-panel:#e6f1f5;
+  --bg-sunken:#b3d0dc;
+  --panel-edge:#6aa9bf;
   --brass:#13b6e4;
-  --brass-soft:#0b6f90;
+  --brass-soft:#095c79;
   --text-main:#0f3b57;
-  --text-dim:#345a6f;
-  --text-faint:#557486;
-  --success:#0d6b42;
-  --error:#c0512e;
-  --focus-ring:#13b6e4;
-  --paper:#ffffff;
-  --paper-line:#d4eef4;
+  --text-dim:#2b5066;
+  --text-faint:#3a5a6e;
+  --success:#0c6139;
+  --error:#ab4523;
+  --focus-ring:#0e8fb5;
+  --paper:#f1f8fa;
+  --paper-line:#cfe6ee;
   --staff:#2a5266;
   --ink:#0f3b57;
-  --panel-2:#e0f0f5;
+  --panel-2:#d6e7ee;
   /* גוונים כהים-מספיק ל-AA כשמשמשים כטקסט בכרטיסים; a4 = קורל. */
-  --a1:#0e7ea0; --a2:#0f6d90; --a3:#127c8c; --a4:#c0512e;
+  --a1:#0b6a88; --a2:#0c5f7f; --a3:#0e6878; --a4:#a8431f;
   --wordmark-grad:linear-gradient(100deg,#13b6e4,#0e7ea0 60%,#0b6f90);
   --wordmark-ink:#0b6f90;
 }
@@ -2279,6 +2281,67 @@ button:active,.primary:active,.google-btn:active,.head-login:active,.head-nav a:
 }
 html.a11y-reduced-motion .feat-card,html.a11y-reduced-motion .drop,html.a11y-reduced-motion .sample-paper{transition:none}
 html.a11y-reduced-motion .feat-card:hover,html.a11y-reduced-motion .drop:hover,html.a11y-reduced-motion .sample-paper,html.a11y-reduced-motion .sample-paper:hover{transform:none}
+</style>
+<style id="chordix-light-2">
+/* ============================================================
+   ערכה בהירה 2 (2026-09-19) — עיצוב-מחדש מהיר, "פחות לבן"
+   ------------------------------------------------------------
+   שכבה אחת שאפשר להסיר בשלמותה. חלה רק על הערכה הבהירה, ולא נוגעת
+   בניגודיות-גבוהה. הרעיון: במקום דף חיוור אחיד — מסת-צבע Deep Ocean
+   למעלה (ה-hero) שמהדהדת את הפוטר, ובאמצע משטחים בגווני-קרח.
+   הטקסט שבתוך ה-hero מקבל את משתני הערכה הכהה, וכרטיס ההעלאה
+   שבתוכו מקבל חזרה את הבהירים — כך כל מה שנשען על משתנים מסתדר לבד.
+   ============================================================ */
+html.theme-light:not(.a11y-high-contrast) .hero{
+  --text-main:#f1fafc; --text-dim:#c8e0e9; --text-faint:#b3d2dd;
+  --panel-edge:#3f7d95; --bg-panel:rgba(255,255,255,.08);
+  --brass:#48c9e9; --brass-soft:#86dbe9;
+  --wordmark-grad:linear-gradient(100deg,#cff1f5,#86dbe9 45%,#48c9e9);
+  margin:14px clamp(10px,2.2vw,28px) 0;padding:62px 0 44px;
+  border-radius:28px;color:var(--text-main);
+  background:
+    radial-gradient(720px 300px at 50% -60px,rgba(72,201,233,.30),transparent 70%),
+    radial-gradient(520px 320px at 8% 112%,rgba(19,182,228,.18),transparent 70%),
+    linear-gradient(160deg,#0f3b57 0%,#10496a 55%,#0f5a78 100%);
+  box-shadow:0 26px 60px -34px rgba(15,59,87,.6);
+}
+html.theme-light:not(.a11y-high-contrast) .hero::before{display:none}
+html.theme-light:not(.a11y-high-contrast) .hero .trust-row li{
+  border-radius:999px;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+/* כרטיס ההעלאה: האי הבהיר בתוך הרצועה הכהה — נקודת-המוקד של הדף */
+html.theme-light:not(.a11y-high-contrast) .hero .drop{
+  --text-main:#0f3b57; --text-dim:#2b5066; --text-faint:#3a5a6e;
+  --panel-edge:#6aa9bf; --bg-panel:#e6f1f5; --brass:#13b6e4; --brass-soft:#095c79;
+  border-color:#86dbe9;border-radius:20px;
+  box-shadow:0 26px 60px -30px rgba(0,0,0,.6);
+}
+html.theme-light:not(.a11y-high-contrast) .hero .drop:hover,
+html.theme-light:not(.a11y-high-contrast) .hero .drop.hot{
+  border-color:#13b6e4;
+  box-shadow:0 30px 66px -28px rgba(0,0,0,.65),0 0 0 6px rgba(72,201,233,.22)}
+/* משטחים: פינות רכות יותר וצל שמרים את הכרטיס מעל רקע שכבר אינו לבן */
+html.theme-light:not(.a11y-high-contrast) .feat-card,
+html.theme-light:not(.a11y-high-contrast) .step-card,
+html.theme-light:not(.a11y-high-contrast) .faq-item,
+html.theme-light:not(.a11y-high-contrast) .install-in,
+html.theme-light:not(.a11y-high-contrast) .lib-tile{
+  border-radius:16px;border-color:color-mix(in srgb,var(--panel-edge) 70%,transparent);
+  box-shadow:0 1px 0 rgba(255,255,255,.55) inset,0 14px 32px -20px rgba(15,59,87,.45)}
+html.theme-light:not(.a11y-high-contrast) .feat-ico{
+  border-radius:14px;background:color-mix(in srgb,var(--brass) 16%,var(--bg-panel));
+  color:var(--a1)}
+html.theme-light:not(.a11y-high-contrast) .sample-paper{
+  border-radius:14px;box-shadow:0 22px 50px -26px rgba(15,59,87,.5)}
+/* נגן האודיו של הדפדפן הוא לבן טהור ואי אפשר לצבוע אותו; multiply נותן לו
+   את גוון הרקע שמתחתיו ומשאיר את האייקונים כהים — בלי לגעת בתפקוד. */
+html.theme-light:not(.a11y-high-contrast) audio{mix-blend-mode:multiply}
+/* כותרת עליונה: זכוכית בגוון הדף, עם קו-מבטא דק כשנדבקת */
+html.theme-light:not(.a11y-high-contrast) .site-head.stuck{
+  box-shadow:0 10px 30px -22px rgba(15,59,87,.55)}
+@media(max-width:640px){
+  html.theme-light:not(.a11y-high-contrast) .hero{margin:8px 8px 0;border-radius:22px;padding:44px 0 34px}
+}
+@media print{ html.theme-light .hero{background:none;box-shadow:none;margin:0} }
 </style>
 </head>
 <body>
@@ -11308,7 +11371,7 @@ renderBundles();
       }
     }
     const meta = document.querySelector('meta[name="theme-color"]:not([media])');
-    if(meta) meta.setAttribute('content', light ? '#f4fbfc' : '#0a1f2b');
+    if(meta) meta.setAttribute('content', light ? '#c7dde7' : '#0a1f2b');
   }
   function setTheme(light, persist){
     root.classList.toggle('theme-light', light);
