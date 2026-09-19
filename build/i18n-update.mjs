@@ -62,6 +62,13 @@ const HTML = {
   'libCtx.del': 'Delete song',
   'faqWho.q': 'Who is it useful for?',
   'faqWho.a': 'Whether you play alone at home or with a band, Chordix is for you. If you play on your own, you can pull the chords and details out of songs you love and play them yourself. If you play in a band, you can produce a chord sheet split into structure and bars for each player, so everyone stays in sync on the order and the chords.',
+  /* 2026-09-19: ציות משפטי — טענות מבוססות, עמודי עוגיות/החזרים, הסכמה ברשימת ההמתנה */
+  "main.5": "Results usually within a minute",
+  "main.9": "A normal-length song is usually analysed within about a minute, depending on your device. Everything runs on your own device, and the file is never uploaded anywhere.",
+  "main.47": "<span class=\"stat-chip\"><span class=\"stat-num\">About 3 in 4</span> chords identified correctly</span><br>That is the average in our own internal measurement on a small sample of songs (about 78% for the chord root). It is not a promise: in practice the result depends on the recording. Clear guitar or piano with a steady tempo comes out well above the average; dense mixes, unaccompanied singing, free tempo or noisy recordings come out below it. Every bar the model is less certain about is marked with a dashed underline — worth checking by ear — and the tool is completely free. MP3, WAV, M4A, OGG and FLAC are supported, up to ten minutes per song.",
+  "site.button.cookies": "Cookie Policy",
+  "site.button.refunds": "Cancellation and Refund Policy",
+  "waitModal.consent": "I agree that my email address will be stored and that one update will be sent to it when credits can be purchased, in accordance with the <button type=\"button\" class=\"link-btn\" data-legal=\"privacy\">Privacy Policy</button>. I can ask to be removed at any time.",
 };
 
 /* תרגומי placeholder / aria (data-i18n-attr → en.attr) */
@@ -94,6 +101,9 @@ const JS = {
   'השם עודכן גם ב־{0} מקטעים דומים': 'Renamed {0} similar sections too',
   'השם עודכן גם במקטע דומה אחד': 'Renamed 1 similar section too',
   'רק המקטע הזה': 'Only this one',
+  /* 2026-09-19: ציות משפטי — טענות מבוססות, עמודי עוגיות/החזרים, הסכמה ברשימת ההמתנה */
+  "כדי להירשם צריך לסמן את תיבת ההסכמה.": "To sign up, please tick the consent box.",
+  "מס׳ עוסק": "Business no.",
 };
 
 const src = fs.readFileSync(FILE, 'utf8');
