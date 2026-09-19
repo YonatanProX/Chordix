@@ -72,12 +72,29 @@ const HTML = {
   "waitModal.consent": "I agree that my email address will be stored and that one update will be sent to it when credits can be purchased, in accordance with the <button type=\"button\" class=\"link-btn\" data-legal=\"privacy\">Privacy Policy</button>. I can ask to be removed at any time.",
   /* 2026-09-20: PDF ישיר, ספרייה מול היסטוריה (30 יום), ניתוח רק למחוברים */
   "helpWindow.div.1": "<b>🎧 Upload:</b> drag an audio file onto the dashed rectangle or click it to choose a file. The file stays on your device — the analysis runs in your browser.<br><br> <b>⏱️ Results:</b> after the analysis you'll see the key, tempo, bar count and length, and above them a colourful structure map. Click a section on the map to jump to that point in the song.<br><br> <b>🎼 Two views:</b> “Timeline” shows the chords by their timing in the recording, and “Chord sheet” shows an ordered, print-ready page of bars.<br><br> <b> Corrections:</b> click a cell on the sheet to change its chords, click a bar number to start a new section there, and “merge with previous” removes an unneeded split.<br><br> <b>🎼 Chords not quite right?</b> Open “Live chord tracking”: shift the bar start, change the tempo (or ÷2 / ×2), and if <b>every</b> chord is wrong by a semitone — the recording isn't tuned to A=440, so change the “recording tuning” and press “Re-tune”.<br><br> <b>🎚️ Transposition:</b> the − and + buttons move the whole sheet to a different key, and the menu next to them chooses sharps or flats.<br><br> <b>🖨️ Saving:</b> “Save as PDF” downloads the chord sheet as a PDF file straight to your computer, and “Print” prints just the sheet, with no interface. “Save to library” keeps the song permanently; an analysis that was not saved stays in the analysis history for 30 days.<br><br> <b>⌨️ Keyboard:</b> every button is reachable with Tab and activated with Enter or Space. Accessibility settings can highlight the focus outline.",
+  /* 2026-09-19: תגובות */
+  "foot.comment.lead": "Got a note, an idea or a bug? We would love to hear it.",
+  "foot.comment.btn": "Add a comment",
+  "commentModal.h2": "Add a comment",
+  "commentModal.intro": "What worked well? What did not? Every comment reaches us directly and helps improve Chordix.",
+  "commentModal.rate": "Rating (optional)",
+  "commentModal.s1": "One star",
+  "commentModal.s2": "Two stars",
+  "commentModal.s3": "Three stars",
+  "commentModal.s4": "Four stars",
+  "commentModal.s5": "Five stars",
+  "commentModal.label": "Your comment",
+  "commentModal.note": "Your comment is stored together with your account identifier and is not published on the site. Details in the ",
+  "commentModal.privacy": "Privacy Policy",
+  "commentModal.send": "Send",
 };
 
 /* תרגומי placeholder / aria (data-i18n-attr → en.attr) */
 const ATTR = {
   'emailAuth.emailPh': 'Email address',
   'emailAuth.otpPh': '6-digit code',
+  /* 2026-09-19: תגובות */
+  "commentModal.close": "Close window",
 };
 
 /* מחרוזות דינמיות דרך cxT (en.js, ממופתח לפי המחרוזת העברית) */
@@ -116,6 +133,15 @@ const JS = {
   "עוד לא שמרתם שירים. בדף הניתוח לחצו “שמירה בספרייה” כדי שהשיר יישאר כאן.": "You have not saved any songs yet. On the analysis page, click “Save to library” to keep a song here.",
   "היסטוריית ניתוחים": "Analysis history",
   "ניתוחים שלא נשמרו בספרייה נמחקים אוטומטית אחרי 30 יום. פתחו ניתוח ולחצו “שמירה בספרייה” כדי לשמור אותו.": "Analyses that were not saved to the library are deleted automatically after 30 days. Open an analysis and click “Save to library” to keep it.",
+  /* 2026-09-19: תגובות */
+  "כדי להוסיף תגובה צריך להתחבר.": "Please sign in to add a comment.",
+  "כתבו לפחות כמה מילים.": "Please write at least a few words.",
+  "שולח…": "Sending…",
+  "תודה! התגובה התקבלה.": "Thank you! Your comment was received.",
+  "שלחתם כבר כמה תגובות היום — נסו שוב מחר. תודה!": "You have already sent several comments today — please try again tomorrow. Thank you!",
+  "השליחה לא הצליחה כרגע. אפשר גם לכתוב לנו ל‑{0}": "Sending failed just now. You can also write to us at {0}",
+  "איך יצא? נשמח לתגובה": "How did it turn out? We would love a comment",
+  "הוספת תגובה": "Add a comment",
 };
 
 const src = fs.readFileSync(FILE, 'utf8');
