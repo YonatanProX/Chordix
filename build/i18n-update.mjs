@@ -13,6 +13,13 @@ const FILE = path.join(ROOT, 'index.html');
 
 /* תיקוני אנגלית למחרוזות ששונו בעברית (data-i18n → en.html) */
 const HTML = {
+  /* מטרונום משופר */
+  "metro.hint": "Click a beat to change it: accented → normal → silent.",
+  "metro.sub": "Subdivision", "metro.sub.1": "None (quarter notes)", "metro.sub.2": "Eighth notes", "metro.sub.3": "Triplets", "metro.sub.4": "Sixteenth notes",
+  "metro.sound": "Sound", "metro.sound.click": "Click", "metro.sound.wood": "Woodblock", "metro.sound.beep": "Beep",
+  "metro.vol": "Volume",
+  "metro.train": "Speed trainer: raise by", "metro.trainEvery": "every", "metro.trainBarsWord": "bars",
+  "metro.key.space": "start / stop", "metro.key.arrows": "tempo", "metro.key.tap": "tap tempo",
   'main.4': 'File never leaves your device',
   'main.5': 'Results in seconds',
   'main.6': 'Ready to print and export',
@@ -252,6 +259,7 @@ const HTML = {
 
 /* תרגומי placeholder / aria (data-i18n-attr → en.attr) */
 const ATTR = {
+  "metro.dotsLabel": "Beats in the bar", "metro.trainBy": "How many BPM to add", "metro.trainBars": "Every how many bars",
   'emailAuth.emailPh': 'Email address',
   'emailAuth.otpPh': '6-digit code',
   /* 2026-09-19: תגובות */
@@ -278,6 +286,8 @@ const ATTR = {
 
 /* מחרוזות דינמיות דרך cxT (en.js, ממופתח לפי המחרוזת העברית) */
 const JS = {
+  /* מטרונום משופר */
+  "פעימה {0}: מודגשת": "Beat {0}: accented", "פעימה {0}: רגילה": "Beat {0}: normal", "פעימה {0}: שקטה": "Beat {0}: silent", "תיבה {0}": "Bar {0}",
   /* מכסת תגובות: שירים שנותחו + 1 */
   "ניצלתם את כל התגובות שלכם. כל שיר שתנתחו מזכה בתגובה נוספת.": "You have used all your comments. Every song you analyse earns you one more.",
   "נשארה לכם תגובה אחת. כל שיר שתנתחו מזכה בתגובה נוספת.": "You have one comment left. Every song you analyse earns you one more.",
