@@ -46,18 +46,33 @@
     <lastmod>2026-09-20</lastmod>
     <priority>0.6</priority>
   </url>
-  <url>
-    <loc>https://chordix.pages.dev/tools</loc>
-    <lastmod>2026-09-20</lastmod>
-    <priority>0.6</priority>
-  </url>
-  <url>
+<url>
     <loc>https://chordix.pages.dev/tips</loc>
     <lastmod>2026-09-20</lastmod>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://chordix.pages.dev/whats-new</loc>
+    <loc>https://chordix.pages.dev/metronome</loc>
+    <lastmod>2026-09-20</lastmod>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://chordix.pages.dev/guitar-chords</loc>
+    <lastmod>2026-09-20</lastmod>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://chordix.pages.dev/piano-chords</loc>
+    <lastmod>2026-09-20</lastmod>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://chordix.pages.dev/tuner</loc>
+    <lastmod>2026-09-20</lastmod>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://chordix.pages.dev/capo</loc>
     <lastmod>2026-09-20</lastmod>
     <priority>0.6</priority>
   </url>
