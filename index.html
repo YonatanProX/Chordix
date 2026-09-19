@@ -130,8 +130,8 @@ window.CX_I18N_DICT = {"en":{"html":{"a.1":"Skip to main content","headNav.a.1":
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="application-name" content="Chordix">
 <meta name="color-scheme" content="dark light">
-<meta name="theme-color" content="#c7dde7" media="(prefers-color-scheme: dark)">
-<meta name="theme-color" content="#c7dde7" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#b4d3e4" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#b4d3e4" media="(prefers-color-scheme: light)">
 
 <!-- ---------- שיתוף ברשתות ---------- -->
 <meta property="og:type" content="website">
@@ -240,33 +240,35 @@ const CX_ICON = { i192:"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMAAAADACA
    למילויי-אייקונים/מסגרות/מבטאים, הטקסט ב-Deep Ocean, והקישורים
    בתכלת-עמוק (brass-soft) שעומד ב-AA מול לבן.
    ============================================================ */
-/* 2026-09-19 — "פחות לבן": אין יותר לבן טהור בערכה הבהירה. הדף ירד מבהירות
-   0.80 ל-0.70, הכרטיסים מ-1.00 ל-0.86 (גוון-קרח), והנייר של דף האקורדים 0.93.
-   כל צמדי הטקסט/רקע נבדקו מחדש: טקסט ראשי ≥8.4:1, משני ≥6.1:1, חלש ≥4.8:1,
-   קישורים ≥5.3:1, וגווני-המבטא a1–a4 ≥5.2:1 על כרטיס. */
+/* 2026-09-19 — הערכה הבהירה היא *אותו עיצוב* של הכהה, רק בהיר יותר.
+   כל משטח נגזר מהמקביל הכהה שלו באותו גוון (202°) ובאותם יחסים: הדף הוא
+   הבסיס, כרטיס מעט בהיר ממנו, שקע מעט כהה ממנו, מסגרת באמצע. אין לבן טהור.
+   כהה → בהיר:  bg-deep #0a1f2b→#b4d3e4 · panel #123240→#cfe3ee · sunken #07161e→#9cc5dc
+   ניגודיות (נבדקה בסקריפט): טקסט ראשי ≥7.5:1, משני ≥6.0:1, חלש ≥5.1:1,
+   קישורים ≥5.5:1, גווני-המבטא a1–a4 ≥5.2:1 על כרטיס. */
 html.theme-light{
-  --bg-deep:#c7dde7;
-  --bg-deep2:#d3e5ec;
-  --bg-panel:#e6f1f5;
-  --bg-sunken:#b3d0dc;
-  --panel-edge:#6aa9bf;
-  --brass:#13b6e4;
-  --brass-soft:#095c79;
+  --bg-deep:#b4d3e4;
+  --bg-deep2:#bfdae8;
+  --bg-panel:#cfe3eef0;
+  --bg-sunken:#9cc5dc;
+  --panel-edge:#6a9fbe;
+  --brass:#0f9fcb;
+  --brass-soft:#07516b;
   --text-main:#0f3b57;
-  --text-dim:#2b5066;
-  --text-faint:#3a5a6e;
-  --success:#0c6139;
-  --error:#ab4523;
+  --text-dim:#28495e;
+  --text-faint:#34546a;
+  --success:#0a5833;
+  --error:#9c3d1d;
   --focus-ring:#0e8fb5;
-  --paper:#f1f8fa;
-  --paper-line:#cfe6ee;
+  --paper:#ecf5f9;
+  --paper-line:#c5dfea;
   --staff:#2a5266;
   --ink:#0f3b57;
-  --panel-2:#d6e7ee;
+  --panel-2:#c4dcea;
   /* גוונים כהים-מספיק ל-AA כשמשמשים כטקסט בכרטיסים; a4 = קורל. */
-  --a1:#0b6a88; --a2:#0c5f7f; --a3:#0e6878; --a4:#a8431f;
-  --wordmark-grad:linear-gradient(100deg,#13b6e4,#0e7ea0 60%,#0b6f90);
-  --wordmark-ink:#0b6f90;
+  --a1:#095f7b; --a2:#0a5672; --a3:#0b5c6b; --a4:#9a3b1a;
+  --wordmark-grad:linear-gradient(100deg,#0f4a68,#0b6888 50%,#0c7a9e);
+  --wordmark-ink:#0b6888;
 }
 *{box-sizing:border-box}
 html{color-scheme:light}
@@ -2057,7 +2059,7 @@ html.theme-light .danger-btn.solid{color:#fff}
 .cx-toast.on{opacity:1;transform:translateY(0)}
 .cx-toast.on .cx-toast-act{pointer-events:auto}
 .cx-toast-act{
-  margin-inline-start:10px;padding:3px 12px;border-radius:999px;cursor:pointer;
+  margin-inline-start:10px;padding:3px 12px;border-radius:8px;cursor:pointer;
   background:transparent;color:var(--brass);border:1px solid var(--brass);font:inherit;font-size:13px;
 }
 .cx-toast-act:hover{background:color-mix(in srgb,var(--brass) 14%,transparent)}
@@ -2150,11 +2152,11 @@ html.theme-light .danger-btn.solid{color:#fff}
 /* בערכה הבהירה רקע חד-גוני נראה שטוח. שלוש הילות רכות
    בשלושה מבטאים שונים נותנות עומק בלי להפריע לקריאות. */
 html.theme-light body{
+  /* אותו מתכון של הערכה הכהה: הילה אחת רכה מלמעלה-מרכז. בכהה היא תכלת
+     על כחול-לילה; כאן היא אור בהיר על אותו כחול, מואר. */
   background-color:var(--bg-deep);
-  background-image:
-    radial-gradient(820px 460px at 14% -140px,color-mix(in srgb,#48c9e9 16%,transparent),transparent 66%),
-    radial-gradient(760px 430px at 86% -80px, color-mix(in srgb,#86dbe9 14%,transparent),transparent 68%),
-    radial-gradient(900px 480px at 50% 108%, color-mix(in srgb,#ace7ea 18%,transparent),transparent 70%);
+  background-image:radial-gradient(1100px 620px at 50% -180px,
+    color-mix(in srgb,#e9f8fd 62%,transparent),transparent 70%);
 }
 html.theme-light .plan,
 html.theme-light .feat-card,
@@ -2258,13 +2260,13 @@ html.a11y-reduced-motion .coupon-btn:hover{transform:none}
 <style id="chordix-polish">
 /* אימוץ עדין מקובץ-ההשראה: צורת כפתורים (pill) והנפשות בלבד.
    הצבעים נשארים פלטת-המותג הקודמת (שני ה-themes) — כל צבע דרך משתנים. */
-/* כפתורים בצורת pill */
-.head-nav a{border-radius:999px;padding:9px 14px}
+/* כפתורים: פינות של 8px, כמו הכרטיסים (היו pill מלא; הבעלים ביקש פחות עגול, 2026-09-19) */
+.head-nav a{border-radius:8px;padding:9px 14px}
 .head-nav a:hover{background:color-mix(in srgb,var(--brass) 12%,transparent)}
-.icon-btn,.head-login,.head-burger,.head-login.primary{border-radius:999px}
+.icon-btn,.head-login,.head-burger,.head-login.primary{border-radius:8px}
 .controls button,.controls select,.views,.views button,.mini,.chip,
 .foot-col a.foot-discord,.foot-col a.foot-youtube,#saveLibBtn,
-button.primary,.plan-cta,.mini-cta,.google-btn{border-radius:999px}
+button.primary,.plan-cta,.mini-cta,.google-btn{border-radius:8px}
 /* הנפשות: ריחוף רך, הקשה, ומעברים עם easing */
 .feat-card,.step-card,.faq-item,.drop,.cta-in,.lib-tile,.plan,.bundle,.google-btn,button.primary,.head-login{
   transition:transform .24s cubic-bezier(.23,1,.32,1),box-shadow .24s ease,border-color .24s ease,background .2s ease}
@@ -2283,65 +2285,12 @@ html.a11y-reduced-motion .feat-card,html.a11y-reduced-motion .drop,html.a11y-red
 html.a11y-reduced-motion .feat-card:hover,html.a11y-reduced-motion .drop:hover,html.a11y-reduced-motion .sample-paper,html.a11y-reduced-motion .sample-paper:hover{transform:none}
 </style>
 <style id="chordix-light-2">
-/* ============================================================
-   ערכה בהירה 2 (2026-09-19) — עיצוב-מחדש מהיר, "פחות לבן"
-   ------------------------------------------------------------
-   שכבה אחת שאפשר להסיר בשלמותה. חלה רק על הערכה הבהירה, ולא נוגעת
-   בניגודיות-גבוהה. הרעיון: במקום דף חיוור אחיד — מסת-צבע Deep Ocean
-   למעלה (ה-hero) שמהדהדת את הפוטר, ובאמצע משטחים בגווני-קרח.
-   הטקסט שבתוך ה-hero מקבל את משתני הערכה הכהה, וכרטיס ההעלאה
-   שבתוכו מקבל חזרה את הבהירים — כך כל מה שנשען על משתנים מסתדר לבד.
-   ============================================================ */
-html.theme-light:not(.a11y-high-contrast) .hero{
-  --text-main:#f1fafc; --text-dim:#c8e0e9; --text-faint:#b3d2dd;
-  --panel-edge:#3f7d95; --bg-panel:rgba(255,255,255,.08);
-  --brass:#48c9e9; --brass-soft:#86dbe9;
-  --wordmark-grad:linear-gradient(100deg,#cff1f5,#86dbe9 45%,#48c9e9);
-  margin:14px clamp(10px,2.2vw,28px) 0;padding:62px 0 44px;
-  border-radius:28px;color:var(--text-main);
-  background:
-    radial-gradient(720px 300px at 50% -60px,rgba(72,201,233,.30),transparent 70%),
-    radial-gradient(520px 320px at 8% 112%,rgba(19,182,228,.18),transparent 70%),
-    linear-gradient(160deg,#0f3b57 0%,#10496a 55%,#0f5a78 100%);
-  box-shadow:0 26px 60px -34px rgba(15,59,87,.6);
-}
-html.theme-light:not(.a11y-high-contrast) .hero::before{display:none}
-html.theme-light:not(.a11y-high-contrast) .hero .trust-row li{
-  border-radius:999px;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
-/* כרטיס ההעלאה: האי הבהיר בתוך הרצועה הכהה — נקודת-המוקד של הדף */
-html.theme-light:not(.a11y-high-contrast) .hero .drop{
-  --text-main:#0f3b57; --text-dim:#2b5066; --text-faint:#3a5a6e;
-  --panel-edge:#6aa9bf; --bg-panel:#e6f1f5; --brass:#13b6e4; --brass-soft:#095c79;
-  border-color:#86dbe9;border-radius:20px;
-  box-shadow:0 26px 60px -30px rgba(0,0,0,.6);
-}
-html.theme-light:not(.a11y-high-contrast) .hero .drop:hover,
-html.theme-light:not(.a11y-high-contrast) .hero .drop.hot{
-  border-color:#13b6e4;
-  box-shadow:0 30px 66px -28px rgba(0,0,0,.65),0 0 0 6px rgba(72,201,233,.22)}
-/* משטחים: פינות רכות יותר וצל שמרים את הכרטיס מעל רקע שכבר אינו לבן */
-html.theme-light:not(.a11y-high-contrast) .feat-card,
-html.theme-light:not(.a11y-high-contrast) .step-card,
-html.theme-light:not(.a11y-high-contrast) .faq-item,
-html.theme-light:not(.a11y-high-contrast) .install-in,
-html.theme-light:not(.a11y-high-contrast) .lib-tile{
-  border-radius:16px;border-color:color-mix(in srgb,var(--panel-edge) 70%,transparent);
-  box-shadow:0 1px 0 rgba(255,255,255,.55) inset,0 14px 32px -20px rgba(15,59,87,.45)}
-html.theme-light:not(.a11y-high-contrast) .feat-ico{
-  border-radius:14px;background:color-mix(in srgb,var(--brass) 16%,var(--bg-panel));
-  color:var(--a1)}
-html.theme-light:not(.a11y-high-contrast) .sample-paper{
-  border-radius:14px;box-shadow:0 22px 50px -26px rgba(15,59,87,.5)}
-/* נגן האודיו של הדפדפן הוא לבן טהור ואי אפשר לצבוע אותו; multiply נותן לו
-   את גוון הרקע שמתחתיו ומשאיר את האייקונים כהים — בלי לגעת בתפקוד. */
+/* ערכה בהירה 2 (2026-09-19). הבעלים: "הרקע הבהיר יהיה כמו הכהה אבל בהיר יותר —
+   זה העיצוב". לכן אין כאן שום מבנה משלה לערכה הבהירה (רצועת ה-hero הכהה שנוסתה
+   הוסרה); הצבעים עצמם יושבים במשתני html.theme-light. נשאר רק מה שאין לו מקביל
+   בכהה: נגן-האודיו של הדפדפן לבן טהור ואי אפשר לצבוע אותו — multiply נותן לו את
+   גוון הרקע שמתחתיו ומשאיר את האייקונים כהים, בלי לגעת בתפקוד. */
 html.theme-light:not(.a11y-high-contrast) audio{mix-blend-mode:multiply}
-/* כותרת עליונה: זכוכית בגוון הדף, עם קו-מבטא דק כשנדבקת */
-html.theme-light:not(.a11y-high-contrast) .site-head.stuck{
-  box-shadow:0 10px 30px -22px rgba(15,59,87,.55)}
-@media(max-width:640px){
-  html.theme-light:not(.a11y-high-contrast) .hero{margin:8px 8px 0;border-radius:22px;padding:44px 0 34px}
-}
-@media print{ html.theme-light .hero{background:none;box-shadow:none;margin:0} }
 </style>
 </head>
 <body>
@@ -11371,7 +11320,7 @@ renderBundles();
       }
     }
     const meta = document.querySelector('meta[name="theme-color"]:not([media])');
-    if(meta) meta.setAttribute('content', light ? '#c7dde7' : '#0a1f2b');
+    if(meta) meta.setAttribute('content', light ? '#b4d3e4' : '#0a1f2b');
   }
   function setTheme(light, persist){
     root.classList.toggle('theme-light', light);
