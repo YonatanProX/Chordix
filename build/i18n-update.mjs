@@ -278,6 +278,10 @@ const ATTR = {
 
 /* מחרוזות דינמיות דרך cxT (en.js, ממופתח לפי המחרוזת העברית) */
 const JS = {
+  /* מכסת תגובות: שירים שנותחו + 1 */
+  "ניצלתם את כל התגובות שלכם. כל שיר שתנתחו מזכה בתגובה נוספת.": "You have used all your comments. Every song you analyse earns you one more.",
+  "נשארה לכם תגובה אחת. כל שיר שתנתחו מזכה בתגובה נוספת.": "You have one comment left. Every song you analyse earns you one more.",
+  "נשארו לכם {0} תגובות.": "You have {0} comments left.",
   /* תפריט צד מוקטן */
   "הקטנת התפריט": "Collapse the menu",
   "הגדלת התפריט": "Expand the menu",
