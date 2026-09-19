@@ -142,6 +142,8 @@ const JS = {
   "השליחה לא הצליחה כרגע. אפשר גם לכתוב לנו ל‑{0}": "Sending failed just now. You can also write to us at {0}",
   "איך יצא? נשמח לתגובה": "How did it turn out? We would love a comment",
   "הוספת תגובה": "Add a comment",
+  "הספרייה מלאה (500 שירים). מחקו שירים ישנים כדי לשמור חדשים.": "The library is full (500 songs). Delete old songs to save new ones.",
+  "יותר מדי שמירות בזמן קצר — נסו שוב בעוד כמה דקות.": "Too many saves in a short time — please try again in a few minutes.",
 };
 
 const src = fs.readFileSync(FILE, 'utf8');
