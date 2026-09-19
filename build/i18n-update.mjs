@@ -66,6 +66,7 @@ const HTML = {
   "main.5": "Results usually within a minute",
   "main.9": "A normal-length song is usually analysed within about a minute, depending on your device. Everything runs on your own device, and the file is never uploaded anywhere.",
   "main.47": "<span class=\"stat-chip\"><span class=\"stat-num\">About 3 in 4</span> chords identified correctly</span><br>That is the average in our own internal measurement on a small sample of songs (about 78% for the chord root). It is not a promise: in practice the result depends on the recording. Clear guitar or piano with a steady tempo comes out well above the average; dense mixes, unaccompanied singing, free tempo or noisy recordings come out below it. Every bar the model is less certain about is marked with a dashed underline — worth checking by ear — and the tool is completely free. MP3, WAV, M4A, OGG and FLAC are supported, up to ten minutes per song.",
+  "main.63": "Drop in a file and, usually within a minute, you will know which chords the song is played in.",
   "site.button.cookies": "Cookie Policy",
   "site.button.refunds": "Cancellation and Refund Policy",
   "waitModal.consent": "I agree that my email address will be stored and that one update will be sent to it when credits can be purchased, in accordance with the <button type=\"button\" class=\"link-btn\" data-legal=\"privacy\">Privacy Policy</button>. I can ask to be removed at any time.",
