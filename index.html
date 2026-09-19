@@ -155,10 +155,10 @@ const CX_ICON = { i192:"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMAAAADACA
 <!-- ---------- גופנים ----------
      צומצם מ-16 משקלים ל-9. כל משקל הוא הורדה נפרדת (עברית + לטינית),
      ולכן הקיצוץ הזה לבדו חוסך כמחצית מבקשות הגופנים בטעינה הראשונה. -->
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700&family=Heebo:wght@700;800&family=Assistant:wght@400;600;700&display=swap">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700&family=Heebo:wght@700;800&family=Assistant:wght@400;600;700&display=swap">
+<!-- גופנים באירוח עצמי (fonts/) — בלי פנייה ל-Google, כדי שכתובת ה-IP של המבקר לא תיחשף לצד שלישי -->
+<link rel="preload" as="font" type="font/woff2" href="/fonts/assistant-hebrew.woff2" crossorigin>
+<link rel="preload" as="font" type="font/woff2" href="/fonts/heebo-hebrew.woff2" crossorigin>
+<link rel="stylesheet" href="/fonts/fonts.css">
 
 <!-- ---------- העדפת ערכת נושא לפני הצביעה ----------
      רץ סינכרונית לפני ה-CSS כדי שלא תהיה הבזקה של הנושא הלא-נכון. -->
@@ -3185,7 +3185,6 @@ html.theme-light:not(.a11y-high-contrast) audio{mix-blend-mode:multiply}
       <p data-i18n="cgBody.p.1">לפני שמתחילים — קריאה קצרה ואישור:</p>
       <ul class="cg-list">
         <li data-i18n="cgBody.li.1"><b>קובץ השמע לא עוזב את המכשיר.</b> כל הפענוח רץ בדפדפן שלכם. אנחנו לא מקבלים את השיר ולא שומעים אותו.</li>
-        <li data-i18n="cgBody.li.2"><b></b> </li>
         <li data-i18n="cgBody.li.3"><b>התוצאה אוטומטית ועלולה לטעות.</b> אין להסתמך עליה בלי בדיקה באוזן.</li>
         <li data-i18n="cgBody.li.4"><b>זכויות יוצרים באחריותכם.</b> השימוש בדפי אקורדים של יצירות מוגנות הוא באחריות המשתמש.</li>
       </ul>
@@ -3309,7 +3308,7 @@ html.theme-light:not(.a11y-high-contrast) audio{mix-blend-mode:multiply}
   <ul>
     <li><b>Supabase, Inc.</b> — בסיס הנתונים ומערכת ההתחברות. כאן נשמרים החשבון וההיסטוריה. פרויקט השירות ממוקם ב<b>אזור באיחוד האירופי</b>. <a href="https://supabase.com/privacy" target="_blank" rel="noopener noreferrer">מדיניות הפרטיות של Supabase</a>.</li>
     <li><b>Cloudflare, Inc.</b> — אירוח האתר והגשתו (Cloudflare Pages), לרבות הגנה מפני תעבורה זדונית. דרך הספק עוברות בקשות הרשת שלך, ובכלל זה כתובת ה‑IP ופרטי דפדפן בסיסיים, כמקובל בכל אתר. <a href="https://www.cloudflare.com/privacypolicy/" target="_blank" rel="noopener noreferrer">מדיניות הפרטיות של Cloudflare</a>.</li>
-    <li><b>Google</b> — שירות ההתחברות (“Sign in with Google”) והגופנים המוצגים בדף. בעת התחברות או טעינת גופן נחשפים לגוגל כתובת ה‑IP ופרטי דפדפן בסיסיים. <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer">מדיניות הפרטיות של Google</a>.</li>
+    <li><b>Google</b> — רק אם בחרת להתחבר דרך Google: שירות ההתחברות (“Sign in with Google”) ותמונת הפרופיל שנטענת משרתי Google. בעת ההתחברות נחשפים לגוגל כתובת ה‑IP ופרטי דפדפן בסיסיים. הגופנים באתר מוגשים מהאתר עצמו, ולא מ‑Google. <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer">מדיניות הפרטיות של Google</a>.</li>
     <li><b>Discord Inc.</b> — רק אם בחרת להתחבר דרך Discord: שירות ההתחברות, ותמונת הפרופיל שנטענת משרתי Discord. נחשפים לספק כתובת ה‑IP ופרטי דפדפן בסיסיים. <a href="https://discord.com/privacy" target="_blank" rel="noopener noreferrer">מדיניות הפרטיות של Discord</a>.</li>
     <li>ספריות הקוד (מנוע ההרצה של המודל וספריית ההתחברות) מוגשות מהאתר עצמו, ולא מרשת הפצה של צד שלישי.</li>
     <li><b>GitHub, Inc.</b> — מאגר קוד המקור של האתר ותהליך הפרסום. <b>לא נשמר שם שום מידע על משתמשים</b>; מדובר בקוד התוכנה בלבד.</li>
@@ -3400,7 +3399,7 @@ html.theme-light:not(.a11y-high-contrast) audio{mix-blend-mode:multiply}
   <ul>
     <li><b>Cloudflare</b> — מארח את האתר. בבדיקה האחרונה האתר לא הציב אף Cookie; ייתכן ש‑Cloudflare יציב Cookie אבטחתי הכרחי (למשל לזיהוי תעבורה זדונית).</li>
     <li><b>Google / Discord</b> — רק אם בחרת להתחבר דרכם: תהליך ההתחברות מתבצע באתר שלהם, ושם חלות העוגיות והמדיניות שלהם.</li>
-    <li><b>Google Fonts</b> — הגופנים נטענים משרתי Google. לא מוצב Cookie, אך כתובת ה‑IP שלך נחשפת ל‑Google בעת הטעינה.</li>
+    <li><b>גופנים</b> — מוגשים מהאתר עצמו. אין פנייה ל‑Google Fonts.</li>
   </ul>
   <p>באתר אין סרטונים מוטמעים, אין כפתורי שיתוף של רשתות חברתיות ואין קוד מעקב של צד שלישי. הקישורים ל‑Discord ול‑YouTube הם קישורים רגילים; דבר אינו נטען מהם עד שלוחצים.</p>
 
@@ -3472,7 +3471,7 @@ SOFTWARE.</pre>
   <p>מנוע ההרצה של המודל בדפדפן, מבית Microsoft, מופץ ברישיון MIT: <span dir="ltr">Copyright (c) Microsoft Corporation. All rights reserved.</span> נוסח הרישיון זהה לנוסח שלעיל, בשינוי שם בעל הזכויות.</p>
 
   <h3>3. גופנים</h3>
-  <p>Heebo, Rubik ו‑Assistant — מופצים ברישיון <span dir="ltr">SIL Open Font License 1.1</span> דרך Google Fonts, ומותרים לשימוש מסחרי בהתאם לתנאי הרישיון.</p>
+  <p>Heebo, Rubik ו‑Assistant — מופצים ברישיון <span dir="ltr">SIL Open Font License 1.1</span> ומותרים לשימוש מסחרי בהתאם לתנאי הרישיון. קובצי הגופנים מוגשים מהאתר עצמו; נוסח הרישיון המלא: <a href="/fonts/OFL-heebo.txt" target="_blank" rel="noopener">Heebo</a> · <a href="/fonts/OFL-rubik.txt" target="_blank" rel="noopener">Rubik</a> · <a href="/fonts/OFL-assistant.txt" target="_blank" rel="noopener">Assistant</a>.</p>
 
   <h3>4. Supabase JavaScript Client</h3>
   <p>ספריית ההתחברות והגישה לבסיס הנתונים, מבית Supabase, מופצת ברישיון MIT: <span dir="ltr">Copyright (c) 2020 Supabase</span>. נוסח הרישיון זהה לנוסח שלעיל, בשינוי שם בעל הזכויות.</p>
@@ -3585,7 +3584,7 @@ SOFTWARE.</pre>
   <ul>
     <li><b>Supabase, Inc.</b> — the database and the sign-in system. The account and analysis history are stored here. The legacy credit-system tables are inactive. The Service's project is located in a <b>region within the European Union</b>. <a href="https://supabase.com/privacy" target="_blank" rel="noopener noreferrer">Supabase's privacy policy</a>.</li>
     <li><b>Cloudflare, Inc.</b> — hosting and serving the site (Cloudflare Pages), including protection against malicious traffic. Your network requests pass through this provider, including your IP address and basic browser details, as is standard for any website. <a href="https://www.cloudflare.com/privacypolicy/" target="_blank" rel="noopener noreferrer">Cloudflare's privacy policy</a>.</li>
-    <li><b>Google</b> — the sign-in service (“Sign in with Google”) and the fonts displayed on the page. When signing in or loading a font, your IP address and basic browser details are exposed to Google. <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer">Google's privacy policy</a>.</li>
+    <li><b>Google</b> — only if you choose to sign in with Google: the sign-in service (“Sign in with Google”) and your profile picture, which is loaded from Google's servers. When signing in, your IP address and basic browser details are exposed to Google. The site's fonts are served from the site itself, not from Google. <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer">Google's privacy policy</a>.</li>
     <li><b>Discord Inc.</b> — only if you choose to sign in with Discord: the sign-in service, and your profile picture, which is loaded from Discord's servers. Your IP address and basic browser details are exposed to this provider. <a href="https://discord.com/privacy" target="_blank" rel="noopener noreferrer">Discord's privacy policy</a>.</li>
     <li>The code libraries (the model's runtime engine and the sign-in library) are served from the site itself, not from a third-party distribution network.</li>
     <li><b>GitHub, Inc.</b> — the site's source code repository and publishing process. <b>No user information whatsoever is stored there</b>; it holds the software code alone.</li>
@@ -3675,7 +3674,7 @@ SOFTWARE.</pre>
   <ul>
     <li><b>Cloudflare</b> — hosts the site. At our last check the site set no cookie at all; Cloudflare may set a strictly necessary security cookie (for example to identify malicious traffic).</li>
     <li><b>Google / Discord</b> — only if you choose to sign in through them: the sign-in takes place on their own sites, where their cookies and policies apply.</li>
-    <li><b>Google Fonts</b> — fonts are loaded from Google's servers. No cookie is set, but your IP address is exposed to Google at load time.</li>
+    <li><b>Fonts</b> — served from the site itself. No request is made to Google Fonts.</li>
   </ul>
   <p>The site contains no embedded videos, no social-network share buttons and no third-party tracking code. The links to Discord and YouTube are ordinary links; nothing is loaded from them until you click.</p>
 
@@ -3747,7 +3746,7 @@ SOFTWARE.</pre>
   <p>The model's in-browser runtime engine, by Microsoft, distributed under the MIT licence: <span dir="ltr">Copyright (c) Microsoft Corporation. All rights reserved.</span> The licence text is identical to the one above, with the name of the rights holder changed.</p>
 
   <h3>3. Fonts</h3>
-  <p>Heebo, Rubik and Assistant — distributed under the <span dir="ltr">SIL Open Font License 1.1</span> via Google Fonts, and permitted for commercial use in accordance with the licence terms.</p>
+  <p>Heebo, Rubik and Assistant — distributed under the <span dir="ltr">SIL Open Font License 1.1</span> and permitted for commercial use in accordance with the licence terms. The font files are served from the site itself; full licence text: <a href="/fonts/OFL-heebo.txt" target="_blank" rel="noopener">Heebo</a> · <a href="/fonts/OFL-rubik.txt" target="_blank" rel="noopener">Rubik</a> · <a href="/fonts/OFL-assistant.txt" target="_blank" rel="noopener">Assistant</a>.</p>
 
   <h3>4. Supabase JavaScript Client</h3>
   <p>The sign-in and database access library, by Supabase, distributed under the MIT licence: <span dir="ltr">Copyright (c) 2020 Supabase</span>. The licence text is identical to the one above, with the name of the rights holder changed.</p>
