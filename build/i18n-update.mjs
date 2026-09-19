@@ -87,6 +87,30 @@ const HTML = {
   "commentModal.note": "Your comment is stored together with your account identifier and is not published on the site. Details in the ",
   "commentModal.privacy": "Privacy Policy",
   "commentModal.send": "Send",
+  /* 2026-09-19: תפריט צד + הזמנה לתגובה */
+  "side.h.main": "Main",
+  "side.new": "Analyse a new song",
+  "side.library": "My song library",
+  "side.h.learn": "Get to know Chordix",
+  "side.how": "How it works",
+  "side.features": "Features",
+  "side.faq": "FAQ",
+  "side.h.tools": "Tools and settings",
+  "side.comment": "Add a comment",
+  "side.help": "Help and instructions",
+  "side.a11y": "Accessibility settings",
+  "side.theme": "Light / dark mode",
+  "side.terms": "Terms of use",
+  "side.privacy": "Privacy",
+  "side.cookies": "Cookies",
+  "side.loginLead": "Sign in to analyse songs and save them to your library.",
+  "side.login": "Sign in",
+  "invite.title": "How was the analysis?",
+  "invite.body": "A minute of your time helps us sharpen Chordix. We would love to hear what worked and what did not.",
+  "invite.yes": "Write a comment",
+  "invite.no": "Not now",
+  "foot.comment.title": "Got something to say?",
+  "foot.comment.lead": "A note, an idea or a bug — every comment reaches us directly.",
 };
 
 /* תרגומי placeholder / aria (data-i18n-attr → en.attr) */
@@ -95,6 +119,11 @@ const ATTR = {
   'emailAuth.otpPh': '6-digit code',
   /* 2026-09-19: תגובות */
   "commentModal.close": "Close window",
+  /* 2026-09-19: תפריט צד + הזמנה לתגובה */
+  "side.open": "Side menu",
+  "side.close": "Close menu",
+  "side.navLabel": "Side menu navigation",
+  "side.logout": "Sign out",
 };
 
 /* מחרוזות דינמיות דרך cxT (en.js, ממופתח לפי המחרוזת העברית) */
