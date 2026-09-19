@@ -278,6 +278,9 @@ const ATTR = {
 
 /* מחרוזות דינמיות דרך cxT (en.js, ממופתח לפי המחרוזת העברית) */
 const JS = {
+  /* תפריט צד מוקטן */
+  "הקטנת התפריט": "Collapse the menu",
+  "הגדלת התפריט": "Expand the menu",
   'שלום, {0}': 'Hi, {0}',
   'מעביר ל-Discord…': 'Redirecting to Discord…',
   'שולח קוד…': 'Sending a code…',
