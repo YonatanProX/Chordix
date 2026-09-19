@@ -1,0 +1,161 @@
+/* ============================================================
+   Chordix — דשבורד ניהול. אותה שפה של האתר: ערכה בהירה כברירת מחדל,
+   ערכה כהה = אותו עיצוב כהה יותר, פינות 8px, בלי לבן טהור.
+   צבעי הגרפים: סדרה אחת בלבד (גוון המותג) — נבדק ≥3:1 מול המשטח בשתי הערכות.
+   ============================================================ */
+:root{
+  color-scheme:light;
+  --bg:#b4d3e4; --bg2:#bfdae8; --panel:#cfe3ee; --sunken:#a9cde0; --edge:#6a9fbe;
+  --text:#0f3b57; --dim:#28495e; --faint:#34546a;
+  --accent:#0f9fcb; --accent-ink:#07516b; --grad:linear-gradient(135deg,#095f7b,#0a5672);
+  --mark:#095f7b; --mark-soft:#095f7b33; --grid:#b3cfde; --hover:#0a4a61;
+  --good:#0a5833; --bad:#9c3d1d; --focus:#0e8fb5;
+  --disp:'Heebo','Assistant',system-ui,sans-serif; --body:'Assistant','Rubik',system-ui,-apple-system,sans-serif;
+}
+html[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#0a1f2b; --bg2:#0f2c3b; --panel:#123240; --sunken:#0b2330; --edge:#255468;
+  --text:#eaf7fb; --dim:#a7c6d2; --faint:#8fb2c0;
+  --accent:#48c9e9; --accent-ink:#86dbe9; --grad:linear-gradient(135deg,#13b6e4,#48c9e9);
+  --mark:#48c9e9; --mark-soft:#48c9e933; --grid:#1d4355; --hover:#86dbe9;
+  --good:#5cba86; --bad:#f59e7a; --focus:#48c9e9;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}   /* display:grid/flex על רכיב לא ידרוס את התכונה hidden */
+html,body{margin:0}
+body{font-family:var(--body);font-size:15.5px;line-height:1.55;color:var(--text);
+  background:radial-gradient(1200px 520px at 50% -180px,var(--bg2),transparent 70%),var(--bg);min-height:100vh}
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.skip{position:absolute;inset-inline-start:12px;top:-60px;background:var(--panel);color:var(--text);padding:10px 14px;border-radius:8px;z-index:50}
+.skip:focus{top:12px}
+:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+.grow{flex:1 1 auto}
+.muted{color:var(--dim);font-size:13.5px}
+
+/* ---------- כותרת ---------- */
+.top{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(12px);border-bottom:1px solid var(--edge)}
+.top-in{max-width:1280px;margin:0 auto;padding:10px 20px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.brand{display:inline-flex;align-items:center;gap:9px;text-decoration:none;direction:ltr}
+.brand-mark{width:32px;height:32px;border-radius:8px;display:grid;place-items:center;color:#fff;background:var(--grad)}
+html[data-theme="dark"] .brand-mark{color:#062330}
+.brand-mark svg{width:18px;height:18px}
+.wordmark{font-family:var(--disp);font-weight:800;font-size:20px;color:var(--text)}
+.wordmark span{color:var(--accent-ink)}
+.top-title{font-family:var(--disp);font-weight:700;font-size:16px;color:var(--dim);padding-inline-start:12px;border-inline-start:1px solid var(--edge)}
+.live{display:inline-flex;align-items:center;gap:7px;font-size:13px;font-weight:600;color:var(--dim);padding:5px 11px;border-radius:999px;border:1px solid var(--edge);background:var(--panel)}
+.live-dot{width:9px;height:9px;border-radius:50%;background:var(--faint)}
+.live.on .live-dot{background:var(--good);box-shadow:0 0 0 4px color-mix(in srgb,var(--good) 25%,transparent)}
+.live.off .live-dot{background:var(--bad)}
+.updated{font-size:12.5px;color:var(--dim)}
+
+/* ---------- כפתורים ---------- */
+.btn{font:inherit;font-weight:700;font-size:14px;min-height:40px;padding:8px 15px;border-radius:8px;border:1px solid var(--edge);cursor:pointer;
+  display:inline-flex;align-items:center;justify-content:center;gap:7px;text-decoration:none;color:var(--text);background:transparent;transition:background .15s ease,transform .15s ease}
+.btn.small{min-height:34px;padding:5px 11px;font-size:13px}
+.btn.ghost:hover{background:color-mix(in srgb,var(--accent) 14%,transparent)}
+.btn.primary{border:0;color:#fff;background:var(--grad)}
+html[data-theme="dark"] .btn.primary{color:#062330}
+.btn.primary:hover{transform:translateY(-1px)}
+.btn[disabled]{opacity:.55;cursor:default}
+.seg{display:inline-flex;border:1px solid var(--edge);border-radius:8px;overflow:hidden;background:var(--panel)}
+.seg button{font:inherit;font-size:13px;font-weight:700;padding:6px 12px;border:0;background:transparent;color:var(--dim);cursor:pointer;min-height:34px}
+.seg button + button{border-inline-start:1px solid var(--edge)}
+.seg button[aria-pressed="true"]{background:color-mix(in srgb,var(--accent) 22%,transparent);color:var(--text)}
+
+/* ---------- מבנה ---------- */
+main{max-width:1280px;margin:0 auto;padding:22px 20px 70px}
+.card{background:var(--panel);border:1px solid var(--edge);border-radius:12px;margin:0}
+.viewonly{margin:0 0 18px;padding:10px 14px;border-radius:8px;font-size:13.5px;color:var(--dim);background:color-mix(in srgb,var(--panel) 70%,transparent);border:1px dashed var(--edge)}
+.sec-head{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:30px 0 12px}
+.sec-head h2{margin:0;font-family:var(--disp);font-size:19px;flex:1 1 auto}
+
+/* ---------- שער ---------- */
+.gate{min-height:62vh;display:grid;place-items:center}
+.gate-card{max-width:460px;text-align:center;padding:34px 30px;border-radius:14px;background:var(--panel);border:1px solid var(--edge)}
+.gate-card h1{margin:14px 0 6px;font-family:var(--disp);font-size:22px}
+.gate-card p{margin:0;color:var(--dim)}
+.gate-act{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:20px}
+.spin{width:54px;height:54px;margin:0 auto;border-radius:50%;border:5px solid var(--mark-soft);border-top-color:var(--mark);animation:spin .9s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+@media(prefers-reduced-motion:reduce){.spin{animation-duration:3s}}
+
+/* ---------- KPI ---------- */
+.kpis{display:grid;gap:14px;grid-template-columns:repeat(auto-fill,minmax(230px,1fr))}
+.kpi{position:relative;padding:16px 18px 14px;border-radius:12px;background:var(--panel);border:1px solid var(--edge);display:flex;flex-direction:column;gap:2px;min-height:132px}
+.kpi-label{font-size:13.5px;font-weight:700;color:var(--dim);padding-inline-end:64px}
+.kpi-value{font-family:var(--body);font-weight:700;font-size:40px;line-height:1.1;color:var(--text);direction:ltr;text-align:end}
+html[dir="rtl"] .kpi-value{text-align:right}
+.kpi-value small{font-size:17px;font-weight:600;color:var(--dim);margin-inline-start:6px}
+.kpi-sub{font-size:12.5px;color:var(--dim);margin-top:auto}
+.kpi-sub b{color:var(--text)}
+.kpi-since{font-size:12px;color:var(--faint)}
+.kpi-reset{position:absolute;top:10px;inset-inline-end:10px;font:inherit;font-size:12px;font-weight:700;color:var(--dim);background:transparent;border:1px solid var(--edge);border-radius:8px;padding:3px 9px;min-height:28px;cursor:pointer}
+.kpi-reset:hover{background:color-mix(in srgb,var(--accent) 14%,transparent);color:var(--text)}
+.kpi.flash{animation:flash 1.2s ease}
+@keyframes flash{0%{box-shadow:0 0 0 0 color-mix(in srgb,var(--accent) 70%,transparent)}100%{box-shadow:0 0 0 14px transparent}}
+@media(prefers-reduced-motion:reduce){.kpi.flash{animation:none}}
+.confirm{position:absolute;inset:0;border-radius:12px;background:var(--panel);display:flex;flex-direction:column;justify-content:center;gap:10px;padding:14px 16px;z-index:2}
+.confirm p{margin:0;font-size:13.5px;color:var(--text)}
+.confirm div{display:flex;gap:8px}
+
+/* ---------- גרפים (small multiples — ציר אחד לכל מדד) ---------- */
+.charts{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}
+.chart{padding:16px 16px 10px}
+.chart figcaption{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-bottom:6px}
+.chart figcaption b{font-family:var(--disp);font-size:15.5px}
+.chart figcaption span{font-size:13px;color:var(--dim)}
+.chart svg{display:block;width:100%;height:auto;overflow:visible}
+.chart .gridline{stroke:var(--grid);stroke-width:1}
+.chart .axis{fill:var(--dim);font-size:11px;font-family:var(--body);font-variant-numeric:tabular-nums}
+.chart .bar{fill:var(--mark)}
+.chart .slot{fill:transparent;cursor:default}
+.chart .slot:hover + .bar,.chart .bar.hot{fill:var(--hover)}
+.chart .val{fill:var(--text);font-size:11.5px;font-weight:700;font-family:var(--body)}
+.tip{position:fixed;z-index:60;pointer-events:none;background:var(--text);color:var(--bg);padding:6px 10px;border-radius:8px;font-size:12.5px;line-height:1.35;box-shadow:0 8px 24px -8px rgba(0,0,0,.5);max-width:240px}
+.tip b{font-size:15px;display:block}
+
+/* ---------- פילוחים ---------- */
+.breaks{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));margin-top:14px}
+.breaks .card{padding:16px 18px}
+.breaks figcaption{font-family:var(--disp);font-weight:700;font-size:15px;margin-bottom:10px}
+.hbar{display:grid;grid-template-columns:minmax(64px,auto) 1fr auto;align-items:center;gap:10px;margin:7px 0;font-size:13.5px}
+.hbar .name{color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:130px}
+.hbar .track{height:12px;border-radius:0 4px 4px 0;position:relative}
+html[dir="rtl"] .hbar .track{border-radius:4px 0 0 4px}
+.hbar .fill{display:block;height:100%;min-width:2px;background:var(--mark);border-radius:inherit}
+.hbar .n{font-variant-numeric:tabular-nums;color:var(--dim);font-weight:700;min-width:2ch;text-align:end}
+.hbars .none{color:var(--dim);font-size:13.5px;margin:0}
+
+/* ---------- לשוניות + טבלאות ---------- */
+.tabs{display:flex;gap:4px;flex-wrap:wrap;margin:34px 0 0;border-bottom:1px solid var(--edge)}
+.tabs button{font:inherit;font-weight:700;font-size:14.5px;padding:10px 16px;border:1px solid transparent;border-bottom:0;border-radius:8px 8px 0 0;background:transparent;color:var(--dim);cursor:pointer;min-height:44px}
+.tabs button[aria-selected="true"]{background:var(--panel);border-color:var(--edge);color:var(--text);margin-bottom:-1px}
+.pill{display:inline-block;min-width:22px;padding:0 7px;margin-inline-start:6px;border-radius:999px;font-size:12px;line-height:20px;text-align:center;background:color-mix(in srgb,var(--accent) 22%,transparent);color:var(--text)}
+.panel{border-top-left-radius:0;border-top-right-radius:0;border-top:0;padding:14px 16px 16px}
+.panel-tools{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+.panel-tools input,.panel-tools select{font:inherit;font-size:14.5px;min-height:40px;padding:7px 12px;border-radius:8px;border:1px solid var(--edge);background:var(--sunken);color:var(--text)}
+.panel-tools input{flex:1 1 220px;min-width:0;max-width:420px}
+.table-wrap{overflow-x:auto;border-radius:8px}
+table.grid{width:100%;border-collapse:collapse;font-size:14px}
+table.grid th{position:sticky;top:0;text-align:start;font-size:12.5px;font-weight:700;color:var(--dim);padding:9px 10px;border-bottom:1px solid var(--edge);white-space:nowrap;background:var(--panel)}
+table.grid td{padding:10px;border-bottom:1px solid color-mix(in srgb,var(--edge) 45%,transparent);vertical-align:top}
+table.grid tr:hover td{background:color-mix(in srgb,var(--accent) 8%,transparent)}
+table.grid td.num,table.grid th.num{text-align:end;font-variant-numeric:tabular-nums;white-space:nowrap}
+table.grid td.ltr{direction:ltr;text-align:start;white-space:nowrap}
+html[dir="rtl"] table.grid td.ltr{text-align:right}
+table.grid td.msg{min-width:260px;max-width:560px;white-space:pre-wrap;overflow-wrap:anywhere}
+table.grid td .sub{display:block;font-size:12.5px;color:var(--dim);direction:ltr;text-align:start}
+html[dir="rtl"] table.grid td .sub{text-align:right}
+table.grid tr.new td{animation:rowNew 2.4s ease}
+@keyframes rowNew{0%{background:color-mix(in srgb,var(--accent) 35%,transparent)}100%{background:transparent}}
+.stars{white-space:nowrap;color:var(--mark);letter-spacing:1px;font-size:15px}
+.stars .off{color:var(--grid)}
+.tag{display:inline-block;padding:1px 8px;border-radius:999px;font-size:12px;font-weight:700;border:1px solid var(--edge);color:var(--dim);white-space:nowrap}
+.tag.on{color:var(--text);background:color-mix(in srgb,var(--accent) 18%,transparent)}
+.empty{text-align:center;color:var(--dim);padding:26px 0;margin:0}
+.more{display:flex;justify-content:center;margin-top:12px}
+.stale{opacity:.55;transition:opacity .2s ease}
+.toast{position:fixed;inset-inline:0;bottom:22px;margin-inline:auto;width:max-content;max-width:calc(100% - 28px);z-index:70;padding:10px 16px;border-radius:8px;background:var(--text);color:var(--bg);font-weight:700;font-size:14px;box-shadow:0 14px 34px -12px rgba(0,0,0,.55)}
+.toast[hidden],.tip[hidden]{display:none}
+@media(max-width:620px){.kpi-value{font-size:34px}.top-title{display:none}.updated{display:none}}
+@media print{.top,.panel-tools,.tabs,.more,.kpi-reset{display:none!important}body{background:#fff}}

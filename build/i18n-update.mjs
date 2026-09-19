@@ -176,6 +176,8 @@ const HTML = {
   "lib.sort.new": "Newest first",
   "lib.sort.old": "Oldest first",
   "lib.sort.name": "By name",
+  /* 2026-09-20: דשבורד ניהול */
+  "side.admin": "Admin dashboard",
 };
 
 /* תרגומי placeholder / aria (data-i18n-attr → en.attr) */

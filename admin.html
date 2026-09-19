@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow,noarchive">
+<meta name="referrer" content="no-referrer">
+<meta name="theme-color" content="#b4d3e4">
+<title>דשבורד · Chordix</title>
+<link rel="preload" as="font" type="font/woff2" href="/fonts/assistant-hebrew.woff2" crossorigin>
+<link rel="stylesheet" href="/fonts/fonts.css">
+<link rel="stylesheet" href="/admin.css">
+</head>
+<body>
+<!--
+  דשבורד ניהול של Chordix — לצפייה בלבד.
+  * אין כאן שום סוד: כל ההרשאה נבדקת בשרת (public.is_admin() ב-Supabase). מי שאינו מנהל מקבל FORBIDDEN.
+  * כל טקסט שמגיע מהמסד (תגובות, שמות שירים, שמות משתמשים) נכתב ל-DOM עם textContent בלבד.
+  * בלי סקריפט מוטמע ובלי handlers מוטמעים — ה-CSP של האתר מתיר רק קבצי JS מהאתר עצמו.
+-->
+<a class="skip" href="#main">דילוג לתוכן</a>
+
+<header class="top">
+  <div class="top-in">
+    <a class="brand" href="/" aria-label="Chordix — לאתר">
+      <span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg></span>
+      <span class="wordmark">Chord<span>ix</span></span>
+    </a>
+    <span class="top-title">דשבורד</span>
+    <span class="live" id="live" role="status" aria-live="polite"><span class="live-dot" aria-hidden="true"></span><span id="liveTxt">מתחבר…</span></span>
+    <span class="grow"></span>
+    <span class="updated" id="updated"></span>
+    <button type="button" class="btn ghost" id="refreshBtn" hidden>רענון</button>
+    <button type="button" class="btn ghost" id="themeBtn" aria-pressed="false">מצב כהה</button>
+    <button type="button" class="btn ghost" id="logoutBtn" hidden>יציאה</button>
+  </div>
+</header>
+
+<main id="main">
+  <!-- שער: לא מחובר / לא מנהל / טוען -->
+  <section class="gate" id="gate" aria-live="polite">
+    <div class="gate-card">
+      <div class="spin" id="gateSpin" aria-hidden="true"></div>
+      <h1 id="gateTitle">בודק הרשאה…</h1>
+      <p id="gateText"></p>
+      <div class="gate-act" id="gateAct" hidden>
+        <button type="button" class="btn primary" id="gateGoogle" hidden>כניסה עם Google</button>
+        <button type="button" class="btn ghost" id="gateSwitch" hidden>יציאה והחלפת חשבון</button>
+        <a class="btn ghost" href="/">חזרה לאתר</a>
+      </div>
+    </div>
+  </section>
+
+  <section id="dash" hidden>
+    <p class="viewonly" id="viewonly">לצפייה בלבד · הנתונים מגיעים ישירות מ‑Supabase · “איפוס” משנה רק מאיזה רגע סופרים — שום נתון לא נמחק.</p>
+
+    <!-- KPI -->
+    <h2 class="sr-only">מדדים ראשיים</h2>
+    <div class="kpis" id="kpis"></div>
+
+    <!-- גרפים -->
+    <div class="sec-head">
+      <h2>30 הימים האחרונים</h2>
+      <div class="seg" role="group" aria-label="טווח ימים לגרפים" id="rangeSeg">
+        <button type="button" data-range="7" aria-pressed="false">7 ימים</button>
+        <button type="button" data-range="14" aria-pressed="false">14 ימים</button>
+        <button type="button" data-range="30" aria-pressed="true">30 ימים</button>
+      </div>
+      <button type="button" class="btn ghost small" id="tableToggle" aria-pressed="false" aria-controls="dailyTableWrap">הצגה כטבלה</button>
+    </div>
+    <div class="charts" id="charts"></div>
+    <div class="table-wrap" id="dailyTableWrap" hidden><table class="grid" id="dailyTable"></table></div>
+
+    <!-- פילוחים -->
+    <div class="breaks">
+      <figure class="card" id="brRatings"><figcaption>התפלגות הדירוגים</figcaption><div class="hbars"></div></figure>
+      <figure class="card" id="brKeys"><figcaption>הסולמות הנפוצים בשירים שנותחו</figcaption><div class="hbars"></div></figure>
+      <figure class="card" id="brProviders"><figcaption>איך המשתמשים מתחברים</figcaption><div class="hbars"></div></figure>
+    </div>
+
+    <!-- רשימות -->
+    <div class="tabs" role="tablist" aria-label="רשימות" id="tabs">
+      <button type="button" role="tab" id="tab-comments" data-tab="comments" aria-selected="true" aria-controls="panel">תגובות <span class="pill" id="cnt-comments"></span></button>
+      <button type="button" role="tab" id="tab-users" data-tab="users" aria-selected="false" aria-controls="panel" tabindex="-1">משתמשים <span class="pill" id="cnt-users"></span></button>
+      <button type="button" role="tab" id="tab-songs" data-tab="songs" aria-selected="false" aria-controls="panel" tabindex="-1">שירים שנותחו <span class="pill" id="cnt-songs"></span></button>
+      <button type="button" role="tab" id="tab-waitlist" data-tab="waitlist" aria-selected="false" aria-controls="panel" tabindex="-1">רשימת המתנה <span class="pill" id="cnt-waitlist"></span></button>
+    </div>
+    <div class="panel card" id="panel" role="tabpanel" aria-labelledby="tab-comments" tabindex="0">
+      <div class="panel-tools">
+        <label class="sr-only" for="q">חיפוש ברשימה</label>
+        <input type="search" id="q" placeholder="חיפוש…" autocomplete="off">
+        <label class="sr-only" for="rateFilter">סינון לפי דירוג</label>
+        <select id="rateFilter">
+          <option value="">כל הדירוגים</option>
+          <option value="5">5 כוכבים</option><option value="4">4 כוכבים</option><option value="3">3 כוכבים</option>
+          <option value="2">2 כוכבים</option><option value="1">כוכב אחד</option><option value="none">בלי דירוג</option>
+        </select>
+        <span class="grow"></span>
+        <span class="muted" id="listCount"></span>
+        <button type="button" class="btn ghost small" id="csvBtn">ייצוא CSV</button>
+      </div>
+      <div class="table-wrap"><table class="grid" id="listTable"></table></div>
+      <p class="empty" id="listEmpty" hidden></p>
+      <div class="more"><button type="button" class="btn ghost" id="moreBtn" hidden>טעינת עוד</button></div>
+    </div>
+  </section>
+</main>
+
+<div class="tip" id="tip" role="tooltip" hidden></div>
+<div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+
+<script src="/vendor/supabase.js"></script>
+<script src="/admin.js"></script>
+</body>
+</html>
