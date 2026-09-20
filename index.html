@@ -12608,9 +12608,11 @@ renderBundles();
     const rv = CX_ROUTES[path] || 'home';
     if(push && rv !== 'home' && window.__sheetOpen && window.__sheetOpen() && !document.documentElement.classList.contains('doc-mode') && window.__maybeInviteComment) setTimeout(()=>{ try{ window.__maybeInviteComment(); }catch(e){} }, 500);
     document.querySelectorAll('[data-rv]').forEach(el=>{ el.hidden = (el.dataset.rv.split(' ').indexOf(rv) < 0); });
-    if(window.__sideSync) try{ window.__sideSync(); }catch(e){}
     navLinks.forEach(a=>a.classList.toggle('active', CX_ROUTES[a.getAttribute('href')] === rv));
     if(push){ try{ history.pushState({ rv }, '', path); }catch(e){} }
+    /* אחרי pushState: כך syncUser קורא את location.pathname המעודכן ומסמן את הפריט הנכון
+       בתפריט-הצד (הבאג שהאפקט הכחול לא זז / קפץ לקטגוריה אחרת נבע מקריאה לפני העדכון) */
+    if(window.__sideSync) try{ window.__sideSync(); }catch(e){}
     if(rv === 'library' && window.__enterLibrary){ try{ window.__enterLibrary(); }catch(e){} }
     window.scrollTo(0, 0);
     if(rv !== 'home'){
