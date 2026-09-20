@@ -1354,6 +1354,8 @@ button.wallet:hover{border-color:var(--brass)}
 
 /* ---------- HERO ---------- */
 .hero{padding:76px 0 8px;text-align:center;position:relative;overflow:hidden}
+.hero-logo{display:block;margin:0 auto 20px;width:84px;height:84px;border-radius:20px;box-shadow:0 14px 38px -16px rgba(0,0,0,.55)}
+@media(max-width:560px){.hero-logo{width:66px;height:66px;border-radius:16px;margin-bottom:14px}}
 .hero::before{
   content:'';position:absolute;left:50%;top:0;translate:-50% 0;
   width:min(760px,110vw);height:320px;pointer-events:none;z-index:-1;
@@ -2075,8 +2077,8 @@ html .side-menu.open{transform:none}
 .side-top{display:flex;align-items:center;justify-content:space-between;padding:16px 18px 12px;border-bottom:1px solid var(--panel-edge)}
 .side-brand{display:inline-flex;align-items:center;gap:11px;direction:ltr;text-decoration:none;font-size:0;border-radius:8px}
 .side-brand:focus-visible{outline:2px solid var(--focus-ring);outline-offset:3px}
-.side-brand img{width:36px;height:36px;border-radius:8px}
-.side-brand .wordmark{font-family:var(--disp);font-weight:800;font-size:22px}
+.side-brand img{width:44px;height:44px;border-radius:9px}
+.side-brand .wordmark{font-family:var(--disp);font-weight:800;font-size:26px}
 /* לוגו הצד גדול וממורכז ברצועת ה-side-top כשהתפריט קבוע (במגירת-מובייל נשאר
    space-between כי יש שם גם כפתור-סגירה) */
 html.side-persist .side-top{justify-content:center}
@@ -2890,6 +2892,8 @@ html.theme-light:not(.a11y-high-contrast) audio{mix-blend-mode:multiply}
 <section class="hero" data-rv="home" aria-labelledby="heroH">
   <div class="wrap hero-in">
     <p class="eyebrow" data-i18n="main.1">שמע ← אקורדים · הכול רץ בדפדפן</p>
+
+    <img class="hero-logo" id="heroMark" alt="" width="84" height="84" decoding="async">
 
     <h1 id="heroH" class="hero-title" data-i18n="main.2">
       <span class="hero-brand">Chordix</span>
@@ -13256,6 +13260,8 @@ renderBundles();
   if(fm && typeof CX_ICON !== 'undefined') fm.src = CX_ICON.i64;
   const lm = $('loginMark');
   if(lm && typeof CX_ICON !== 'undefined') lm.src = CX_ICON.i64;
+  const hm = $('heroMark');
+  if(hm && typeof CX_ICON !== 'undefined') hm.src = CX_ICON.i192;
 
   /* ---------- 6. גיבוי אם Supabase לא נטען ----------
      בלי זה אזור החשבון פשוט לא מופיע, והמשתמש לא מבין למה
