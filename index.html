@@ -4536,6 +4536,30 @@ SOFTWARE.</pre>
      ============================================================ -->
 <script>
 "use strict";
+/* ============================================================
+   נעילת-דומיין (anti-rehost)
+   ------------------------------------------------------------
+   הקוד הזה מתערפל ב-build (build/obfuscate.mjs) — שמות הדומיינים
+   נעלמים לתוך מערך-המחרוזות המוצפן. עותק שהודבק לאתר זר יפנה את
+   המבקרים חזרה ל-Chordix במקום לרוץ שם. אין hard-break: תמיד הפניה,
+   לא מסך ריק — כך שדומיין לגיטימי שנשכח ברשימה לכל היותר "יקפוץ"
+   ל-pages.dev, לא ישבר.
+   מותרים: chordix.pages.dev + כל *.chordix.pages.dev (תצוגות-קדם
+   של Cloudflare) + localhost / 127.0.0.1 (בדיקה מקומית).
+   ⚠ דומיין מותאם חדש (למשל chordix.co.il) — להוסיף כאן וגם בתגי
+     canonical/og:url למעלה, אחרת מבקרים בו יופנו ל-pages.dev.
+   מגבלה ידועה: זו הרתעה מפני העתקה עצלה; מי שמפרק את הקוד יכול
+   להסיר את הבדיקה. ההגנה האמיתית היא הערפול עצמו. ============= */
+(function(){
+  try{
+    var h = (location.hostname || '').toLowerCase();
+    if(h && h !== 'chordix.pages.dev' && !h.endsWith('.chordix.pages.dev')
+       && h !== 'localhost' && h !== '127.0.0.1'){
+      location.replace('https://chordix.pages.dev/');
+      return;
+    }
+  }catch(e){}
+})();
 let M_MODEL_READY = false;
 let M_MODEL_BYTES = null;
 let M_TUNE = 0;

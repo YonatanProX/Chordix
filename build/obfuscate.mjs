@@ -18,6 +18,17 @@ const ROOT = path.resolve(__dirname, '..');          // Chordix/
 const SRC_HTML = path.join(ROOT, 'index.html');
 const DIST = path.join(ROOT, 'dist');
 
+/* build ניפוי מקומי:  OBF_DEBUG=1 npm run build
+   מכבה selfDefending / disableConsoleOutput / הבאנר, כדי שאפשר לפתוח console
+   ולנפות באגים ב-dist. אף פעם לא לפרוס build כזה. */
+const DEBUG_BUILD = process.env.OBF_DEBUG === '1';
+
+/* נעילת-דומיין: לא משתמשים ב-domainLock של javascript-obfuscator — הוא הוכח כלא-אמין
+   בתוך ה-bundle המלא (עובד בקטע מבודד, לא נכנס לפעולה עם selfDefending+renameGlobals+
+   אפשרויות-המחרוזות המלאות; לא ניתן לאמת → לא בטוח לפרוס על לקוחות משלמים).
+   במקומו יש שומר-דומיין קטן ומפורש בראש בלוק-הלוגיקה ב-index.html (מתערפל כאן עם השאר):
+   הוא מפנה כל דומיין שאינו שלנו חזרה ל-chordix.pages.dev. הרשימה המותרת נמצאת שם. */
+
 /* קבצים/תיקיות שלא מועתקים ל-dist (לא נכסי-שירות) */
 const COPY_SKIP = new Set([
   'dist', 'build', 'node_modules', '.git',
@@ -79,21 +90,43 @@ function medConfig(reservedNames) {
     identifierNamesGenerator: 'mangled-shuffled',
     renameGlobals: true,
     reservedNames,                         // regex-strings של שמות לשמר
-    // מחרוזות: קידוד + פיצול
+    // ---- מחרוזות: קידוד, פיצול, ערבוב, והזזת-אינדקס + עטיפה בקריאות-פונקציה ----
+    // כל מחרוזת עוברת למערך מוצפן; הגישה אליה דרך wrapper-ים ואינדקסים מוזזים.
+    // מקשה מאוד לקרוא שמות-פונקציות/הודעות/מפתחות בקוד המעורפל. העלות היא בעיקר
+    // באתחול ובקוד-ה-UI, לא בלולאות-ה-DSP (שהן מספריות וכמעט בלי מחרוזות).
     stringArray: true,
     stringArrayEncoding: ['base64'],
-    stringArrayThreshold: 0.75,
+    stringArrayThreshold: 1,               // כל המחרוזות (היה 0.75)
+    stringArrayShuffle: true,
+    stringArrayRotate: true,
+    stringArrayIndexShift: true,
+    stringArrayWrappersCount: 2,
+    stringArrayWrappersChainedCalls: true,
+    stringArrayWrappersType: 'function',   // wrapper-פונקציה (חזק) במקום משתנה
+    stringArrayWrappersParametersMaxCount: 4,
+    // stringArrayCallsTransform מכובה במכוון: הוא עוטף כל *גישה* למחרוזת בקריאת-פונקציה
+    // → +100KB (gzip) ועלות-ריצה בכל גישה, כולל בלולאות. הערבוב/סיבוב/הזזת-אינדקס +
+    // ה-wrappers כבר מקשים מאוד לפענח את מערך-המחרוזות סטטית. עלות/תועלת לא משתלמת כאן.
+    stringArrayCallsTransform: false,
     splitStrings: true,
     splitStringsChunkLength: 8,
     numbersToExpressions: true,
     simplify: true,
     unicodeEscapeSequence: false,
-    // מכובה במכוון (עוצמה בינונית — לא לפגוע בטעינה/לולאות DSP)
+    // ---- הגנות אנטי-חבלה (כולן CSP-safe: בלי eval/Function) ----
+    // selfDefending: הקוד "מגן על עצמו" — אם ממפים/מייפים אותו מחדש (beautify) הוא נשבר.
+    // disableConsoleOutput: מנטרל console.* בזמן ריצה → מסתיר עקבות-אלגוריתם מהיומן.
+    // כולן מכובות ב-build ניפוי (OBF_DEBUG=1) כדי לאפשר בדיקה מקומית עם console פתוח.
+    // (נעילת-דומיין נעשית ע"י שומר מפורש ב-index.html, לא כאן — ראו הערה למעלה.)
+    selfDefending: !DEBUG_BUILD,
+    disableConsoleOutput: !DEBUG_BUILD,
+    // ---- מכובה במכוון: overhead ללולאות-ה-DSP או ניפוח גודל הקובץ ----
+    // controlFlowFlattening / deadCodeInjection — כל אחד מהם עלול להאט את הניתוח
+    // (עד ~1.5x) או להכפיל את גודל הקובץ. לא מפעילים בלי מדידה שמראה עלות זניחה.
+    // debugProtection — פוגע ב-UX (מקפיא DevTools של משתמשים לגיטימיים). מושבת.
     controlFlowFlattening: false,
     deadCodeInjection: false,
-    selfDefending: false,
     debugProtection: false,
-    disableConsoleOutput: false,
     // אסור eval/Function (ה-CSP מתיר wasm-unsafe-eval בלבד)
   };
 }
@@ -152,12 +185,23 @@ function main() {
   const obfCode = result.getObfuscatedCode();
   console.log(`[obfuscate] פלט מעורפל: ${obfCode.length}b  (${((obfCode.length/bundleSrc.length)*100).toFixed(0)}% מהמקור, ${Date.now()-t0}ms)`);
 
+  // סימן-מים/זכויות-יוצרים: באנר קריא (לא מעורפל) בראש הקובץ — הרתעה + ראיה משפטית
+  // + מזהה-build ייחודי לכל פרסום. app.js נטען כ-<script src> (לא inline) ולכן אינו
+  // זקוק ל-hash ב-CSP; הבאנר לא משפיע על ה-CSP.
+  const buildStamp = new Date().toISOString().slice(0, 19).replace('T', ' ') + ' UTC';
+  const banner =
+    `/*! Chordix — © ${new Date().getFullYear()} Chordix. כל הזכויות שמורות / All rights reserved.\n` +
+    `   קוד קנייני. העתקה, הפצה, הנדסה-לאחור או חילוץ אסורים (תנאי השימוש, ס׳ 4).\n` +
+    `   Proprietary code. Copying, distribution, reverse-engineering or extraction is prohibited.\n` +
+    `   build:${buildStamp} */\n`;
+  const finalCode = DEBUG_BUILD ? obfCode : banner + obfCode;
+
   // בדיקת-תקינות תחבירית של הפלט (אם נכשל — זורק, ה-build נעצר)
-  new Function(obfCode); // parse-only; זורק על שגיאת-תחביר
+  new Function(finalCode); // parse-only; זורק על שגיאת-תחביר
   console.log('[obfuscate] בדיקת-תחביר עברה ✔');
 
-  // שם-קובץ עם hash של התוכן
-  const hash = crypto.createHash('sha256').update(obfCode).digest('hex').slice(0, 8);
+  // שם-קובץ עם hash של התוכן הסופי (כולל הבאנר)
+  const hash = crypto.createHash('sha256').update(finalCode).digest('hex').slice(0, 8);
   const appName = `app.${hash}.js`;
 
   // בניית ה-HTML לפלט: הסרת בלוקי-הלוגיקה, והזרקת <script defer src>
@@ -172,7 +216,7 @@ function main() {
   fs.rmSync(DIST, { recursive: true, force: true });
   fs.mkdirSync(DIST, { recursive: true });
   copyRecursive(ROOT, DIST);
-  fs.writeFileSync(path.join(DIST, appName), obfCode, 'utf8');
+  fs.writeFileSync(path.join(DIST, appName), finalCode, 'utf8');
   fs.writeFileSync(path.join(DIST, 'index.html'), outHtml, 'utf8');
 
   /* CSP: במקום 'unsafe-inline' — hash לכל סקריפט מוטמע שנשאר ב-HTML הסופי. כך סקריפט שהוזרק
@@ -202,7 +246,7 @@ function main() {
   /* Service Worker: גרסת-המטמון נגזרת מהפרסום עצמו */
   const swPath = path.join(DIST, 'sw.js');
   if (fs.existsSync(swPath)) {
-    const build = crypto.createHash('sha256').update(outHtml).update(obfCode).digest('hex').slice(0, 10);
+    const build = crypto.createHash('sha256').update(outHtml).update(finalCode).digest('hex').slice(0, 10);
     fs.writeFileSync(swPath, fs.readFileSync(swPath, 'utf8').replaceAll('__BUILD__', build), 'utf8');
   }
 
