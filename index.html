@@ -216,6 +216,7 @@ const CX_ICON = { i192:"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMAAAADACA
   --grad:linear-gradient(100deg,#86dbe9,#48c9e9 50%,#13b6e4);
   --wordmark-grad:linear-gradient(100deg,#86dbe9,#48c9e9 50%,#13b6e4);
   --wordmark-ink:#48c9e9;
+  --note-boost:2.1;
 }
 /* ============================================================
    ערכת נושא בהירה
@@ -269,6 +270,8 @@ html.theme-light{
   --a1:#095f7b; --a2:#0a5672; --a3:#0b5c6b; --a4:#9a3b1a;
   --wordmark-grad:linear-gradient(100deg,#0f4a68,#0b6888 50%,#0c7a9e);
   --wordmark-ink:#0b6888;
+  --note-color:#0c6a8c;
+  --note-boost:2.6;
 }
 *{box-sizing:border-box}
 html{color-scheme:light}
@@ -302,21 +305,23 @@ body{
 #bgFx .orb.o3{width:260px;height:260px;top:82%;inset-inline-start:24%;
   background:radial-gradient(circle,color-mix(in srgb,var(--a3) 16%,transparent),transparent 70%);
   animation:orbDrift1 24s ease-in-out infinite alternate-reverse}
-#bgFx .note{position:absolute;color:var(--brass);opacity:0;line-height:1;
+#bgFx .note{position:absolute;color:var(--note-color,var(--brass));opacity:0;line-height:1;
   font-family:'Segoe UI Symbol','Noto Music','Apple Symbols',serif;
-  text-shadow:0 0 14px color-mix(in srgb,var(--brass) 45%,transparent);
+  text-shadow:0 0 16px color-mix(in srgb,var(--note-color,var(--brass)) 55%,transparent);
   animation:noteFloat var(--d,20s) ease-in-out var(--delay,0s) infinite;
   will-change:transform,opacity}
+/* --note-boost מגביר נראות של התווים ומפתחות-הסול ברקע. כהה = ברירת-מחדל;
+   בהיר גבוה יותר, כי צבע כהה על רקע בהיר צריך יותר עוצמה. (ב-:root וב-theme-light) */
 @keyframes noteFloat{
   0%{transform:translateY(12px) rotate(-6deg);opacity:0}
-  22%{opacity:var(--op,.1)}
+  22%{opacity:calc(var(--op,.1) * var(--note-boost,1))}
   50%{transform:translateY(-16px) rotate(6deg)}
-  78%{opacity:var(--op,.1)}
+  78%{opacity:calc(var(--op,.1) * var(--note-boost,1))}
   100%{transform:translateY(12px) rotate(-6deg);opacity:0}}
 @keyframes orbDrift1{from{transform:translate(0,0)}to{transform:translate(46px,34px)}}
 @keyframes orbDrift2{from{transform:translate(0,0)}to{transform:translate(-38px,44px)}}
 @media (prefers-reduced-motion:reduce){
-  #bgFx .note{animation:none;opacity:var(--op,.08)}
+  #bgFx .note{animation:none;opacity:calc(var(--op,.08) * var(--note-boost,1))}
   #bgFx .orb{animation:none}}
 html.a11y-reduced-motion #bgFx .note{animation:none;opacity:var(--op,.08)}
 html.a11y-reduced-motion #bgFx .orb{animation:none}
@@ -369,16 +374,30 @@ header.top{padding:34px 20px 6px;position:relative}
 /* ---------- dropzone ---------- */
 .stage{margin-top:30px}
 .drop{
-  border:2px dashed var(--panel-edge);
+  position:relative;
+  border:none;
   border-radius:8px;
   background:var(--bg-panel);
   padding:46px 24px;
   text-align:center;
-  transition:border-color .18s,box-shadow .18s,transform .18s;
+  transition:box-shadow .18s,transform .18s;
   cursor:pointer;
 }
+/* מסגרת "נמלים צועדות": SVG מונפש שהקווקוו שלו נע סביב קו-המתאר המעוגל של אזור
+   הגרירה. הקווקוו נשאר קיים גם בלי אנימציה (הפחתת-תנועה / דפדפן ישן) — רק לא נע. */
+.drop-ants{position:absolute;inset:0;width:100%;height:100%;overflow:visible;pointer-events:none}
+.drop-ants rect{
+  fill:none;
+  stroke:var(--panel-edge);
+  stroke-width:2;
+  stroke-dasharray:9 7;
+  animation:dropAnts 7s linear infinite;
+}
+@keyframes dropAnts{to{stroke-dashoffset:-160px}}
+.drop:hover .drop-ants rect,.drop.hot .drop-ants rect{stroke:var(--brass)}
+@media (prefers-reduced-motion:reduce){.drop-ants rect{animation:none}}
+html.a11y-reduced-motion .drop-ants rect{animation:none}
 .drop:hover,.drop.hot{
-  border-color:var(--brass);
   box-shadow:0 0 0 4px color-mix(in srgb,var(--brass) 14%,transparent);
   transform:translateY(-2px);
 }
@@ -675,6 +694,7 @@ html.a11y-high-contrast{
 html.a11y-high-contrast .panel,html.a11y-high-contrast .float-window,html.a11y-high-contrast .modal,
 html.a11y-high-contrast .work,html.a11y-high-contrast .readout,html.a11y-high-contrast .tune,
 html.a11y-high-contrast .now,html.a11y-high-contrast .drop{background:#000;border:2px solid #ffe27a}
+html.a11y-high-contrast .drop-ants{display:none}
 html.a11y-high-contrast button.primary,html.a11y-high-contrast .views button.on{background:#ffe27a;color:#000}
 html.a11y-high-contrast .seg b,html.a11y-high-contrast .tlch span{color:#000}
 
@@ -2914,6 +2934,7 @@ html.theme-light:not(.a11y-high-contrast) audio{mix-blend-mode:multiply}
 
     <div class="stage" id="app">
       <div data-i18n-attr="aria-label:app.div.attr_label.1" class="drop" id="drop" tabindex="0" role="button" aria-label="בחירת קובץ שמע לניתוח">
+        <svg class="drop-ants" aria-hidden="true"><rect width="100%" height="100%" rx="8" ry="8"/></svg>
         <span class="drop-ico" aria-hidden="true">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
             <path d="M12 16V4.8"/><path d="M7.8 9 12 4.8 16.2 9"/>
