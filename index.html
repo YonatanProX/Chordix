@@ -1806,7 +1806,6 @@ html[dir="rtl"] .page-cta-in .fc-btn svg{transform:scaleX(-1)}
 .metro-bpm span{font-size:14px;color:var(--text-dim);letter-spacing:.12em}
 .metro-dots{display:flex;justify-content:center;gap:12px;min-height:22px;direction:ltr}
 .tool-out-h{margin:6px 0 0;font-weight:700;font-size:13.5px;color:var(--text-main)}
-.capo-out{display:block;min-height:54px;padding:12px 14px;border-radius:8px;background:var(--paper);border:1px dashed var(--panel-edge);color:#10222d;font-family:var(--mono);font-size:18px;font-weight:700;white-space:pre-wrap;text-align:left}
 .tool-note{margin:0;font-size:13px;color:var(--text-dim);min-height:1.4em}
 /* מה חדש */
 .news-list{list-style:none;margin:34px auto 0;padding:0;max-width:760px;display:flex;flex-direction:column;gap:12px}
@@ -3448,32 +3447,6 @@ html.theme-light:not(.a11y-high-contrast) audio{mix-blend-mode:multiply}
   </div>
 </section>
 
-<section class="band tool-page" data-rv="capo" data-marketing hidden aria-labelledby="capoPageH">
-  <div class="wrap">
-    <p class="sec-eyebrow" data-i18n="tools.eyebrow">כלים למוזיקאי</p>
-    <h2 id="capoPageH" class="sec-title" data-i18n="pg.capo.title">קאפו וטרנספוזיציה</h2>
-    <p class="sec-lead" data-i18n="pg.capo.lead">מדביקים אקורדים, בוחרים בכמה חצאי טונים להזיז, ומקבלים את האקורדים החדשים.</p>
-    <div class="tool-stage">
-      <article class="tool-card" aria-labelledby="capoH">
-        <h3 id="capoH"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 4v16M7 4l-3 3M7 4l3 3"/><path d="M17 20V4m0 16-3-3m3 3 3-3"/></svg><span data-i18n="capo.h">מחשבון קאפו וטרנספוזיציה</span></h3>
-        <label for="capoIn" data-i18n="capo.in">האקורדים שלכם</label>
-        <textarea id="capoIn" rows="3" dir="ltr" spellcheck="false" autocomplete="off">Am F C G</textarea>
-        <div class="tool-row">
-          <label for="capoShift" data-i18n="capo.shift">הזזה בחצאי טונים</label>
-          <select id="capoShift"></select>
-        </div>
-        <div class="tool-row">
-          <label for="capoAcc" data-i18n="capo.acc">סימון</label>
-          <select id="capoAcc"><option value="sharp" data-i18n="capo.sharp">דיאזים (#)</option><option value="flat" data-i18n="capo.flat">במולים (b)</option></select>
-        </div>
-        <p class="tool-out-h" data-i18n="capo.outH">התוצאה</p>
-        <output class="capo-out" id="capoOut" for="capoIn capoShift capoAcc" dir="ltr" aria-live="polite"></output>
-        <p class="tool-note" id="capoNote"></p>
-      </article>
-    </div>
-  </div>
-</section>
-
 <!-- ============ טיפים (מסלול /tips) — מדריך ממוספר, לא רשת כרטיסים ============ -->
 <section class="band tips-page" id="tipsPage" data-rv="tips" data-marketing hidden aria-labelledby="tipsH">
   <div class="wrap tips-wrap">
@@ -3533,7 +3506,7 @@ html.theme-light:not(.a11y-high-contrast) audio{mix-blend-mode:multiply}
 </section>
 
 <!-- ============ רצועת סיום משותפת לעמודי התוכן ============ -->
-<section class="band-thin page-cta" data-rv="how features faq metronome guitar piano tuner capo tips" data-marketing hidden aria-labelledby="pageCtaH">
+<section class="band-thin page-cta" data-rv="how features faq metronome guitar piano tuner tips" data-marketing hidden aria-labelledby="pageCtaH">
   <div class="wrap page-cta-in">
     <div><h2 id="pageCtaH" data-i18n="pagecta.h">יש לכם הקלטה? יש לכם דף אקורדים.</h2>
     <p data-i18n="pagecta.p">מעלים קובץ שמע ומקבלים סולם, קצב, מבנה ואקורדים — בדפדפן, בלי שהקובץ עוזב את המכשיר.</p></div>
@@ -3809,7 +3782,6 @@ html.theme-light:not(.a11y-high-contrast) audio{mix-blend-mode:multiply}
       <li><a data-route href="/guitar-chords"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6" y="3" width="12" height="18" rx="1.5"/><path d="M10 3v18M14 3v18M6 9h12M6 15h12"/><circle cx="10" cy="12" r="1.2" fill="currentColor"/><circle cx="14" cy="6" r="1.2" fill="currentColor"/></svg><span data-i18n="side.gtr">אקורדים לגיטרה</span></a></li>
       <li><a data-route href="/piano-chords"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="1.5"/><path d="M9 5v14M15 5v14"/><path d="M7 5v8h3V5zM14 5v8h3V5z" fill="currentColor" stroke="none"/></svg><span data-i18n="side.pno">אקורדים לפסנתר</span></a></li>
       <li><a data-route href="/tuner"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 17a8 8 0 0 1 16 0"/><path d="M12 17l4-7"/><circle cx="12" cy="17" r="1.4" fill="currentColor"/><path d="M4 20h16"/></svg><span data-i18n="side.tuner">טיונר לגיטרה</span></a></li>
-      <li><a data-route href="/capo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 4v16M7 4l-3 3M7 4l3 3"/><path d="M17 20V4m0 16-3-3m3 3 3-3"/></svg><span data-i18n="side.capo">קאפו וטרנספוזיציה</span></a></li>
     </ul>
     <p class="side-h" data-i18n="side.h.guides">מדריכים</p>
     <ul>
@@ -12602,7 +12574,7 @@ renderBundles();
      מעדכן את ה-URL, וגולל לראש. Cloudflare מגיש את index.html לכל
      נתיב, כך שרענון של /how עובד. */
   const CX_ROUTES = { '/how':'how', '/features':'features', '/faq':'faq', '/library':'library', '/tips':'tips',
-                      '/metronome':'metronome', '/guitar-chords':'guitar', '/piano-chords':'piano', '/tuner':'tuner', '/capo':'capo', '/tools':'metronome' };
+                      '/metronome':'metronome', '/guitar-chords':'guitar', '/piano-chords':'piano', '/tuner':'tuner', '/tools':'metronome' };
   const navLinks = [...document.querySelectorAll('.head-nav a[data-route]')];
   function cxShowRoute(path, push){
     const rv = CX_ROUTES[path] || 'home';
@@ -12897,19 +12869,6 @@ renderBundles();
     addEventListener('popstate', stop);
     try{ new MutationObserver(()=>setTimeout(()=>{ drawDots(-1); if(!timer) tog.textContent = cxT("הפעלה"); }, 0)).observe(document.documentElement, { attributes:true, attributeFilter:['lang'] }); }catch(e){}
     resetStates(); setBpm(bpmIn.value); drawDots(-1);
-
-    /* --- מחשבון קאפו / טרנספוזיציה --- */
-    const cin = $('capoIn'), shift = $('capoShift'), acc = $('capoAcc'), cout = $('capoOut'), note = $('capoNote');
-    const SH = ['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'], FL = ['C','Db','D','Eb','E','F','Gb','G','Ab','A','Bb','B'];
-    const IDX = { 'C':0,'B#':0,'C#':1,'Db':1,'D':2,'D#':3,'Eb':3,'E':4,'Fb':4,'F':5,'E#':5,'F#':6,'Gb':6,'G':7,'G#':8,'Ab':8,'A':9,'A#':10,'Bb':10,'B':11,'Cb':11 };
-    for(let v=-11; v<=11; v++){ const o = document.createElement('option'); o.value = String(v); o.textContent = (v>0?'+':'') + v; if(v === 0) o.selected = true; shift.appendChild(o); }
-    function calc(){
-      const n = parseInt(shift.value, 10) || 0, names = acc.value === 'flat' ? FL : SH;
-      const tr = r => names[(((IDX[r] + n) % 12) + 12) % 12];
-      cout.textContent = cin.value.replace(/(^|[\s|(\[,\-])([A-G](?:#|b)?)([^\s|/)\],]*)(?:\/([A-G](?:#|b)?))?/g, (m, pre, root, rest, bass) => (root in IDX) ? pre + tr(root) + rest + (bass && (bass in IDX) ? '/' + tr(bass) : (bass ? '/' + bass : '')) : m);
-      note.textContent = n === 0 ? '' : (n < 0 ? cxT("כדי להישמע בסולם המקורי: קאפו בסריג {0} ונגנו את האקורדים שבתוצאה.", -n) : cxT("האקורדים הוזזו {0} חצאי טונים למעלה.", n));
-    }
-    [cin, shift, acc].forEach(el => el.addEventListener('input', calc)); calc();
   })();
 
   /* ---------- חלון ההגדרות ----------
