@@ -2073,10 +2073,13 @@ html[dir="rtl"] .side-menu{transform:translateX(102%)}
 html[dir="ltr"] .side-menu{transform:translateX(-102%)}
 html .side-menu.open{transform:none}
 .side-top{display:flex;align-items:center;justify-content:space-between;padding:16px 18px 12px;border-bottom:1px solid var(--panel-edge)}
-.side-brand{display:inline-flex;align-items:center;gap:10px;direction:ltr;text-decoration:none;font-size:0;border-radius:8px}
+.side-brand{display:inline-flex;align-items:center;gap:11px;direction:ltr;text-decoration:none;font-size:0;border-radius:8px}
 .side-brand:focus-visible{outline:2px solid var(--focus-ring);outline-offset:3px}
-.side-brand img{width:30px;height:30px;border-radius:8px}
-.side-brand .wordmark{font-family:var(--disp);font-weight:800;font-size:19px}
+.side-brand img{width:36px;height:36px;border-radius:8px}
+.side-brand .wordmark{font-family:var(--disp);font-weight:800;font-size:22px}
+/* לוגו הצד גדול וממורכז ברצועת ה-side-top כשהתפריט קבוע (במגירת-מובייל נשאר
+   space-between כי יש שם גם כפתור-סגירה) */
+html.side-persist .side-top{justify-content:center}
 .side-top .float-close{position:static;width:36px;height:36px}
 .side-nav{flex:1 1 auto;overflow-y:auto;padding:8px 12px 14px}
 .side-h{margin:16px 10px 6px;font-size:11.5px;font-weight:700;letter-spacing:.06em;color:var(--text-faint)}
