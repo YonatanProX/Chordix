@@ -63,6 +63,11 @@
 /fonts/*
   Cache-Control: public, max-age=31536000, immutable
 
+# סמלי המותג — נכס קבוע. בהחלפת לוגו: לשנות שם-קובץ (logo-128 → logo-129),
+# אחרת דפדפנים שכבר ביקרו ימשיכו להציג את הישן עד שנה.
+/icons/*
+  Cache-Control: public, max-age=31536000, immutable
+
 # דשבורד הניהול: לא לאינדוקס, לא למטמון. האבטחה עצמה בשרת (is_admin ב-Supabase).
 /admin
   X-Robots-Tag: noindex, nofollow, noarchive

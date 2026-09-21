@@ -8,7 +8,7 @@
    ============================================================ */
 /* ה-build מחליף את __BUILD__ ב-hash של הפרסום, כך שכל deploy מנקה את המטמון הקודם לבד. */
 const V = 'chordix-v11-__BUILD__';
-const SHELL = ['./', './index.html', './site.webmanifest'];
+const SHELL = ['./', './index.html', './site.webmanifest', './icons/logo-128.png'];
 
 self.addEventListener('install', e => {
   self.skipWaiting();

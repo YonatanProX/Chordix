@@ -3,7 +3,7 @@
    ------------------------------------------------------------
    המקור index.html נשאר קריא (עורכים אותו). כאן מייצרים
    dist/index.html שבו בלוקי-הלוגיקה שלנו מוחלפים בקובץ חיצוני
-   מעורפל app.<hash>.js. דאטה (i18n/icons/ld+json), bootstrap
+   מעורפל app.<hash>.js. דאטה (i18n/ld+json), bootstrap
    מוקדם, ו-vendor/ — לא נגעים. ראה תוכנית starry-tickling-teapot.
    הרצה:  npm run build     (Cloudflare Pages: build command)
    ============================================================ */
@@ -45,7 +45,6 @@ const COPY_DENY = [/^CHANGELOG.*\.md$/i, /\.(sql|map|mjs|env|log)$/i, /^\.env/i]
 function shouldObfuscate(attrs, code) {
   if (/\bsrc\s*=/.test(attrs)) return false;                    // חיצוני (vendor)
   if (/\btype\s*=/.test(attrs) && !/text\/javascript/i.test(attrs)) return false; // ld+json וכו'
-  if (/\bid\s*=\s*["']iconData["']/.test(attrs)) return false;  // נתוני אייקונים
   if (/CX_I18N_DICT\s*=/.test(code)) return false;              // מילון i18n (הבלוק הגדול)
   if (/CX_I18N_DICT\s*&&\s*window\.CX_I18N_DICT\.en/.test(code)) return false; // תוספות-תרגום
   // bootstrap ערכת-נושא/a11y (חייב לרוץ מוקדם, inline): הבלוק הזעיר שקורא
