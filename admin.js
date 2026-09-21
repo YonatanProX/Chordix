@@ -62,7 +62,7 @@ var S = { data:null, range:30, tab:'comments', q:'', rate:'', rows:[], total:0, 
    ============================================================ */
 function gate(title, text, opts){
   opts = opts || {};
-  $('dash').hidden = true; $('gate').hidden = false;
+  $('dash').hidden = true; $('projects').hidden = true; $('gate').hidden = false;
   $('gateSpin').hidden = !opts.spin;
   $('gateTitle').textContent = title; $('gateText').textContent = text || '';
   $('gateAct').hidden = !!opts.spin;
@@ -93,7 +93,7 @@ async function check(){
     var a = await sb.rpc('is_admin');
     if(a.error){ stopLive(); gate('אין תקשורת עם Supabase', 'לא הצלחנו לבדוק הרשאה. בדקו את החיבור ונסו שוב.', { switchAcct:true }); return; }
     if(a.data !== true){ stopLive(); gate('אין הרשאת ניהול', 'החשבון ' + S.email + ' אינו מנהל. אפשר לצאת ולהיכנס עם חשבון המנהל.', { switchAcct:true }); return; }
-    $('gate').hidden = true; $('dash').hidden = false; $('refreshBtn').hidden = false; $('logoutBtn').hidden = false;
+    $('gate').hidden = true; $('dash').hidden = false; $('projects').hidden = false; $('refreshBtn').hidden = false; $('logoutBtn').hidden = false;
     await refresh(true);
     startLive();
   }catch(e){ gate('משהו השתבש', 'נסו לרענן את הדף.', { switchAcct:true }); }

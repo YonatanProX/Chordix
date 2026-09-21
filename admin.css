@@ -159,3 +159,15 @@ table.grid tr.new td{animation:rowNew 2.4s ease}
 .toast[hidden],.tip[hidden]{display:none}
 @media(max-width:620px){.kpi-value{font-size:34px}.top-title{display:none}.updated{display:none}}
 @media print{.top,.panel-tools,.tabs,.more,.kpi-reset{display:none!important}body{background:#fff}}
+
+/* ---------- פרויקטי שיפור המנוע (קישורים למעבדה שבאתר הראשי) ---------- */
+.projects{margin-top:34px}
+.projects h2{margin:0 0 4px;font-size:18px}
+.proj-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;margin-top:14px}
+.proj{display:flex;align-items:flex-start;gap:14px;padding:18px;text-decoration:none;color:inherit;transition:border-color .15s,transform .15s}
+.proj:hover{border-color:var(--accent);transform:translateY(-1px)}
+.proj:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.proj svg{flex:0 0 30px;width:30px;height:30px;color:var(--accent)}
+.proj b{display:block;font-size:16px}
+.proj small{display:block;margin-top:3px;font-size:13.5px;line-height:1.6;color:var(--muted)}
+@media(prefers-reduced-motion:reduce){.proj{transition:none}.proj:hover{transform:none}}
