@@ -4766,7 +4766,14 @@ function newIncidentId(){
    ============================================================ */
 const $ = id => document.getElementById(id);
 const clamp = (v,a,b)=>v<a?a:v>b?b:v;
-const yieldUI = ()=>new Promise(r=>setTimeout(r,0));
+/* הפסקה קצרה כדי שהדפדפן יצייר את סרגל ההתקדמות. כשהלשונית ברקע הדפדפן מאט את setTimeout לפעם בשנייה
+   (ואחרי כמה דקות — לפעם בדקה), והניתוח, שעוצר כאן מאות פעמים, נראה כאילו "חיכה שנחזור". הודעות MessageChannel
+   אינן מואטות, לכן ברקע משתמשים בהן. כשהלשונית גלויה ההתנהגות לא משתנה. */
+const yieldUI = (()=>{
+  let ch = null; const q = [];
+  try{ ch = new MessageChannel(); ch.port1.onmessage = ()=>{ const r = q.shift(); if(r) r(); }; }catch(e){ ch = null; }
+  return ()=>new Promise(r=>{ if(ch && document.hidden){ q.push(r); ch.port2.postMessage(0); } else setTimeout(r,0); });
+})();
 
 function toMono(buf){
   const n = buf.length, ch = buf.numberOfChannels;
