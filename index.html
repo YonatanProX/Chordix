@@ -7246,7 +7246,7 @@ var S4A = {
   cpartPos: 0.5,     // C3: ...and only in the second half of the song (flat 0.25-0.55, see report)
   endOutro: true,    // E1 ('chorus' = name it chorus instead)
   noVoc: 'engine',   // no vocal information: 'engine' = old logic untouched | 'names' = new names, intro/outro taken from the old logic
-  flat: true,        // F1
+  flat: false,       // F1 — כבוי: "חלק חוזר שפותח את השירה = AABA" הוא הטלת מטבע מול שיר שנפתח בפזמון ויש בו בית אחד; על DEV הכלל לא תרם (±1)
   prepost: false     // pre / post sub-labels (strict metric only; they cost 1.2 pts strict on DEV, so off)
 };
 if (typeof S4A_OPT === 'object' && S4A_OPT) for (var __k in S4A_OPT) S4A[__k] = S4A_OPT[__k];
@@ -7314,7 +7314,7 @@ function s4aClassify(segs, dyn, aff, voc, old) {
   var M = aff && aff.M && aff.N === N ? aff.M : null;
   order.forEach(function (v) {
     var m = function (f) { return v.idx.reduce(function (x, k) { return x + f(k); }, 0) / v.idx.length; };
-    v.count = v.idx.length; v.e = m(function (k) { return eN[k]; }); v.pos = m(function (k) { return tpos[k]; });
+    v.count = v.idx.reduce(function (n, k, j) { return n + ((j === 0 || v.idx[j - 1] !== k - 1) ? 1 : 0); }, 0);   /* חזרות = מופעים נפרדים (רצפים של יחידות סמוכות), לא יחידות: מקטע שנחתך לשניים לא "חזר" */ v.e = m(function (k) { return eN[k]; }); v.pos = m(function (k) { return tpos[k]; });
     v.voc = voc ? m(function (k) { return voc[k]; }) : 0.5; v.bars = m(function (k) { return dyn[k].bars; });
     v.score = (O.wE * v.e + O.wPos * v.pos + O.wVoc * v.voc) / ((O.wE + O.wPos + O.wVoc) || 1);
   });
@@ -7738,6 +7738,17 @@ function mergeRoleFragments(segs){
                                segs[i+1].to-segs[i+1].from)<4;
     const sameCluster = segs[i].c===segs[i+1].c;
     if(run<3 && !shortPair && !sameCluster){ i++; continue; }
+    /* שומר-ענק: רצף של חומרים *שונים* שיוצר "מקטע" ארוך מ-32 תיבות אינו מקטע אלא שם שגוי שבלע בית ו-C-part.
+       במקרה כזה מאחדים בתוך הרצף רק שכנים מאותו חומר (או שבר קצר) — הגבולות בין החומרים נשארים, ואת השם קל לתקן בלחיצה. */
+    let mixed=false; for(let q=i+1;q<=z;q++) if(segs[q].c!==segs[i].c){ mixed=true; break; }
+    if(mixed && segs[z].to-segs[i].from > 32){
+      for(let q=i;q<z;){
+        const sp = Math.min(segs[q].to-segs[q].from, segs[q+1].to-segs[q+1].from)<4;
+        if(sp || segs[q].c===segs[q+1].c){ segs[q].to=segs[q+1].to; segs.splice(q+1,1); z--; }
+        else q++;
+      }
+      i=z+1; continue;
+    }
     segs[i].to=segs[z].to;
     segs.splice(i+1,z-i);
   }
