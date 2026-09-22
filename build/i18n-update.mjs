@@ -261,6 +261,12 @@ const ATTR = {
 
 /* מחרוזות דינמיות דרך cxT (en.js, ממופתח לפי המחרוזת העברית) */
 const JS = {
+  /* 2026-09-22: אוזן לשירה */
+  "מאזין לשירה…": "Listening for vocals…",
+  "זיהוי השירה לא זמין — ממשיכים בלעדיו": "Vocal detection unavailable — continuing without it",
+  "קובץ המודל {0} חסר בשרת. הוא חייב להיות מועלה לצד index.html, באותה תיקייה.": "The model file {0} is missing on the server. It must be uploaded next to index.html, in the same folder.",
+  "קובץ {0} חסר בשרת": "The file {0} is missing on the server",
+  "קובץ {0} פגום": "The file {0} is corrupt",
   "המעבדה פתוחה למנהל האתר בלבד.": "The lab is open to the site administrator only.",
   /* מטרונום משופר */
   "פעימה {0}: מודגשת": "Beat {0}: accented", "פעימה {0}: רגילה": "Beat {0}: normal", "פעימה {0}: שקטה": "Beat {0}: silent", "תיבה {0}": "Bar {0}",

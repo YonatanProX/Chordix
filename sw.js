@@ -32,7 +32,7 @@ self.addEventListener('fetch', e => {
 
   /* המודל וקבצי ה-wasm: מטמון תחילה. הם גדולים, בלתי משתנים,
      וזה מה שמאפשר לנתח שירים גם בלי רשת. */
-  if (/\/chordix-model(?:-e1)?\.bin$/.test(url.pathname) ||
+  if (/\/chordix-(?:model(?:-e1)?|vocal-[\w-]+)\.bin$/.test(url.pathname) ||
       url.pathname.endsWith('.wasm')) {
     e.respondWith(
       caches.match(req).then(hit => hit || fetch(req).then(res => {

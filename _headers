@@ -32,6 +32,15 @@
   Cache-Control: public, max-age=31536000, immutable
   Content-Type: application/octet-stream
 
+# מודל זיהוי השירה (PANNs MobileNetV1, ראש-שירה, int8, gzip) + בנק מסנני mel. בעדכון מודל: שם קובץ חדש.
+/chordix-vocal-s15.bin
+  Cache-Control: public, max-age=31536000, immutable
+  Content-Type: application/octet-stream
+
+/chordix-vocal-mel.bin
+  Cache-Control: public, max-age=31536000, immutable
+  Content-Type: application/octet-stream
+
 /og-cover.png
   Cache-Control: public, max-age=604800
 
