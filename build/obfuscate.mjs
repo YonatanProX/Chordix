@@ -38,7 +38,14 @@ const COPY_SKIP = new Set([
   'README.md', 'README.txt', 'i18n-keys.json', 'bench.html',
 ]);
 /* כל דבר שנראה כמו תיעוד/מקור/נתונים פנימיים נשאר בחוץ, גם אם יתווסף בעתיד */
-const COPY_DENY = [/^CHANGELOG.*\.md$/i, /\.(sql|map|mjs|env|log)$/i, /^\.env/i];
+const COPY_DENY = [
+  /^CHANGELOG.*\.md$/i, /\.(sql|map|mjs|env|log)$/i, /^\.env/i,
+  /* עותקי-גיבוי של ה-HTML בשורש (index.<משהו>.html) — מקור קריא ולא-מעורפל.
+     index.html עצמו לא נתפס כאן (אין לו חלק-אמצעי) והוא נכתב בנפרד אחרי הערפול. */
+  /^index\..+\.html$/i,
+  /* כל סימון-גיבוי מוכר, בכל סיומת */
+  /\.(bak|backup|orig|old|save|tmp|swp)$/i, /~$/i, /[.-](backup|bak|old|copy)\./i,
+];
 
 /* בלוק-script יוחרג מהערפול אם הוא נתונים/‏bootstrap-מוקדם/vendor.
    הזיהוי לפי מארקרים בתוכן — כל שינוי מבני צריך לעדכן כאן. */
@@ -217,6 +224,16 @@ function main() {
   copyRecursive(ROOT, DIST);
   fs.writeFileSync(path.join(DIST, appName), finalCode, 'utf8');
   fs.writeFileSync(path.join(DIST, 'index.html'), outHtml, 'utf8');
+
+  /* שומר-פרסום: ב-dist מותרים רק דפי-HTML שהם באמת חלק מהשירות. כל HTML אחר בשורש
+     (גיבוי, עותק, טיוטה) הוא מקור קריא ולא-מעורפל — ולכן עוקף את כל הגנת-הקוד.
+     עדיף להפיל את ה-build מלפרסם אותו. */
+  const ALLOWED_HTML = new Set(['index.html', 'admin.html']);
+  const strayHtml = fs.readdirSync(DIST, { withFileTypes: true })
+    .filter(e => e.isFile() && /\.html?$/i.test(e.name) && !ALLOWED_HTML.has(e.name))
+    .map(e => e.name);
+  if (strayHtml.length)
+    throw new Error(`פרסום: קובצי-HTML שאינם נכסי-שירות הגיעו ל-dist: ${strayHtml.join(', ')} — להוסיף ל-COPY_DENY/COPY_SKIP.`);
 
   /* CSP: במקום 'unsafe-inline' — hash לכל סקריפט מוטמע שנשאר ב-HTML הסופי. כך סקריפט שהוזרק
      (XSS) לא ירוץ גם אם חמק מהניטרול. סקריפטי-נתונים (ld+json וכד') לא מורצים ולא צריכים hash. */
