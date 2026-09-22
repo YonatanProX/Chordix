@@ -82,3 +82,16 @@
 /index.before-login-redesign.user-backup*
   X-Robots-Tag: noindex, nofollow, noarchive
   Cache-Control: no-store
+
+# זמני (2026-09-22) — מסמכים פנימיים שהוסרו מהפרסום ב-19.9 אך נשארו במטמון-הקצה
+# של Cloudflare (s-maxage=604800). דפי-דמה מפורסמים בכתובות האלה כדי לאלץ מחיקה.
+# ⚠ למחוק יחד עם PURGE_STUBS ב-build/obfuscate.mjs אחרי אימות.
+/README.*
+  X-Robots-Tag: noindex, nofollow, noarchive
+  Cache-Control: no-store
+/i18n-keys.json
+  X-Robots-Tag: noindex, nofollow, noarchive
+  Cache-Control: no-store
+/CHANGELOG-*
+  X-Robots-Tag: noindex, nofollow, noarchive
+  Cache-Control: no-store

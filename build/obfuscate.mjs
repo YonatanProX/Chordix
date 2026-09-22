@@ -143,12 +143,22 @@ function medConfig(reservedNames) {
    (s-maxage=604800) עד שבוע, וב-pages.dev אין מחיקת-מטמון ידנית. פרסום *קובץ*
    באותה כתובת כן מאלץ רענון — ולכן נכתב כאן דף-דמה ריק עם no-store.
    ⚠ למחוק את הבלוק הזה (ואת הכלל ב-_headers) אחרי שמאומת שהכתובת נקייה. */
-const PURGE_STUBS = ['index.before-login-redesign.user-backup.html'];
-const PURGE_STUB_HTML =
-  '<!doctype html><html lang="he"><head><meta charset="utf-8">' +
-  '<meta name="robots" content="noindex, nofollow, noarchive">' +
-  '<meta http-equiv="refresh" content="0; url=/"><title>Chordix</title></head>' +
-  '<body></body></html>';
+const PURGE_STUBS = [
+  'index.before-login-redesign.user-backup.html',   /* עותק המקור הקריא (852KB) */
+  'README.md', 'README.txt', 'i18n-keys.json',      /* מסמכים פנימיים (הוסרו 2026-09-19) */
+  'CHANGELOG-תיקוני-ביקורת.md',                      /* יומן תיקוני-האבטחה */
+  'CHANGELOG-משקל-קצב-וסולם.md',
+];
+/* גוף הדמה לפי סוג הקובץ — קטן, ריק מתוכן, בלי שום מידע */
+function purgeStubBody(name) {
+  if (/\.html?$/i.test(name))
+    return '<!doctype html><html lang="he"><head><meta charset="utf-8">' +
+           '<meta name="robots" content="noindex, nofollow, noarchive">' +
+           '<meta http-equiv="refresh" content="0; url=/"><title>Chordix</title></head>' +
+           '<body></body></html>';
+  if (/\.json$/i.test(name)) return '{}';
+  return 'Chordix — https://chordix.pages.dev/';
+}
 
 function copyRecursive(srcDir, dstDir, rel = '') {
   for (const entry of fs.readdirSync(srcDir, { withFileTypes: true })) {
@@ -242,9 +252,9 @@ function main() {
      (גיבוי, עותק, טיוטה) הוא מקור קריא ולא-מעורפל — ולכן עוקף את כל הגנת-הקוד.
      עדיף להפיל את ה-build מלפרסם אותו. */
   /* דפי-דמה לניקוי-מטמון (זמני — ראו PURGE_STUBS) */
-  for (const name of PURGE_STUBS) fs.writeFileSync(path.join(DIST, name), PURGE_STUB_HTML, 'utf8');
+  for (const name of PURGE_STUBS) fs.writeFileSync(path.join(DIST, name), purgeStubBody(name), 'utf8');
 
-  const ALLOWED_HTML = new Set(['index.html', 'admin.html', ...PURGE_STUBS]);
+  const ALLOWED_HTML = new Set(['index.html', 'admin.html', ...PURGE_STUBS.filter(n => /\.html?$/i.test(n))]);
   const strayHtml = fs.readdirSync(DIST, { withFileTypes: true })
     .filter(e => e.isFile() && /\.html?$/i.test(e.name) && !ALLOWED_HTML.has(e.name))
     .map(e => e.name);
