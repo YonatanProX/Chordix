@@ -137,6 +137,19 @@ function medConfig(reservedNames) {
   };
 }
 
+/* ---- זמני (2026-09-22) — ניקוי מטמון-קצה של Cloudflare ----------------------
+   קובץ-הגיבוי index.before-login-redesign.user-backup.html פורסם בטעות עד היום.
+   הסרתו מ-dist לא מנקה את מטמון-הקצה: Cloudflare ממשיך להגיש את העותק השמור
+   (s-maxage=604800) עד שבוע, וב-pages.dev אין מחיקת-מטמון ידנית. פרסום *קובץ*
+   באותה כתובת כן מאלץ רענון — ולכן נכתב כאן דף-דמה ריק עם no-store.
+   ⚠ למחוק את הבלוק הזה (ואת הכלל ב-_headers) אחרי שמאומת שהכתובת נקייה. */
+const PURGE_STUBS = ['index.before-login-redesign.user-backup.html'];
+const PURGE_STUB_HTML =
+  '<!doctype html><html lang="he"><head><meta charset="utf-8">' +
+  '<meta name="robots" content="noindex, nofollow, noarchive">' +
+  '<meta http-equiv="refresh" content="0; url=/"><title>Chordix</title></head>' +
+  '<body></body></html>';
+
 function copyRecursive(srcDir, dstDir, rel = '') {
   for (const entry of fs.readdirSync(srcDir, { withFileTypes: true })) {
     if (rel === '' && COPY_SKIP.has(entry.name)) continue;
@@ -228,7 +241,10 @@ function main() {
   /* שומר-פרסום: ב-dist מותרים רק דפי-HTML שהם באמת חלק מהשירות. כל HTML אחר בשורש
      (גיבוי, עותק, טיוטה) הוא מקור קריא ולא-מעורפל — ולכן עוקף את כל הגנת-הקוד.
      עדיף להפיל את ה-build מלפרסם אותו. */
-  const ALLOWED_HTML = new Set(['index.html', 'admin.html']);
+  /* דפי-דמה לניקוי-מטמון (זמני — ראו PURGE_STUBS) */
+  for (const name of PURGE_STUBS) fs.writeFileSync(path.join(DIST, name), PURGE_STUB_HTML, 'utf8');
+
+  const ALLOWED_HTML = new Set(['index.html', 'admin.html', ...PURGE_STUBS]);
   const strayHtml = fs.readdirSync(DIST, { withFileTypes: true })
     .filter(e => e.isFile() && /\.html?$/i.test(e.name) && !ALLOWED_HTML.has(e.name))
     .map(e => e.name);

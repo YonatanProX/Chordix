@@ -75,3 +75,10 @@
 /admin.*
   X-Robots-Tag: noindex, nofollow, noarchive
   Cache-Control: no-store
+
+# זמני (2026-09-22) — דף-דמה לניקוי מטמון-הקצה של הכתובת שבה פורסם בטעות
+# קובץ-גיבוי של המקור. no-store כדי שהדמה עצמו לא יישמר בשום מטמון.
+# ⚠ למחוק יחד עם PURGE_STUBS ב-build/obfuscate.mjs אחרי אימות.
+/index.before-login-redesign.user-backup*
+  X-Robots-Tag: noindex, nofollow, noarchive
+  Cache-Control: no-store
