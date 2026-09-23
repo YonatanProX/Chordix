@@ -36,11 +36,13 @@ body{font-family:var(--body);font-size:15.5px;line-height:1.55;color:var(--text)
 .top{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(12px);border-bottom:1px solid var(--edge)}
 .top-in{max-width:1280px;margin:0 auto;padding:10px 20px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
 .brand{display:inline-flex;align-items:center;gap:9px;text-decoration:none;direction:ltr}
-.brand-mark{width:32px;height:32px;border-radius:8px;display:grid;place-items:center;color:#fff;background:var(--grad)}
-html[data-theme="dark"] .brand-mark{color:#062330}
-.brand-mark svg{width:18px;height:18px}
-.wordmark{font-family:var(--disp);font-weight:800;font-size:20px;color:var(--text)}
-.wordmark span{color:var(--accent-ink)}
+.brand-mark{width:32px;height:32px;border-radius:50%;display:block}
+/* המילה Chordix כתמונה (לוגו 2026-09-23): כחול-כהה בבהיר, לבן בכהה */
+.wordmark{display:inline-flex}
+.wm-img{display:block;height:23px;width:auto}
+.wm-on-dark{display:none}
+html[data-theme="dark"] .wm-on-dark{display:block}
+html[data-theme="dark"] .wm-on-light{display:none}
 .top-title{font-family:var(--disp);font-weight:700;font-size:16px;color:var(--dim);padding-inline-start:12px;border-inline-start:1px solid var(--edge)}
 .live{display:inline-flex;align-items:center;gap:7px;font-size:13px;font-weight:600;color:var(--dim);padding:5px 11px;border-radius:999px;border:1px solid var(--edge);background:var(--panel)}
 .live-dot{width:9px;height:9px;border-radius:50%;background:var(--faint)}

@@ -44,7 +44,7 @@
   Cache-Control: public, max-age=31536000, immutable
   Content-Type: application/octet-stream
 
-/og-cover.png
+/og-cover-c2.png
   Cache-Control: public, max-age=604800
 
 /site.webmanifest

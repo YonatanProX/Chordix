@@ -44,7 +44,7 @@ index.html                      הדף
 chordix-model-e1.bin               מודל הזיהוי (gzip), נטען לפי דרישה
 sw.js                           service worker
 site.webmanifest                מניפסט PWA
-og-cover.png                    תמונת שיתוף
+og-cover-c2.png                  תמונת שיתוף
 _headers                        כותרות מטמון ואבטחה ל-Netlify
 robots.txt / sitemap.xml        SEO
 supabase-credits.sql            גבייה עם החזר (credit_holds) — להריץ פעם אחת
