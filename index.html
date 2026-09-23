@@ -518,7 +518,10 @@ html:not(.theme-light) audio{filter:invert(.92) hue-rotate(180deg)}
 .sheet-head h1{font-family:var(--disp);font-weight:800;font-size:26px;margin:0;flex:1;min-width:200px;color:var(--ink)}
 .sheet-head .meta{font-family:var(--mono);font-size:12px;color:#29384a;text-align:start}
 .sec{margin-bottom:26px;break-inside:avoid}
-.sec-bar{display:flex;align-items:center;gap:10px;margin-bottom:9px}
+/* כשאין מקום (טלפון במצב-מסמך, תוויות ארוכות) פריט שלם יורד שורה — לא
+   נשבר בתוכו ולא מרחיב את הדף. ברוחב רגיל ובהדפסה הכול נכנס בשורה אחת. */
+.sec-bar{display:flex;align-items:center;gap:10px;margin-bottom:9px;flex-wrap:wrap}
+.sec-bar>*{white-space:nowrap}
 .sec-tag{font-family:var(--disp);font-weight:700;font-size:12.5px;letter-spacing:.03em;padding:3px 11px;border-radius:6px;color:#0d1219}
 .sec-bar select{background:transparent;border:1px solid var(--paper-line);color:#3b3560;padding:3px 8px;font-size:12px;border-radius:6px}
 .sec-bar select:hover{background:#e9f1fb;border-color:#94a6b8}
@@ -1619,6 +1622,11 @@ html.doc-mode .results-wrap{max-width:920px}
 html.doc-mode #result{background:var(--bg-panel);border:1px solid var(--panel-edge);
   border-radius:8px;padding:16px 20px 26px;box-shadow:0 18px 50px -26px rgba(0,0,0,.5)}
 html.doc-mode #result .controls{justify-content:center;flex-wrap:wrap;gap:8px;margin-bottom:6px}
+/* בטלפון שלוש שכבות ריווח (עוטף + כרטיס + דף) השאירו לדף 277px מתוך 375 —
+   רשת 4 תיבות עם אקורדים ארוכים לא נכנסה והדף גלל הצידה. */
+@media (max-width:420px){
+  html.doc-mode .results-wrap,html.doc-mode #result{padding-inline:8px}
+}
 
 /* הוסרו מהממשק: "האקורדים לא מדויקים? מעקב אקורדים רץ" ו"אפשרויות דף
    האקורדים וייצוא". נשארים ב-DOM (מוסתרים) כדי שהמנוע ימשיך לקרוא מהם
