@@ -83,6 +83,14 @@ window.CX_I18N_DICT = {"en":{"html":{"a.1":"Skip to main content","headNav.a.1":
     'highlight runs ahead of or behind what you hear — with Bluetooth headphones, for '+
     'example — move the “Sync” slider until it lands on the sound.';
   d.attr['timelineView.button.attr_title.sync'] = 'Reset the sync offset';
+  /* תפריט גבולות המקטעים בדף האקורדים */
+  d.js = d.js || {};
+  d.js['גבול מקטע בתיבה הזו'] = 'Section boundary at this bar';
+  d.js['{0} מתחיל כאן']       = '{0} starts here';
+  d.js['מקטע חדש מתחיל כאן']  = 'A new section starts here';
+  d.js['הגבול הוזז']          = 'Boundary moved';
+  d.js['ביטול']               = 'Undo';
+  d.js['המקטע נפתח לכל התיבות שלו — בחרו את התיבה המדויקת'] = 'The section now shows all its bars — pick the exact bar';
 })();
 </script>
 
@@ -543,7 +551,22 @@ html:not(.theme-light) audio{filter:invert(.92) hue-rotate(180deg)}
   position:absolute;top:1px;inset-inline-start:13px;background:none;border:0;padding:0;line-height:1}
 button.n{cursor:pointer;border-radius:4px}
 button.n:hover{color:#fff;background:var(--brass);padding:0 3px;margin:0 -3px}
-button.n:hover::after{content:' ✂'}
+button.n:hover::after{content:' ▾'}
+/* תפריט "מי מתחיל כאן" שנפתח ממספר התיבה */
+.bar-menu{position:fixed;z-index:140;min-width:200px;max-width:calc(100vw - 16px);padding:6px;
+  background:var(--bg-deep2);border:1px solid var(--panel-edge);border-radius:8px;
+  box-shadow:0 18px 44px rgba(0,0,0,.34)}
+.bar-menu button{display:block;width:100%;min-height:40px;background:none;border:0;border-radius:8px;
+  padding:9px 11px;font-family:var(--body);font-size:13.5px;color:var(--text-dim);
+  cursor:pointer;text-align:start}
+.bar-menu button:hover{background:var(--panel-2);color:var(--text-main)}
+.bar-menu button:focus-visible{background:var(--panel-2);color:var(--text-main);
+  outline:2px solid var(--focus-ring);outline-offset:-2px}
+html.a11y-high-contrast .bar-menu button:hover,
+html.a11y-high-contrast .bar-menu button:focus-visible{background:#ffe27a;color:#000}
+/* במסך מגע מספר התיבה זעיר — מגדילים את אזור הלחיצה בלי לשנות את המראה */
+@media (pointer:coarse){ button.n::before{content:'';position:absolute;top:-9px;bottom:-3px;left:-9px;right:-9px} }
+@media print{.bar-menu{display:none!important}}
 /* הצבעים כאן היו קשיחים וערוכים לערכה בהירה בערכה הכהה
    יצא טקסט סגלגל על רקע כהה ביחס 2.4. עוברים למשתני הערכה. */
 .mini{background:transparent;border:1px solid var(--panel-edge);color:var(--text-main);
@@ -8515,7 +8538,7 @@ function segmentSpectral(bars, energy, A, sens, opt){
 
 function segment(bars, energy, A, sens){
   const n=bars.length;
-  if(n<12) return [{from:0,to:n,name:cxT("מקטע א"),c:0,num:0}];
+  if(n<12) return [{from:0,to:n,name:"מקטע א",c:0,num:0}];
 
   const segs = segmentSpectral(bars, energy, A, sens);
 
@@ -10512,8 +10535,24 @@ async function modelPredict(feat, nFrames, onProg, shifts){
 /* ============================================================
    3. ממשק
    ============================================================ */
-const SECTION_TYPES = [cxT("אינטרו"),cxT("בית"),cxT("פרה‑פזמון"),cxT("פזמון"),cxT("פוסט‑פזמון"),'C‑part',cxT("סולו / מעבר"),cxT("סיום"),
-                       cxT("מקטע א"),cxT("מקטע ב"),cxT("מקטע ג"),cxT("מקטע ד"),cxT("מקטע ה"),cxT("מקטע ו"),cxT("מקטע ז"),cxT("מקטע ח"),cxT("מקטע ט"),cxT("מקטע י")];
+/* הערכים נשארים בעברית — הם השם הקנוני שנשמר ב-s.name (מפתח לצבע, למספור
+   ולהתפשטות השם). רק התווית בתפריט מתורגמת, ברגע ההצגה. */
+const SECTION_TYPES = ["אינטרו","בית","פרה‑פזמון","פזמון","פוסט‑פזמון",'C‑part',"סולו / מעבר","סיום",
+                       "מקטע א","מקטע ב","מקטע ג","מקטע ד","מקטע ה","מקטע ו","מקטע ז","מקטע ח","מקטע ט","מקטע י"];
+/* התפריט הפתוח של מספר-תיבה בדף האקורדים (openBarMenu), אם יש */
+let barMenuClose = null, barMenuBtn = null;
+/* שירים שנשמרו מהממשק האנגלי לפני התיקון נושאים שם מתורגם ("Verse").
+   מחזירים אותו לשם הקנוני, כדי שהצבע, התפריט וההתפשטות יעבדו. */
+function canonSecName(n){
+  if(!n || SECTION_TYPES.includes(n)) return n;
+  const D = window.CX_I18N_DICT || {};
+  for(const L in D){
+    const js = D[L] && D[L].js;
+    if(!js) continue;
+    for(const k of SECTION_TYPES) if(js[k] === n) return k;
+  }
+  return n;
+}
 const SECTION_COLOR = {
   'אינטרו':'#6f93b0','בית':'#4fb9a8','פרה‑פזמון':'#9ec46b','פזמון':'#f0a63c',
   'פוסט‑פזמון':'#e8b96a','C‑part':'#4f86c6','סולו / מעבר':'#e2503f','סיום':'#8a8072',
@@ -10576,8 +10615,10 @@ function chordText(c, flat){
 function beatSlashOn(){ return $('beatSlash') && $('beatSlash').checked; }
 function loopFoldOn(){ return $('loopFold') && $('loopFold').checked; }
 /* טווח התיבות שבאמת מודפס למקטע, וכמה פעמים הוא מנוגן */
+/* מקטעים שהמשתמש פתח לעריכת גבול (ראו unfoldSection) — לא מקופלים יותר */
+const unfoldedSecs = new WeakSet();
 function secView(s){
-  if(!loopFoldOn()) return {from:s.from, to:s.to, rep:1, L:s.to-s.from};
+  if(!loopFoldOn() || unfoldedSecs.has(s)) return {from:s.from, to:s.to, rep:1, L:s.to-s.from};
   const lp = sectionLoop(state.bars, s, 8);
   return (lp.k>1 && lp.L>=2)
     ? {from:s.from, to:s.from+lp.L, rep:lp.k, L:lp.L}
@@ -10703,6 +10744,7 @@ function renderTape(){
 }
 
 function renderSheet(){
+  if(barMenuClose) barMenuClose();   /* התפריט מצביע על תיבות של הרינדור הקודם */
   const flat = useFlats();
   const keyTxt = state.key
     ? noteName(dispKeyRoot(), flat) + (state.key.minor?'m':'')
@@ -10758,7 +10800,7 @@ function renderSheet(){
       }
       const num = i===s.from
         ? `<span class="n">1</span>`
-        : cxT("<button class=\"n\" data-split=\"{0}\" title=\"פתיחת מקטע חדש כאן\">{1}</button>", i, i-s.from+1);
+        : `<button class="n" data-bmenu="${i}" title="${cxEsc(cxT("גבול מקטע בתיבה הזו"))}" aria-haspopup="menu" aria-expanded="false">${i-s.from+1}</button>`;
       const cls = ['cellbar'];
       let tip = '';
       if(b && b.conf!==undefined && b.conf<0.42){ cls.push('unsure'); tip=cxT("הזיהוי כאן פחות בטוח — כדאי לאמת באוזן"); }
@@ -10803,8 +10845,8 @@ function renderSheet(){
   $('sheet').querySelectorAll('[data-merge]').forEach(b=>{
     b.addEventListener('click', e=>{ e.stopPropagation(); mergeSection(+b.dataset.merge); });
   });
-  $('sheet').querySelectorAll('[data-split]').forEach(b=>{
-    b.addEventListener('click', e=>{ e.stopPropagation(); splitSection(+b.dataset.split); });
+  $('sheet').querySelectorAll('[data-bmenu]').forEach(b=>{
+    b.addEventListener('click', e=>{ e.stopPropagation(); openBarMenu(b, +b.dataset.bmenu); });
   });
   $('sheet').querySelectorAll('.cellbar').forEach(cell=>{
     const open = ()=>{
@@ -10830,7 +10872,8 @@ function renderSheet(){
       });
     };
     cell.addEventListener('click', open);
-    cell.addEventListener('keydown', e=>{ if(e.key==='Enter'){ e.preventDefault(); open(); } });
+    /* Enter על כפתור מספר-התיבה שייך לכפתור, לא לעריכת האקורד */
+    cell.addEventListener('keydown', e=>{ if(e.key==='Enter' && e.target===cell){ e.preventDefault(); open(); } });
   });
   const capoEl = $('capoNote');
   if(capoEl) renderCapoNote(capoEl);
@@ -10881,10 +10924,140 @@ function splitSection(barIdx){
   const i = state.secs.findIndex(s => barIdx>s.from && barIdx<s.to);
   if(i<0) return;
   const s = state.secs[i];
-  state.secs.splice(i+1, 0, {from:barIdx, to:s.to, name:s.name, c:s.c, num:0});
+  /* החלק הקצר מקבל קבוצה משלו (הוא בדרך כלל החומר ה"זר" — אינטרו או סולו
+     שנדבקו), והארוך נשאר בקבוצה המקורית. כך שינוי שם של החלק הקצר לא
+     יתפשט לכל המקטעים שדומים למקטע המקורי. */
+  const fresh = freshSecC();
+  const leadLonger = (barIdx - s.from) >= (s.to - barIdx);
+  state.secs.splice(i+1, 0, {from:barIdx, to:s.to, name:s.name, c: leadLonger ? fresh : s.c, num:0});
+  if(!leadLonger) s.c = fresh;
   s.to = barIdx;
   renumberSections();
   renderTape(); renderSheet();
+}
+function freshSecC(){
+  let m = -1;
+  for(const x of state.secs) if(Number.isFinite(x.c) && x.c>m) m = x.c;
+  return m + 1;
+}
+/* הזזת גבול בפעולה אחת. dir=+1: המקטע הבא מתחיל בתיבה barIdx (התיבות
+   מכאן עד סוף המקטע עוברות אליו). dir=-1: המקטע הנוכחי מתחיל ב-barIdx
+   (התיבות שלפניה עוברות למקטע הקודם). */
+function moveBoundary(barIdx, dir){
+  const i = state.secs.findIndex(s => barIdx>s.from && barIdx<s.to);
+  if(i<0) return;
+  const s = state.secs[i];
+  const a = dir>0 ? s : state.secs[i-1], b = dir>0 ? state.secs[i+1] : s;
+  if(!a || !b) return;
+  const was = [a.to, b.from];
+  a.to = barIdx; b.from = barIdx;
+  renumberSections();
+  renderTape(); renderSheet();
+  toastAction(cxT("הגבול הוזז"), cxT("ביטול"), ()=>{
+    if(!state.secs.includes(a) || !state.secs.includes(b)) return;
+    a.to = was[0]; b.from = was[1];
+    renumberSections(); renderTape(); renderSheet();
+  });
+}
+
+/* מקטע מקופל (×N) מציג רק את הסיבוב הראשון, אז מספר תיבה בו לא מציין
+   סיבוב מסוים. לחיצה עליו פותחת את המקטע לכל התיבות, ואז בוחרים תיבה מדויקת. */
+function unfoldSection(s, barIdx){
+  unfoldedSecs.add(s);
+  renderSheet();
+  const b = $('sheet').querySelector(`[data-bmenu="${barIdx}"]`);
+  if(b) b.focus();
+  toast(cxT("המקטע נפתח לכל התיבות שלו — בחרו את התיבה המדויקת"));
+}
+
+/* תפריט קטן על מספר התיבה. כל אפשרות היא "מי מתחיל כאן" — כך מתקנים
+   גבול שזז בתיבה או שתיים בלחיצה אחת, במקום פיצול + מיזוג + שינוי שם. */
+function openBarMenu(btn, barIdx){
+  /* לחיצה שנייה על אותו מספר תיבה סוגרת את התפריט */
+  if(barMenuClose && barMenuBtn===btn){ barMenuClose(); btn.focus(); return; }
+  if(barMenuClose) barMenuClose();
+  const i = state.secs.findIndex(s => barIdx>s.from && barIdx<s.to);
+  if(i<0) return;
+  const s = state.secs[i], nx = state.secs[i+1];
+  if(secView(s).rep>1){ unfoldSection(s, barIdx); return; }
+  const items = [];
+  if(nx) items.push([cxT("{0} מתחיל כאן", secLabel(nx)), ()=>moveBoundary(barIdx, +1)]);
+  if(i>0) items.push([cxT("{0} מתחיל כאן", secLabel(s)), ()=>moveBoundary(barIdx, -1)]);
+  items.push([cxT("מקטע חדש מתחיל כאן"), ()=>splitSection(barIdx)]);
+
+  const m = document.createElement('div');
+  m.className = 'bar-menu';
+  m.id = 'barMenu';
+  m.setAttribute('role', 'menu');
+  m.setAttribute('aria-label', cxT("תיבה {0}", barIdx - s.from + 1));
+  const btns = items.map(([label, fn])=>{
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.setAttribute('role', 'menuitem');
+    b.textContent = label;
+    b.addEventListener('click', e=>{
+      e.stopPropagation(); close(false); fn();
+      /* אחרי כל אחת מהפעולות מקטע מתחיל בתיבה הזו — הפוקוס עובר לשם שלו */
+      const sel = $('sheet').querySelector(`select[data-sec="${barIdx}"]`);
+      if(sel) sel.focus();
+    });
+    m.appendChild(b);
+    return b;
+  });
+  document.body.appendChild(m);
+
+  /* כשגודל הטקסט מוגדל, ל-body יש zoom: המיקום נכתב ביחידות שלפני ההגדלה */
+  const r = btn.getBoundingClientRect(), vw = document.documentElement.clientWidth;
+  const mr = m.getBoundingClientRect();
+  const z = (m.offsetWidth ? mr.width / m.offsetWidth : 1) || 1;
+  const w = mr.width, h = mr.height;
+  const x = Math.min(Math.max(8, r.left), vw - w - 8);
+  const y = (r.bottom + 4 + h <= window.innerHeight) ? r.bottom + 4 : Math.max(8, r.top - h - 4);
+  m.style.left = (x / z) + 'px';
+  m.style.top  = (y / z) + 'px';
+
+  /* לחיצה מחוץ לתפריט רק סוגרת אותו — היא לא פותחת גם את עריכת האקורד מתחתיה */
+  const outside = e=>{
+    if(m.contains(e.target) || e.target===btn) return;
+    const swallow = ev=>{ ev.stopPropagation(); ev.preventDefault(); };
+    document.addEventListener('click', swallow, {capture:true, once:true});
+    setTimeout(()=>document.removeEventListener('click', swallow, true), 500);
+    close(false);
+  };
+  const onKey = e=>{
+    if(!m.contains(document.activeElement)) return;
+    if(e.key==='Escape' || e.key==='Tab'){ e.preventDefault(); close(true); return; }
+    if(e.key==='ArrowDown' || e.key==='ArrowUp'){
+      e.preventDefault();
+      const k = btns.indexOf(document.activeElement);
+      const n = (k + (e.key==='ArrowDown' ? 1 : -1) + btns.length) % btns.length;
+      btns[n].focus();
+    }
+  };
+  const onFocusOut = e=>{ const t = e.relatedTarget; if(t && !m.contains(t) && t!==btn) close(false); };
+  const onMove = ()=>close(false);
+  function close(refocus){
+    document.removeEventListener('pointerdown', outside, true);
+    document.removeEventListener('keydown', onKey, true);
+    window.removeEventListener('scroll', onMove, true);
+    window.removeEventListener('resize', onMove);
+    m.removeEventListener('focusout', onFocusOut);
+    m.remove();
+    btn.setAttribute('aria-expanded', 'false');
+    btn.removeAttribute('aria-controls');
+    barMenuClose = null; barMenuBtn = null;
+    if(refocus && btn.isConnected) btn.focus();
+  }
+  barMenuClose = ()=>close(false);
+  barMenuBtn = btn;
+  btn.setAttribute('aria-expanded', 'true');
+  btn.setAttribute('aria-controls', 'barMenu');
+  document.addEventListener('pointerdown', outside, true);
+  document.addEventListener('keydown', onKey, true);
+  window.addEventListener('scroll', onMove, true);
+  window.addEventListener('resize', onMove);
+  m.addEventListener('focusout', onFocusOut);
+  btns[0].focus();
 }
 
 /* ------------------------------------------------------------
@@ -12046,7 +12219,10 @@ window.__buildLibMeta = () => ({
     title: state.title, key: state.key, bpm: state.bpm, duration: state.duration,
     capo: state.capo||0, meter: state.meter ? state.meter.label : '4/4',
     bars: state.bars.map(b => ({ t0:b.t0, t1:b.t1, chords: b.chords, conf:b.conf, beatsInBar: b.beatsInBar })),
-    secs: state.secs.map(s => ({ name:s.name, num:s.num||0, from:s.from, to:s.to }))
+    /* c = קבוצת החומר המוזיקלי. נשמר כדי שבשיר שנפתח מחדש תיקון שם
+       יתפשט רק למקטעים הדומים באמת, ולא לכל המקטעים באותו שם. */
+    secs: state.secs.map(s => ({ name:s.name, num:s.num||0, from:s.from, to:s.to,
+                                 c: Number.isFinite(s.c) ? s.c : 0 }))
   }
 });
 
@@ -12080,9 +12256,9 @@ window.__loadSavedAnalysis = function(row){
                                   conf: b.conf===undefined?0.75:b.conf,
                                   beatsInBar: b.beatsInBar || savedBpb }));
   state.secs = (d.secs && d.secs.length)
-    ? d.secs.map(x=>({name: cxCleanLabel(x.name) || SECTION_TYPES[1],
+    ? d.secs.map(x=>({name: canonSecName(cxCleanLabel(x.name)) || SECTION_TYPES[1],
                       num:(x.num|0)||0, from:(x.from|0), to:(x.to|0), c:(x.c|0)||0}))
-    : [{ name:cxT("מקטע א"), num:0, from:0, to: state.bars.length, c:0 }];
+    : [{ name:"מקטע א", num:0, from:0, to: state.bars.length, c:0 }];
   state.runs = runsFromBars(state.bars, state.duration, state.edits);
   state.capo = 0; state.capoApply = false; state.capoAuto = true;
   state.capoOpts = state.key
