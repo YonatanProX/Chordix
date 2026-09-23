@@ -89,6 +89,7 @@ window.CX_I18N_DICT = {"en":{"html":{"a.1":"Skip to main content","headNav.a.1":
   d.js['{0} מתחיל כאן']       = '{0} starts here';
   d.js['מקטע חדש מתחיל כאן']  = 'A new section starts here';
   d.js['הגבול הוזז']          = 'Boundary moved';
+  d.js['מנוע זיהוי v{0}']     = 'Recognition engine v{0}';
   d.js['ביטול']               = 'Undo';
   d.js['המקטע נפתח לכל התיבות שלו — בחרו את התיבה המדויקת'] = 'The section now shows all its bars — pick the exact bar';
 })();
@@ -708,6 +709,8 @@ footer.site nav{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margi
 footer.site nav button{font-size:12.5px;padding:7px 13px}
 footer.site .rule{width:120px;height:1px;background:linear-gradient(90deg,transparent,var(--panel-edge),transparent);margin:12px auto}
 footer.site .fine{color:var(--text-faint);font-size:11.5px;max-width:640px;margin:0 auto;line-height:1.7}
+footer.site .engine-ver{margin-top:6px;font-size:11px}
+footer.site .engine-ver:empty{display:none}
 
 /* ---------- accessibility modes ---------- */
 
@@ -3784,6 +3787,7 @@ html.theme-light:not(.a11y-high-contrast) audio{mix-blend-mode:multiply}
     © <span id="footYear">2026</span> <span class="fill">Chordix</span> ·
     <a href="mailto:chordix.business@gmail.com">chordix.business@gmail.com</a>
   </p>
+  <p class="fine engine-ver" id="engineVer"></p>
 </footer>
 
 <div id="utilityStack">
@@ -12218,6 +12222,8 @@ window.__buildLibMeta = () => ({
   data: {
     title: state.title, key: state.key, bpm: state.bpm, duration: state.duration,
     capo: state.capo||0, meter: state.meter ? state.meter.label : '4/4',
+    /* איזו גרסת מנוע ניתחה את השיר — כדי לדעת מול מה לבדוק תלונה */
+    engine: window.CX_ENGINE_VERSION || null,
     bars: state.bars.map(b => ({ t0:b.t0, t1:b.t1, chords: b.chords, conf:b.conf, beatsInBar: b.beatsInBar })),
     /* c = קבוצת החומר המוזיקלי. נשמר כדי שבשיר שנפתח מחדש תיקון שם
        יתפשט רק למקטעים הדומים באמת, ולא לכל המקטעים באותו שם. */
@@ -12948,6 +12954,16 @@ renderBundles();
   const yearEl = $id('footYear');
   if(yearEl) yearEl.textContent = new Date().getFullYear();
 
+  /* ---------- גרסת מנוע הזיהוי (בתחתית האתר, ונשמרת עם כל ניתוח) ----------
+     מעלים ב-0.1 רק כשמשנים את הזיהוי עצמו (מבנה / אקורדים / טמפו / סולם) ומעלים לאתר.
+     שינוי עיצוב או ממשק — לא משנה את הגרסה. הכלל וההיסטוריה: "קבצי md/CLAUDE.md". */
+  window.CX_ENGINE_VERSION = '1.1';
+  window.__paintEngineVer = () => {
+    const el = $id('engineVer');
+    if(el) el.textContent = cxT("מנוע זיהוי v{0}", window.CX_ENGINE_VERSION);
+  };
+  window.__paintEngineVer();
+
   /* ---------- חלונות צפים ---------- */
   const openWindows = [];
   function setupFloatWindow(btn, win, closeBtn){
@@ -13233,6 +13249,7 @@ renderBundles();
     try{ if(window.__paintAuthUI) window.__paintAuthUI(); }catch(e){}
     const y = document.getElementById('footYear');
     if(y) y.textContent = new Date().getFullYear();
+    try{ if(window.__paintEngineVer) window.__paintEngineVer(); }catch(e){}
   }
 
   let CX_LANG = (window.CX_getLang && window.CX_getLang()) || 'he';
