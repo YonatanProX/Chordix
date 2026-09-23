@@ -7729,28 +7729,13 @@ function __engineClassifyRoles(segs, dyn, aff){
    הוא הראיה החזקה לפיצול-יתר. בנוסף נשמר כלל הרסיסים הקצר שהיה קיים.
    האיחוד מתבצע רק אחרי התיוג, כך שאינו משנה את בחירת בית/פזמון. */
 function mergeRoleFragments(segs){
+  /* מוסכמת הבעלים (2026-09-23): שני מקטעים סמוכים באותו שם הם תמיד מקטע אחד — "בית 1 + בית 2" צמודים הם בית אחד,
+     ופזמון כפול הוא פזמון אחד (כלל 9 במוסכמות התיוג). הגבול ביניהם נעלם מהדף; אם השם שגוי — מתקנים בלחיצה אחת.
+     (עד 2026-09-22 זוג סמוך מחומרים שונים נשאר מפוצל, וזה הציג "בית 1 | בית 2" ו"פזמון 4 | פזמון 5".) */
   for(let i=0;i<segs.length-1;){
     if(segs[i].role !== segs[i+1].role){ i++; continue; }
-    let z=i+1;
-    while(z+1<segs.length && segs[z+1].role===segs[i].role) z++;
-    const run=z-i+1;
-    const shortPair = Math.min(segs[i].to-segs[i].from,
-                               segs[i+1].to-segs[i+1].from)<4;
-    const sameCluster = segs[i].c===segs[i+1].c;
-    if(run<3 && !shortPair && !sameCluster){ i++; continue; }
-    /* שומר-ענק: רצף של חומרים *שונים* שיוצר "מקטע" ארוך מ-32 תיבות אינו מקטע אלא שם שגוי שבלע בית ו-C-part.
-       במקרה כזה מאחדים בתוך הרצף רק שכנים מאותו חומר (או שבר קצר) — הגבולות בין החומרים נשארים, ואת השם קל לתקן בלחיצה. */
-    let mixed=false; for(let q=i+1;q<=z;q++) if(segs[q].c!==segs[i].c){ mixed=true; break; }
-    if(mixed && segs[z].to-segs[i].from > 32){
-      for(let q=i;q<z;){
-        const sp = Math.min(segs[q].to-segs[q].from, segs[q+1].to-segs[q+1].from)<4;
-        if(sp || segs[q].c===segs[q+1].c){ segs[q].to=segs[q+1].to; segs.splice(q+1,1); z--; }
-        else q++;
-      }
-      i=z+1; continue;
-    }
-    segs[i].to=segs[z].to;
-    segs.splice(i+1,z-i);
+    segs[i].to=segs[i+1].to;
+    segs.splice(i+1,1);
   }
   return segs;
 }
