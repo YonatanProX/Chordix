@@ -2,6 +2,8 @@
 # Cloudflare Pages — כותרות מטמון ואבטחה
 # script-src: ה-build (build/obfuscate.mjs) מחליף את 'unsafe-inline' ב-hashes של הסקריפטים
 # המוטמעים שנשארים ב-dist/index.html. אין כאן לערוך hashes ידנית.
+# "! Access-Control-Allow-Origin" מסיר את ברירת-המחדל של Cloudflare (ACAO: *), כדי שאתר
+# זר לא יוכל למשוך מהדפדפן את המודל / הקוד שלנו. האתר עצמו טוען הכול מאותו מקור ולא צריך CORS.
 # ============================================================
 
 /*
@@ -13,6 +15,7 @@
   Cross-Origin-Opener-Policy: same-origin
   Cross-Origin-Resource-Policy: same-origin
   Strict-Transport-Security: max-age=63072000; includeSubDomains; preload
+  ! Access-Control-Allow-Origin
 
 # ה-HTML משתנה בכל פרסום — תמיד לאמת מול השרת
 /index.html
