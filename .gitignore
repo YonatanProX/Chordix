@@ -3,3 +3,8 @@ node_modules/
 
 # פלט הבנייה — נוצר ע"י `npm run build` (Cloudflare מייצר ומגיש אותו)
 dist/
+
+# סודות ומטמון מקומיים של wrangler / Pages Functions — לעולם לא בריפו
+.dev.vars*
+.env*
+.wrangler/

@@ -92,6 +92,52 @@ window.CX_I18N_DICT = {"en":{"html":{"a.1":"Skip to main content","headNav.a.1":
   d.js['מנוע זיהוי v{0}']     = 'Recognition engine v{0}';
   d.js['ביטול']               = 'Undo';
   d.js['המקטע נפתח לכל התיבות שלו — בחרו את התיבה המדויקת'] = 'The section now shows all its bars — pick the exact bar';
+  /* cx-chat:i18n:start — העוזר המוזיקלי */
+  d.html['cxChat.title']      = 'Music assistant';
+  d.html['cxChat.sub']        = 'Music and site questions';
+  d.html['cxChat.attach']     = 'Attach the open sheet';
+  d.html['cxChat.attachDesc'] = 'Sends: key, tempo, time signature, sections and chords. Not the recording and not the file name.';
+  d.html['cxChat.notice']     = "Automated answers, may be wrong. Some questions are processed by Cloudflare's AI. We don't save the chat.";
+  d.html['cxChat.privacy']    = 'Privacy';
+  d.html['cxChat.inputLbl']   = 'Question for the music assistant';
+  d.attr['cxChat.fab']        = 'Open the music assistant';
+  d.attr['cxChat.clear']      = 'Clear the chat';
+  d.attr['cxChat.close']      = 'Close the assistant';
+  d.attr['cxChat.log']        = 'Chat with the assistant';
+  d.attr['cxChat.attachTitle'] = 'Sends: key, tempo, time signature, sections and chords. Not the recording and not the file name.';
+  d.attr['cxChat.ph']         = 'Ask about music or the site';
+  d.attr['cxChat.send']       = 'Send';
+  d.attr['cxChat.stop']       = 'Stop the answer';
+  d.js['פתיחת העוזר המוזיקלי'] = 'Open the music assistant';
+  d.js['סגירת העוזר המוזיקלי'] = 'Close the music assistant';
+  d.js['אני:']                = 'Me:';
+  d.js['העוזר:']              = 'Assistant:';
+  d.js['הצעות לשאלות']        = 'Suggested questions';
+  d.js['איך מעלים שיר?']      = 'How do I upload a song?';
+  d.js['האקורדים לא מדויקים'] = "The chords aren't accurate";
+  d.js['מה זה קאפו?']         = 'What is a capo?';
+  d.js['העברת אקורדים לסולם אחר'] = 'Transposing chords to another key';
+  d.js['איך מכוונים גיטרה?']  = 'How do I tune a guitar?';
+  d.js['שלום, כאן העוזר המוזיקלי של Chordix.'] = 'Hi, this is the Chordix music assistant.';
+  d.js['אפשר לשאול על אקורדים, סולמות, קאפו, קצב ותרגול, או על השימוש באתר.'] =
+    'Ask about chords, keys, capo, rhythm and practice, or about using the site.';
+  d.js['על זה אין לי כרגע תשובה בטוחה. אולי אחת מההצעות האלה עוזרת:'] =
+    "I don't have a reliable answer to that right now. Maybe one of these helps:";
+  d.js['על זה אין לי כרגע תשובה בטוחה.'] = "I don't have a reliable answer to that right now.";
+  d.js['אפשר גם לעיין בעמוד הטיפים, להשאיר תגובה או לכתוב ל-{0}.'] =
+    'You can also check the tips page, leave a comment or email {0}.';
+  d.js['לעמוד הטיפים']        = 'Open the tips page';
+  d.js['להשארת תגובה']        = 'Leave a comment';
+  d.js['השאלה הזו, יחד עם השיחה עד כה, נשלחת לעיבוד בבינה מלאכותית של Cloudflare. בלי פרטים אישיים, בבקשה.'] =
+    "This question and the conversation so far are sent to Cloudflare's AI for processing. Please don't include personal details.";
+  d.js['העוזר מקליד…']        = 'The assistant is typing…';
+  d.js['התשובה נעצרה.']       = 'Answer stopped.';
+  d.js['התשובה נקטעה באמצע. אפשר לנסות לשאול שוב.'] = 'The answer was cut off. You can try asking again.';
+  d.js['המכסה היומית של הבינה המלאכותית נגמרה, אז כרגע עונות רק התשובות המובנות.'] =
+    "Today's AI allowance is used up, so for now only the built-in answers are available.";
+  d.js['יש כרגע עומס. אפשר לנסות שוב בעוד רגע.'] = "It's busy right now. Try again in a moment.";
+  d.js['לא הצלחתי לקבל תשובה מהשרת כרגע.'] = "I couldn't get an answer from the server just now.";
+  /* cx-chat:i18n:end */
 })();
 </script>
 
@@ -1812,7 +1858,8 @@ main > section[data-rv]:not([data-rv~="home"]):not(.page-cta):not([hidden]){flex
   html.side-persist .side-backdrop,html.side-persist #sideOpen,html.side-persist #sideClose{display:none!important}
   html.side-persist .site-head .brand{display:none}
   html.side-persist .head-nav{margin-inline-start:0}
-  html.side-persist #utilityStack{inset-inline-start:auto;inset-inline-end:18px}
+  /* פינת סוף-השורה שייכת לעוזר המוזיקלי; העמודה חוזרת לצד ההתחלה, מיד אחרי תפריט הצד (ועוקבת אחרי מצב מוקטן) */
+  html.side-persist #utilityStack{inset-inline-end:auto;inset-inline-start:calc(var(--side-w) + 18px);transition:inset-inline-start .22s ease}
   html.side-persist .cm-invite{inset-inline-start:var(--side-w)}
 }
 html.doc-mode.side-persist body{padding-inline-start:var(--side-w)}
@@ -2019,7 +2066,7 @@ html.a11y-reduced-motion body,html.a11y-reduced-motion .side-menu,html.a11y-redu
 .side-acct-menu button:hover{background:color-mix(in srgb,var(--brass) 14%,transparent)}
 .side-acct-menu button:focus-visible{outline:2px solid var(--focus-ring);outline-offset:1px}
 /* החלונות הצפים (עזרה/נגישות) לא נפתחים מתחת לתפריט הצד */
-@media(min-width:1100px){ html.side-persist #helpWindow,html.side-persist #a11yWindow{inset-inline-start:auto;inset-inline-end:18px} }
+@media(min-width:1100px){ html.side-persist #helpWindow,html.side-persist #a11yWindow{inset-inline-end:auto;inset-inline-start:calc(var(--side-w) + 18px);transition:inset-inline-start .22s ease} }
 .float-window{z-index:140!important}
 /* ---------- חלון ההגדרות ---------- */
 .settings-modal{max-width:560px}
@@ -2931,6 +2978,257 @@ html.a11y-reduced-motion .feat-card:hover,html.a11y-reduced-motion .drop:hover,h
    בכהה: נגן-האודיו של הדפדפן לבן טהור ואי אפשר לצבוע אותו — multiply נותן לו את
    גוון הרקע שמתחתיו ומשאיר את האייקונים כהים, בלי לגעת בתפקוד. */
 html.theme-light:not(.a11y-high-contrast) audio{mix-blend-mode:multiply}
+</style>
+<style id="cx-chat">
+/* ============================================================
+   העוזר המוזיקלי: כפתור בפינת סוף-השורה (שמאל-למטה בעברית, ימין-למטה
+   באנגלית) + חלון שיחה לא-מודאלי. השיחה חיה רק בזיכרון הדף.
+   תנועה: קפיץ רך בכניסה/פתיחה, בועות עולות, צ'יפים במדרגות, אקולייזר
+   כמחוון "עונה". מצב הבסיס הוא תמיד המצב הסופי הגלוי, כך שהפחתת-תנועה
+   (שמכבה את כל האנימציות) משאירה הכול במקום.
+   ============================================================ */
+:root{
+  --cx-user-bg:#0b6f90;          /* 5.4:1 מול --cx-user-ink; עמוק יותר מ---cta-solid (4.4:1) */
+  --cx-user-ink:#f4fbfc;
+  --cx-fab-ink:#f4fbfc;
+  --cx-bot-bg:color-mix(in srgb,var(--bg-sunken) 55%,var(--bg-panel));
+  --cx-out:cubic-bezier(.23,1,.32,1);
+  --cx-spring:cubic-bezier(.34,1.56,.64,1);
+}
+/* קפיץ אמיתי (ריסון 0.62, קפיצת-יתר של 8%) בדפדפנים שתומכים ב-linear() */
+@supports (transition-timing-function:linear(0,1)){
+  :root{--cx-spring:linear(0,.101,.319,.561,.771,.926,1.023,1.071,1.084,1.075,1.057,1.037,1.019,1.006,.998,.994,.993,.994,.995,.997,.998,.999,1)}
+}
+html.a11y-high-contrast{--cx-user-bg:#ffe27a;--cx-user-ink:#000;--cx-fab-ink:#000;--cx-bot-bg:#000}
+
+/* ---------- כפתור הפתיחה ---------- */
+#cxChatFab{
+  position:fixed;inset-inline-end:18px;bottom:18px;z-index:150;
+  width:56px;height:56px;padding:0;border-radius:8px;border:1px solid transparent;
+  display:grid;place-items:center;cursor:pointer;
+  background:var(--grad-cta);color:var(--cx-fab-ink);
+  box-shadow:0 12px 26px -12px rgba(3,24,36,.6),0 2px 6px -2px rgba(3,24,36,.35);
+  transition:transform .2s var(--cx-out),box-shadow .2s ease,filter .2s ease;
+  -webkit-tap-highlight-color:transparent;
+}
+#cxChatFab:hover{color:var(--cx-fab-ink);border-color:transparent;filter:brightness(1.08);transform:translateY(-2px);
+  box-shadow:0 16px 30px -12px rgba(3,24,36,.62),0 3px 8px -3px rgba(3,24,36,.4)}
+#cxChatFab:active{transform:scale(.95)}
+#cxChatFab:focus-visible{outline:3px solid var(--focus-ring);outline-offset:3px}
+#cxChatFab svg{grid-area:1/1;width:28px;height:28px;display:block;
+  transition:transform .34s var(--cx-spring),opacity .16s ease}
+#cxChatFab .cx-ico-x{opacity:0;transform:rotate(-90deg) scale(.5)}
+#cxChatFab.cx-open .cx-ico-chat{opacity:0;transform:rotate(90deg) scale(.5)}
+#cxChatFab.cx-open .cx-ico-x{opacity:1;transform:none}
+#cxChatFab .cx-bar{transform-box:fill-box;transform-origin:50% 100%}
+#cxChatFab:hover .cx-bar,#cxChatFab:focus-visible .cx-bar{animation:cxBarHop .3s var(--cx-out) 1}
+#cxChatFab .cx-bar:nth-of-type(2){animation-delay:.06s}
+#cxChatFab .cx-bar:nth-of-type(3){animation-delay:.12s}
+/* מחוון מצב: הפסים "מנגנים" רק כל עוד העוזר עונה */
+#cxChatFab.cx-busy .cx-bar{animation:cxBarLoop .8s ease-in-out infinite}
+#cxChatFab.cx-busy .cx-bar:nth-of-type(2){animation-delay:-.27s}
+#cxChatFab.cx-busy .cx-bar:nth-of-type(3){animation-delay:-.53s}
+#cxChatFab.cx-enter{animation:cxFabIn .42s var(--cx-spring) both}
+@keyframes cxFabIn{from{opacity:0;transform:translateY(18px) scale(.7)}to{opacity:1;transform:none}}
+@keyframes cxBarHop{0%,100%{transform:scaleY(1)}35%{transform:scaleY(1.55)}70%{transform:scaleY(.72)}}
+@keyframes cxBarLoop{0%,100%{transform:scaleY(.5)}50%{transform:scaleY(1.4)}}
+
+/* ---------- החלון ---------- */
+#cxChat{
+  position:fixed;z-index:150;inset-inline-end:18px;bottom:86px;
+  width:min(380px,calc(100vw - 36px));
+  height:min(580px,calc(100vh - var(--bar-h,64px) - 110px));
+  height:min(580px,calc(100dvh - var(--bar-h,64px) - 110px));
+  display:flex;flex-direction:column;overflow-x:hidden;overflow-y:auto;   /* מסך נמוך: החלון נגלל במקום לחתוך את שדה הכתיבה */
+  background:linear-gradient(var(--bg-panel),var(--bg-panel)),var(--bg-deep);
+  border:1px solid var(--panel-edge);border-radius:8px;
+  box-shadow:0 26px 60px -26px rgba(3,20,30,.62),0 4px 14px -6px rgba(3,20,30,.3);
+  color:var(--text-main);font-family:var(--body);
+  transform-origin:100% 100%;
+}
+html[dir="rtl"] #cxChat{transform-origin:0 100%}
+#cxChat.cx-opening{animation:cxPanelIn .28s var(--cx-spring) both}
+#cxChat.cx-closing{animation:cxPanelOut .16s cubic-bezier(.4,0,1,1) both;pointer-events:none}
+@keyframes cxPanelIn{from{opacity:0;transform:translateY(8px) scale(.85)}to{opacity:1;transform:none}}
+@keyframes cxPanelOut{from{opacity:1;transform:none}to{opacity:0;transform:translateY(6px) scale(.92)}}
+
+.cx-head{display:flex;align-items:center;gap:10px;flex-shrink:0;
+  padding-block:9px;padding-inline:12px 8px;background:var(--bg-deep2);
+  border-bottom:1px solid color-mix(in srgb,var(--panel-edge) 75%,transparent)}
+.cx-mark{position:relative;flex:0 0 36px;width:36px;height:36px;display:grid;place-items:center}
+.cx-mark img{width:32px;height:32px;border-radius:50%;display:block}
+/* טבעת "עונה": קשת דקה שמסתובבת רק בזמן תשובה */
+.cx-mark::after{content:"";position:absolute;inset:-1px;border-radius:50%;border:2px solid transparent;opacity:0;transition:opacity .2s ease}
+#cxChat.cx-answering .cx-mark::after{opacity:1;border-top-color:var(--brass);border-inline-end-color:var(--brass);animation:cxSpin .9s linear infinite}
+@keyframes cxSpin{to{transform:rotate(1turn)}}
+.cx-head-txt{flex:1 1 auto;min-width:0}
+.cx-head h2{margin:0;font-family:var(--disp);font-size:15.5px;font-weight:700;line-height:1.25;color:var(--text-main)}
+.cx-sub{margin:1px 0 0;font-size:12.5px;line-height:1.3;color:var(--text-dim)}
+.cx-hbtn{flex:0 0 36px;width:36px;height:36px;padding:0;display:grid;place-items:center;border-radius:8px;
+  border:1px solid transparent;background:transparent;color:var(--text-dim)}
+.cx-hbtn:hover{color:var(--text-main);border-color:color-mix(in srgb,var(--brass) 55%,transparent);background:color-mix(in srgb,var(--brass) 12%,transparent)}
+.cx-hbtn svg{width:18px;height:18px;display:block}
+
+/* ---------- השיחה ---------- */
+/* position:relative: התוויות המוסתרות (sr-only, ממוקמות absolute) נשארות בתוך הגלילה של השיחה ולא מגדילות את החלון */
+.cx-log{position:relative;flex:1 1 auto;min-height:72px;overflow-y:auto;overscroll-behavior:contain;
+  padding:14px 12px 10px;display:flex;flex-direction:column;gap:10px}
+.cx-log:focus-visible{outline:2px solid var(--focus-ring);outline-offset:-3px}
+.cx-msg{max-width:88%;padding:9px 12px;border-radius:8px;font-size:14.5px;line-height:1.6;
+  overflow-wrap:anywhere;animation:cxMsgIn .2s var(--cx-out) both}
+.cx-msg.cx-still{animation:none}
+.cx-bot{align-self:flex-start;background:var(--cx-bot-bg);color:var(--text-main);
+  border:1px solid color-mix(in srgb,var(--panel-edge) 60%,transparent);border-start-start-radius:3px}
+.cx-user{align-self:flex-end;background:var(--cx-user-bg);color:var(--cx-user-ink);border-end-end-radius:3px;white-space:pre-wrap}
+.cx-msg p{margin:0}
+.cx-msg p+p,.cx-msg p+ul,.cx-msg ul+p{margin-top:6px}
+.cx-msg ul{margin:0;padding-inline-start:18px}
+.cx-msg li{margin:2px 0}
+.cx-msg li::marker{color:var(--brass)}
+.cx-msg strong{font-weight:700}
+.cx-msg a{color:var(--brass-soft);text-decoration:underline;text-underline-offset:2px}
+.cx-msg a:hover{color:var(--text-main)}
+.cx-ch{font-weight:600;letter-spacing:.01em}
+.cx-w{animation:cxWordIn .2s var(--cx-out) both;animation-delay:var(--d,0ms)}
+@keyframes cxMsgIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@keyframes cxWordIn{from{opacity:0}to{opacity:1}}
+.cx-caret{display:inline-block;width:2px;height:1.05em;margin-inline-start:2px;vertical-align:-2px;
+  background:var(--brass);border-radius:1px;animation:cxBlink 1s steps(1) infinite}
+@keyframes cxBlink{50%{opacity:0}}
+.cx-sys{align-self:center;max-width:94%;margin:0;padding:5px 10px;font-size:12.5px;line-height:1.5;text-align:center;
+  color:var(--text-dim);border:1px dashed color-mix(in srgb,var(--panel-edge) 80%,transparent);border-radius:8px;
+  animation:cxMsgIn .2s var(--cx-out) both}
+
+/* צ'יפים (הצעות) וקישורים */
+.cx-chips{display:flex;flex-wrap:wrap;gap:6px;align-self:stretch}
+.cx-chip{font:inherit;font-size:13px;font-weight:600;line-height:1.3;min-height:34px;padding:7px 11px;border-radius:8px;
+  text-align:start;cursor:pointer;background:transparent;color:var(--brass-soft);
+  border:1px solid color-mix(in srgb,var(--brass) 55%,var(--panel-edge));
+  animation:cxChipIn .26s var(--cx-spring) both;animation-delay:calc(var(--i,0) * 40ms)}
+.cx-chip:hover{color:var(--text-main);border-color:var(--brass);background:color-mix(in srgb,var(--brass) 14%,transparent)}
+@keyframes cxChipIn{from{opacity:0;transform:translateY(6px) scale(.96)}to{opacity:1;transform:none}}
+.cx-links{display:flex;flex-wrap:wrap;gap:6px;margin-top:9px}
+.cx-lnk{display:inline-flex;align-items:center;gap:5px;min-height:32px;padding:5px 10px;border-radius:8px;cursor:pointer;
+  font:inherit;font-size:12.5px;font-weight:600;line-height:1.3;text-decoration:none;
+  color:var(--brass-soft);background:color-mix(in srgb,var(--brass) 10%,transparent);
+  border:1px solid color-mix(in srgb,var(--brass) 45%,transparent)}
+.cx-msg a.cx-lnk{text-decoration:none}
+.cx-lnk:hover{color:var(--text-main);border-color:var(--brass);background:color-mix(in srgb,var(--brass) 18%,transparent)}
+.cx-lnk svg{width:14px;height:14px;flex:0 0 14px}
+html[dir="rtl"] .cx-lnk svg,html[dir="rtl"] .cx-send svg{transform:scaleX(-1)}
+
+/* מחוון הקלדה: אקולייזר של חמישה פסים */
+.cx-typing{display:flex;align-items:center;padding:11px 14px}
+.cx-eq5{display:inline-flex;align-items:flex-end;gap:3px;height:16px}
+.cx-eq5 i{display:block;width:3px;height:16px;border-radius:2px;background:var(--brass);
+  transform-origin:50% 100%;transform:scaleY(.45);animation:cxEq .9s ease-in-out infinite;animation-delay:calc(var(--i) * -.18s)}
+@keyframes cxEq{0%,100%{transform:scaleY(.3)}50%{transform:scaleY(1)}}
+
+/* ---------- תחתית: צירוף דף, הודעה קבועה, שדה כתיבה ---------- */
+.cx-foot{flex-shrink:0;padding:8px 10px 10px;border-top:1px solid color-mix(in srgb,var(--panel-edge) 70%,transparent)}
+.cx-attach-row{margin:0 0 7px}
+.cx-attach{display:inline-flex;align-items:center;gap:6px;min-height:32px;padding:5px 10px;border-radius:8px;cursor:pointer;
+  font:inherit;font-size:12.5px;font-weight:600;color:var(--text-dim);background:transparent;
+  border:1px dashed color-mix(in srgb,var(--panel-edge) 90%,transparent)}
+.cx-attach svg{width:15px;height:15px;flex:0 0 15px}
+.cx-attach .cx-ok{display:none}
+.cx-attach[aria-pressed="true"]{color:var(--text-main);border-style:solid;border-color:var(--brass);background:color-mix(in srgb,var(--brass) 16%,transparent)}
+.cx-attach[aria-pressed="true"] .cx-clip{display:none}
+.cx-attach[aria-pressed="true"] .cx-ok{display:block}
+.cx-notice{margin:0 0 8px;font-size:11.5px;line-height:1.5;color:var(--text-dim)}
+.cx-notice .cx-link{display:inline;min-height:0;padding:0 2px;border:0;border-radius:3px;background:none;cursor:pointer;
+  font:inherit;color:var(--brass-soft);text-decoration:underline;text-underline-offset:2px}
+.cx-notice .cx-link:hover{color:var(--text-main)}
+.cx-form{position:relative;display:flex;align-items:flex-end;gap:8px;margin:0}
+.cx-form textarea{flex:1 1 auto;min-width:0;min-height:42px;max-height:calc(1.45em * 4 + 20px);resize:none;overflow-y:auto;
+  margin:0;padding:9px 11px;border-radius:8px;
+  border:1px solid color-mix(in srgb,var(--text-dim) 70%,var(--panel-edge));   /* 4.8:1 מול החלון בשתי הערכות */
+  background:var(--bg-sunken);color:var(--text-main);font:inherit;font-size:14.5px;line-height:1.45}
+.cx-form textarea::placeholder{color:var(--text-dim);opacity:1}
+.cx-form textarea:focus{border-color:var(--focus-ring)}
+.cx-form textarea:focus-visible{outline:2px solid var(--focus-ring);outline-offset:1px}
+.cx-send,.cx-stop{flex:0 0 42px;width:42px;height:42px;padding:0;display:grid;place-items:center;border-radius:8px;cursor:pointer;
+  border:1px solid transparent;background:var(--grad-cta);color:var(--cx-fab-ink);transition:filter .15s ease,transform .15s var(--cx-out)}
+.cx-send:hover,.cx-stop:hover{color:var(--cx-fab-ink);border-color:transparent;filter:brightness(1.1)}
+.cx-send[disabled]{opacity:.45;cursor:default;filter:saturate(.6)}
+.cx-stop{background:var(--bg-sunken);color:var(--text-main);border-color:var(--panel-edge)}
+.cx-stop:hover{color:var(--text-main);border-color:var(--brass)}
+.cx-send svg,.cx-stop svg{width:20px;height:20px;display:block}
+/* תו שמרחף מכפתור השליחה */
+.cx-fly{position:absolute;inset-inline-end:11px;bottom:34px;width:18px;height:18px;color:var(--brass);pointer-events:none;
+  animation:cxFly .38s var(--cx-out) both}
+@keyframes cxFly{0%{opacity:0;transform:translateY(8px) scale(.7)}30%{opacity:1}100%{opacity:0;transform:translateY(-30px) rotate(-14deg) scale(1)}}
+
+/* ---------- מסכים קטנים ---------- */
+@media (max-width:760px){
+  #cxChatFab{width:52px;height:52px;inset-inline-end:12px;bottom:calc(12px + env(safe-area-inset-bottom,0px))}
+  #cxChat{inset-inline-end:12px;bottom:calc(76px + env(safe-area-inset-bottom,0px));width:min(380px,calc(100vw - 24px))}
+  /* יעדי מגע: לפחות 44px לכל בקר בחלון */
+  .cx-hbtn{flex-basis:44px;width:44px;height:44px}
+  .cx-send,.cx-stop{flex-basis:44px;width:44px;height:44px}
+  .cx-chip,.cx-lnk,.cx-attach{min-height:44px}
+  /* 16px בשדה הכתיבה מונע זום אוטומטי ב-iOS (כמו בשאר שדות האתר) */
+  .cx-form textarea{min-height:44px;font-size:16px}
+  /* קישור הפרטיות בתוך המשפט: ריפוד אנכי מגדיל את אזור הלחיצה בלי להזיז את השורה */
+  .cx-notice .cx-link{padding:13.5px 4px}
+}
+@media (max-width:700px){
+  html:not(.cx-chat-open):has(#cmInvite:not([hidden])) #cxChatFab{visibility:hidden}
+}
+/* ההזמנה לתגובה לא מכסה את שדה הכתיבה: מוסתרת כל עוד הצ'אט פתוח, וחוזרת כשסוגרים אותו */
+html.cx-chat-open #cmInvite{visibility:hidden}
+@media (max-width:640px){
+  /* גיליון: כשהמקלדת פתוחה החלון עולה גם מעל הכותרת, כדי שיישאר מקום לשיחה */
+  #cxChat{inset-inline:10px;width:auto;top:max(8px,calc(var(--bar-h,64px) + 8px - var(--cx-kb,0px)));height:auto;
+    bottom:calc(10px + env(safe-area-inset-bottom,0px) + var(--cx-kb,0px));transform-origin:50% 100%}
+  html[dir="rtl"] #cxChat{transform-origin:50% 100%}
+  html.cx-chat-open #cxChatFab{visibility:hidden}
+  .cx-msg{max-width:92%}
+}
+/* מסך נמוך (טלפון לרוחב, זום דפדפן 200%): כל הגובה שמתחת לכותרת, כותרת החלון דחוסה */
+@media (max-height:480px){
+  .cx-sub{display:none}
+  .cx-head{padding-block:4px}
+}
+@media (max-height:480px) and (min-width:641px){
+  #cxChat{top:calc(var(--bar-h,64px) + 8px);bottom:8px;height:auto}
+  html.cx-chat-open #cxChatFab{visibility:hidden}
+}
+/* זום נגישות: הגוף מוגדל, ולכן גם החלון (וגם הכותרת); מחלקים כדי שיישאר בתוך המסך ומתחת לכותרת */
+html.a11y-zoomed #cxChat{width:min(380px,calc((100vw - 36px) / var(--a11y-zoom,1)));
+  height:min(580px,calc((100vh - 24px) / var(--a11y-zoom,1) - var(--bar-h,64px) - 86px));
+  height:min(580px,calc((100dvh - 24px) / var(--a11y-zoom,1) - var(--bar-h,64px) - 86px))}
+@media (max-width:640px){
+  html.a11y-zoomed #cxChat{width:auto;height:auto;top:calc(var(--bar-h,64px) + 8px / var(--a11y-zoom,1));
+    bottom:calc((10px + env(safe-area-inset-bottom,0px) + var(--cx-kb,0px)) / var(--a11y-zoom,1))}
+}
+
+/* ---------- ערכה בהירה: טבעת מיקוד ומחוון הקלדה בניגודיות 3:1 לפחות ----------
+   --focus-ring הבהיר של האתר (#0e8fb5) הוא 2.4 עד 2.8:1 מול משטחי החלון; בתוך החלון
+   משתמשים ב---a1 (4.5 עד 5.4:1). ניגודיות גבוהה שומרת על הטבעת הצהובה שלה. */
+html.theme-light:not(.a11y-high-contrast) #cxChat,html.theme-light:not(.a11y-high-contrast) #cxChatFab{--focus-ring:var(--a1)}
+html.theme-light:not(.a11y-high-contrast) .cx-eq5 i,html.theme-light:not(.a11y-high-contrast) .cx-caret{background:var(--brass-soft)}
+
+/* ---------- גופן קריא (נגישות): כמו בשאר האתר ---------- */
+html.a11y-readable #cxChat,html.a11y-readable #cxChat .cx-head h2{font-family:Arial,Helvetica,sans-serif}
+html.a11y-readable .cx-msg,html.a11y-readable .cx-sys,html.a11y-readable .cx-notice{letter-spacing:.02em;line-height:2;word-spacing:.06em}
+
+/* ---------- ניגודיות גבוהה ---------- */
+html.a11y-high-contrast #cxChatFab{background:#ffe27a;border-color:#ffe27a}
+html.a11y-high-contrast #cxChat{background:#000;border:2px solid #ffe27a}
+html.a11y-high-contrast .cx-head{background:#000;border-bottom-color:#ffe27a}
+html.a11y-high-contrast .cx-bot{border-color:#ffe27a}
+html.a11y-high-contrast .cx-foot{border-top-color:#ffe27a}
+html.a11y-high-contrast .cx-chip,html.a11y-high-contrast .cx-lnk,html.a11y-high-contrast .cx-attach{color:#fff2c2;border-color:#ffe27a;background:#000}
+html.a11y-high-contrast .cx-send{background:#ffe27a;color:#000}
+html.a11y-high-contrast .cx-sys{color:#fff;border-color:#ffe27a}
+
+/* ---------- הפחתת תנועה (הכלל הכללי לא תופס פסאודו-אלמנטים) ---------- */
+html.a11y-reduced-motion #cxChat .cx-mark::after{animation:none}
+@media (prefers-reduced-motion:reduce){#cxChat .cx-mark::after{animation:none}}
+
+/* ---------- הדפסה ---------- */
+@media print{#cxChatFab,#cxChat{display:none!important}}
 </style>
 </head>
 <body>
@@ -3901,6 +4199,61 @@ html.theme-light:not(.a11y-high-contrast) audio{mix-blend-mode:multiply}
     </p>
   </div>
 </div>
+<!-- cx-chat:markup:start: העוזר המוזיקלי (כפתור + חלון). ה-JS בסוף הקובץ; הכפתור מוסתר עד שמאשרים את התנאים -->
+<button type="button" id="cxChatFab" hidden aria-expanded="false" aria-controls="cxChat"
+  data-i18n-attr="aria-label:cxChat.fab" aria-label="פתיחת העוזר המוזיקלי">
+  <svg class="cx-ico-chat" viewBox="0 0 24 24" fill="none" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+    <path d="M6.2 3.5h11.6a2.7 2.7 0 0 1 2.7 2.7v7.6a2.7 2.7 0 0 1-2.7 2.7h-6.5l-4.4 3.6c-.45.37-1.1.05-1.1-.53V16.5a2.7 2.7 0 0 1-2.3-2.7V6.2a2.7 2.7 0 0 1 2.7-2.7z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/>
+    <rect class="cx-bar" x="7.9" y="9.2" width="1.9" height="3.8" rx=".95" fill="currentColor"/>
+    <rect class="cx-bar" x="11.05" y="7" width="1.9" height="6" rx=".95" fill="currentColor"/>
+    <rect class="cx-bar" x="14.2" y="8.4" width="1.9" height="4.6" rx=".95" fill="currentColor"/>
+  </svg>
+  <svg class="cx-ico-x" viewBox="0 0 24 24" fill="none" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+    <path d="M7 7l10 10M17 7L7 17" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+  </svg>
+</button>
+<section id="cxChat" role="dialog" aria-modal="false" aria-labelledby="cxChatTitle" aria-describedby="cxChatSub" hidden>
+  <div class="cx-head">
+    <span class="cx-mark"><img src="/icons/logo-c2-192.png" alt="" width="32" height="32" decoding="async" loading="lazy"></span>
+    <div class="cx-head-txt">
+      <h2 id="cxChatTitle" data-i18n="cxChat.title">העוזר המוזיקלי</h2>
+      <p class="cx-sub" id="cxChatSub" data-i18n="cxChat.sub">עונה על מוזיקה ועל האתר</p>
+    </div>
+    <button type="button" class="cx-hbtn" id="cxChatClear" data-i18n-attr="aria-label:cxChat.clear,title:cxChat.clear" aria-label="ניקוי השיחה" title="ניקוי השיחה">
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"><path d="M4.5 12a7.5 7.5 0 1 0 2.2-5.3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M4.5 4.2v4.3h4.3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+    <button type="button" class="cx-hbtn" id="cxChatClose" data-i18n-attr="aria-label:cxChat.close,title:cxChat.close" aria-label="סגירת העוזר" title="סגירת העוזר">
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"><path d="M7 7l10 10M17 7L7 17" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+    </button>
+  </div>
+  <div class="cx-log" id="cxChatLog" role="log" aria-live="polite" aria-relevant="additions" tabindex="0"
+    data-i18n-attr="aria-label:cxChat.log" aria-label="השיחה עם העוזר"></div>
+  <div class="cx-foot">
+    <div class="cx-attach-row" id="cxAttachRow" hidden>
+      <button type="button" class="cx-attach" id="cxAttach" aria-pressed="false" aria-describedby="cxAttachDesc"
+        data-i18n-attr="title:cxChat.attachTitle" title="יישלחו: סולם, קצב, משקל, מקטעים ואקורדים. בלי ההקלטה ובלי שם הקובץ.">
+        <svg class="cx-clip" viewBox="0 0 24 24" fill="none" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"><path d="M15.6 7.4l-6.3 6.3a1.9 1.9 0 0 0 2.7 2.7l6.6-6.6a3.9 3.9 0 0 0-5.5-5.5L6.4 11a5.9 5.9 0 0 0 8.4 8.4l4.8-4.8" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <svg class="cx-ok" viewBox="0 0 24 24" fill="none" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"><path d="M5 12.5l4.2 4.2L19 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span data-i18n="cxChat.attach">צירוף הדף הפתוח</span>
+      </button>
+      <span class="sr-only" id="cxAttachDesc" data-i18n="cxChat.attachDesc">יישלחו: סולם, קצב, משקל, מקטעים ואקורדים. בלי ההקלטה ובלי שם הקובץ.</span>
+    </div>
+    <p class="cx-notice"><span data-i18n="cxChat.notice">תשובות אוטומטיות, עלולות לטעות. חלק מהשאלות נשלחות לעיבוד בבינה המלאכותית של Cloudflare. אנחנו לא שומרים את השיחה.</span>
+      <button type="button" class="cx-link" data-legal="privacy" data-i18n="cxChat.privacy">פרטיות</button></p>
+    <form class="cx-form" id="cxChatForm" novalidate>
+      <label class="sr-only" for="cxChatInput" data-i18n="cxChat.inputLbl">שאלה לעוזר המוזיקלי</label>
+      <textarea id="cxChatInput" rows="1" maxlength="500" autocomplete="off" enterkeyhint="send" dir="auto"
+        data-i18n-attr="placeholder:cxChat.ph" placeholder="כתבו שאלה על מוזיקה או על האתר"></textarea>
+      <button type="submit" class="cx-send" id="cxChatSend" disabled data-i18n-attr="aria-label:cxChat.send,title:cxChat.send" aria-label="שליחה" title="שליחה">
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"><path d="M5 12h13M13 6.5l5.5 5.5-5.5 5.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <button type="button" class="cx-stop" id="cxChatStop" hidden data-i18n-attr="aria-label:cxChat.stop,title:cxChat.stop" aria-label="עצירת התשובה" title="עצירת התשובה">
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"><rect x="7" y="7" width="10" height="10" rx="2" fill="currentColor"/></svg>
+      </button>
+    </form>
+  </div>
+</section>
+<!-- cx-chat:markup:end -->
 <div class="modal-backdrop hidden" id="loginModal" role="dialog" aria-modal="true" aria-labelledby="loginTitle">
   <div class="modal login-modal">
     <div class="modal-header login-head">
@@ -4200,7 +4553,7 @@ html.theme-light:not(.a11y-high-contrast) audio{mix-blend-mode:multiply}
 <div id="legalSources" hidden>
 
 <div id="legal-terms" data-title="תנאי שימוש">
-  <p class="legal-meta">עודכן לאחרונה: 19 בספטמבר 2026</p>
+  <p class="legal-meta">עודכן לאחרונה: 26 בספטמבר 2026</p>
 
   <h3>1. כללי</h3>
   <p>אתר ושירות “Chordix” (להלן: <b>“השירות”</b>) מופעלים על ידי <span class="fill">Chordix</span> (להלן: <b>“המפעיל”</b>). תנאים אלה מהווים הסכם מחייב בינך לבין המפעיל. עצם הכניסה לשירות והשימוש בו מהווים הסכמה מלאה לתנאים. אם אינך מסכים לתנאי כלשהו — אינך רשאי לעשות שימוש בשירות.</p>
@@ -4215,7 +4568,7 @@ html.theme-light:not(.a11y-high-contrast) audio{mix-blend-mode:multiply}
 
   <h3>3א. חשבון משתמש והתחברות</h3>
   <p>חלק מיכולות השירות — ניתוח שיר ושמירת היסטוריה — מחייבות חשבון. <b>ההתחברות אפשרית באמצעות חשבון Google, חשבון Discord, או כתובת אימייל עם קוד חד‑פעמי</b>, ואין בשירות סיסמה נפרדת. בהתחברות דרך ספק חיצוני, השימוש כפוף גם לתנאי השימוש של אותו ספק.</p>
-  <p>אתה אחראי לשמירה על חשבון ה‑Google שלך ולכל פעולה שתיעשה בשירות באמצעותו. חשבון אחד מיועד לאדם אחד; אין להעביר, למכור או לשתף חשבון. המפעיל רשאי להשעות או לסגור חשבון שנעשה בו שימוש לרעה, שימוש בניגוד לתנאים אלה או שימוש בלתי חוקי.</p>
+  <p>אתה אחראי לשמירה על החשבון שבאמצעותו אתה מתחבר (Google, Discord או תיבת הדוא"ל) ולכל פעולה שתיעשה בשירות באמצעותו. חשבון אחד מיועד לאדם אחד; אין להעביר, למכור או לשתף חשבון. המפעיל רשאי להשעות או לסגור חשבון שנעשה בו שימוש לרעה, שימוש בניגוד לתנאים אלה או שימוש בלתי חוקי.</p>
   <p>אתה רשאי לבקש את מחיקת חשבונך בכל עת בפנייה ל‑<a href="mailto:chordix.business@gmail.com">chordix.business@gmail.com</a>. מחיקת החשבון מוחקת גם את היסטוריית הניתוחים.</p>
 
   <h3>3ב. השירות ניתן ללא תשלום</h3>
@@ -4244,6 +4597,12 @@ html.theme-light:not(.a11y-high-contrast) audio{mix-blend-mode:multiply}
   <h3>6. דיוק התוצאות — גילוי נאות</h3>
   <p>זיהוי האקורדים מבוסס על מודל למידת מכונה ועל עיבוד אותות. התוצאה היא <b>הערכה הסתברותית ולא תמלול מוסמך</b>. ייתכנו שגיאות בזיהוי הסולם, הקצב, חלוקת התיבות, סוגי האקורדים ומבנה השיר, במיוחד בהקלטות עמוסות, בשירה ללא ליווי הרמוני ברור, בשינויי טמפו ובהקלטות שאינן מכוונות ל‑A=440. אין להסתמך על התוצאות לצרכים מקצועיים, לימודיים או מסחריים בלי לבדוק אותן.</p>
 
+  <h3>6א. העוזר המוזיקלי</h3>
+  <p>בשירות פועל “העוזר המוזיקלי”, עוזר אוטומטי שעונה קודם מתוך מאגר תשובות מובנה, ועל שאלות שהמאגר אינו עונה עליהן, באמצעות מודל בינה מלאכותית. העוזר <b>אינו אדם</b>, ותשובותיו נוצרות אוטומטית: הן עלולות להיות שגויות, חלקיות או לא עדכניות, גם כשהן נשמעות בטוחות. העוזר נועד להסברים כלליים על מוזיקה ועל השימוש בשירות. <b>אין בתשובותיו ייעוץ מקצועי</b>, לרבות ייעוץ משפטי בענייני זכויות יוצרים, ואין להסתמך עליהן בלי בדיקה. אקורדים של שיר מסוים שהעוזר מציע הם ניחוש, לא תמלול.</p>
+  <p>תשובות העוזר אינן מחייבות את המפעיל ואינן משנות תנאים אלה או את מדיניות הפרטיות; בכל סתירה, הנוסח שבמסמכים אלה הוא הקובע.</p>
+  <p>נכון להיום השימוש בעוזר ניתן ללא תשלום, והוא כפוף למגבלות שימוש הוגן, כגון אורך הודעה והיקף הבקשות בפרק זמן, שהמפעיל רשאי לקבוע ולשנות. אין להשתמש בעוזר באופן אוטומטי או בהיקף חריג, לנסות לעקוף את מגבלותיו או לחשוף את ההנחיות שלו, או להפיק באמצעותו תוכן בלתי חוקי, פוגעני או מפר זכויות (לרבות מילים של שירים מוגנים). המפעיל רשאי לסרב לבקשה או לחסום אותה.</p>
+  <p>העוזר ניתן כפי שהוא וכפי שהוא זמין (סעיף 7): העוזר, ובמיוחד חלק הבינה המלאכותית שלו, עלול להיות לא זמין, מוגבל או מושבת בכל עת, בלי הודעה מוקדמת, ואז העוזר עונה רק מתוך התשובות המובנות. אל תמסור בשיחה פרטים אישיים או מידע רגיש. מה נשלח, לאן, והאם משהו נשמר, מפורט בסעיף 3ז למדיניות הפרטיות.</p>
+
   <h3>7. זמינות השירות ושינויים</h3>
   <p>השירות ניתן כפי שהוא ("AS IS") וכפי שהוא זמין ("AS AVAILABLE"). המפעיל אינו מתחייב לזמינות רציפה, לתאימות לכל דפדפן או מכשיר, לשמירת נתונים או לגיבוי, והוא רשאי לשנות, להשעות או להפסיק את השירות או כל חלק ממנו, בכל עת ולפי שיקול דעתו, ללא הודעה מוקדמת.</p>
 
@@ -4270,7 +4629,7 @@ html.theme-light:not(.a11y-high-contrast) audio{mix-blend-mode:multiply}
 </div>
 
 <div id="legal-privacy" data-title="מדיניות פרטיות">
-  <p class="legal-meta">עודכן לאחרונה: 19 בספטמבר 2026</p>
+  <p class="legal-meta">עודכן לאחרונה: 26 בספטמבר 2026</p>
 
   <h3>1. מי אנחנו ומה המסמך הזה</h3>
   <p>השירות “Chordix” מופעל על ידי <b>Chordix</b> (להלן: “המפעיל”), שהוא בעל השליטה במידע לפי חוק הגנת הפרטיות, התשמ"א‑1981. מסמך זה מתאר איזה מידע נאסף, למה, היכן הוא נשמר ומה הזכויות שלך. לפניות בנושאי פרטיות: <a href="mailto:chordix.business@gmail.com">chordix.business@gmail.com</a>.</p>
@@ -4287,13 +4646,15 @@ html.theme-light:not(.a11y-high-contrast) audio{mix-blend-mode:multiply}
   <p><b>ד. רשימת המתנה.</b> רק אם מילאת את טופס רשימת ההמתנה וסימנת את תיבת ההסכמה, נשמרים <b>כתובת הדוא"ל</b> ושם החבילה שהתעניינת בה, לצורך אחד: לשלוח לך עדכון כשתיפתח אפשרות רכישה.</p>
   <p><b>ה. תגובות.</b> אם בחרת לשלוח תגובה דרך הטופס שבאתר, נשמרים <b>תוכן התגובה, הדירוג (אם נתת), השפה, מועד השליחה ומזהה החשבון שלך</b>. התגובות משמשות לשיפור השירות בלבד, אינן מתפרסמות באתר, ולא יפורסמו בלי אישורך המפורש. אל תכלול בתגובה מידע רגיש. ניתן לבקש את מחיקתן בכל עת.</p>
   <p><b>ו. מיקרופון (טיונר).</b> הטיונר שבעמוד הכלים מבקש גישה למיקרופון או לכרטיס הקול <b>רק כשאתה מפעיל אותו</b>. הקול מנותח במכשירך בלבד כדי לזהות גובה צליל; הוא <b>אינו מוקלט, אינו נשמר ואינו נשלח</b> אלינו או לאף צד שלישי, והגישה נסגרת כשעוצרים את הטיונר או עוזבים את העמוד.</p>
+  <p><b>ז. העוזר המוזיקלי.</b> העוזר שבפינת המסך עונה קודם מתוך מאגר תשובות מובנה שפועל <b>בדפדפן שלך בלבד</b>, וכל עוד התשובות האלה מספיקות, דבר מהשיחה אינו נשלח. רק כשהן אינן מספיקות, נשלחים לרכיב השרת של המפעיל ב‑Cloudflare, לצורך עיבוד במודל בינה מלאכותית (סעיף 5): <b>טקסט השיחה הנוכחית</b> (ההודעות שכתבת בה ותשובות העוזר), שפת הממשק ואיזה עמוד באתר פתוח (למשל “טיונר” או “דף אקורדים”). אם לחצת במפורש על “צירוף הדף הפתוח”, נשלח גם <b>סיכום של דף האקורדים הפתוח: סולם, קצב, משקל, שמות המקטעים והאקורדים</b>. ההקלטה, שם הקובץ, שמך, כתובת הדוא"ל ומזהה החשבון אינם נשלחים לעוזר לעולם, ורכיב השרת אינו קורא ואינו שומר את כתובת ה‑IP שלך או כל מזהה אחר. בפעם הראשונה שבה שאלה נשלחת לעיבוד כזה, חלון העוזר מציין זאת. <b>המפעיל אינו שומר את השיחה</b>: היא אינה נכתבת למסד הנתונים או לאחסון במכשירך, רכיב השרת אינו רושם את תוכנה ביומנים, והיא נמחקת כשמרעננים או סוגרים את הדף, או בלחיצה על “ניקוי השיחה”. כדי למנוע עומס, השרת מגביל את מספר הבקשות הכולל, בלי לזהות מי שלח אותן. אל תכלול בשיחה פרטים מזהים או מידע רגיש. השימוש בעוזר הוא רשות; בלעדיו כל שאר השירות פועל כרגיל.</p>
   <p><b>מה איננו אוספים:</b> איננו מבקשים מספר טלפון, כתובת מגורים, תאריך לידה, מספר זהות או פרטי תשלום, ואיננו אוספים נתוני מיקום, נתוני שימוש התנהגותיים או מזהי פרסום.</p>
   <p>מסירת המידע נעשית מרצונך. אינך חייב על פי דין למסור אותו, אך בלעדיו לא ניתן לפתוח חשבון או לשמור היסטוריה.</p>
 
   <h3>4. למה המידע משמש</h3>
   <ul>
     <li>לזהות אותך ולאפשר כניסה לחשבון;</li>
-    <li>להציג לך את היסטוריית הניתוחים שלך ולאפשר לפתוח אותם מחדש.</li>
+    <li>להציג לך את היסטוריית הניתוחים שלך ולאפשר לפתוח אותם מחדש;</li>
+    <li>לענות על שאלות ששלחת לעוזר המוזיקלי (סעיף 3ז).</li>
   </ul>
   <p>המידע אינו נמכר, אינו מושכר ואינו מועבר לצדדים שלישיים לצורכי שיווק. אין פרסום באתר ואין שיתוף מידע עם מפרסמים.</p>
 
@@ -4301,7 +4662,7 @@ html.theme-light:not(.a11y-high-contrast) audio{mix-blend-mode:multiply}
   <p>המפעיל אינו מחזיק שרתים משלו ונשען על ספקי תשתית מוכרים. לכל אחד מהם מדיניות פרטיות ואבטחה משלו, ואלה חלות על המידע המוחזק אצלו:</p>
   <ul>
     <li><b>Supabase, Inc.</b> — בסיס הנתונים ומערכת ההתחברות. כאן נשמרים החשבון וההיסטוריה. פרויקט השירות ממוקם ב<b>אזור באיחוד האירופי</b>. <a href="https://supabase.com/privacy" target="_blank" rel="noopener noreferrer">מדיניות הפרטיות של Supabase</a>.</li>
-    <li><b>Cloudflare, Inc.</b> — אירוח האתר והגשתו (Cloudflare Pages), לרבות הגנה מפני תעבורה זדונית. דרך הספק עוברות בקשות הרשת שלך, ובכלל זה כתובת ה‑IP ופרטי דפדפן בסיסיים, כמקובל בכל אתר. <a href="https://www.cloudflare.com/privacypolicy/" target="_blank" rel="noopener noreferrer">מדיניות הפרטיות של Cloudflare</a>.</li>
+    <li><b>Cloudflare, Inc.</b> — אירוח האתר והגשתו (Cloudflare Pages), לרבות הגנה מפני תעבורה זדונית. דרך הספק עוברות בקשות הרשת שלך, ובכלל זה כתובת ה‑IP ופרטי דפדפן בסיסיים, כמקובל בכל אתר. בנוסף, רכיב שרת של המפעיל אצל ספק זה (Pages Functions) מקבל את השאלות לעוזר המוזיקלי שהתשובות המובנות אינן עונות עליהן (סעיף 3ז), ומעביר אותן לעיבוד במודל בינה מלאכותית שפועל בשירות Workers AI של Cloudflare. לפי התנאים של Cloudflare, היא מעבדת את התוכן הזה כמעבד מטעם המפעיל ואינה משתמשת בו לאימון מודלים של בינה מלאכותית. <a href="https://www.cloudflare.com/privacypolicy/" target="_blank" rel="noopener noreferrer">מדיניות הפרטיות של Cloudflare</a>.</li>
     <li><b>Google</b> — רק אם בחרת להתחבר דרך Google: שירות ההתחברות (“Sign in with Google”) ותמונת הפרופיל שנטענת משרתי Google. בעת ההתחברות נחשפים לגוגל כתובת ה‑IP ופרטי דפדפן בסיסיים. הגופנים באתר מוגשים מהאתר עצמו, ולא מ‑Google. <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer">מדיניות הפרטיות של Google</a>.</li>
     <li><b>Discord Inc.</b> — רק אם בחרת להתחבר דרך Discord: שירות ההתחברות, ותמונת הפרופיל שנטענת משרתי Discord. נחשפים לספק כתובת ה‑IP ופרטי דפדפן בסיסיים. <a href="https://discord.com/privacy" target="_blank" rel="noopener noreferrer">מדיניות הפרטיות של Discord</a>.</li>
     <li>ספריות הקוד (מנוע ההרצה של המודל וספריית ההתחברות) מוגשות מהאתר עצמו, ולא מרשת הפצה של צד שלישי.</li>
@@ -4316,6 +4677,7 @@ html.theme-light:not(.a11y-high-contrast) audio{mix-blend-mode:multiply}
 
   <h3>6. העברת מידע אל מחוץ לישראל</h3>
   <p>ספקי התשתית שלעיל הם חברות זרות המידע נשמר ומעובד מחוץ לגבולות ישראל. מסד הנתונים, שבו נשמר כל המידע האישי, ממוקם ב<b>אזור באיחוד האירופי</b> — כלומר במדינות שדיני הגנת המידע בהן מעניקים רמת הגנה המוכרת כנאותה, בהתאם לתקנות הגנת הפרטיות (העברת מידע אל מאגרי מידע שמחוץ לגבולות המדינה), התשס"א‑2001. השימוש בשירות מהווה הסכמה להעברה זו.</p>
+  <p><b>העוזר המוזיקלי.</b> שאלות שנשלחות לעיבוד בבינה מלאכותית (סעיף 3ז) מעובדות ברשת הגלובלית של Cloudflare, ולא ניתן להגביל את העיבוד הזה למדינה או לאזור מסוים. לכן הוא עשוי להתבצע גם מחוץ לישראל ומחוץ לאיחוד האירופי, לרבות בארצות הברית; נכון למועד עדכון זה, ספקי המשנה ש‑Cloudflare מפרטת לשירות זה נמצאים בארצות הברית ובאנגליה. Cloudflare מעבדת את המידע כמעבד מטעם המפעיל, לפי התנאים שלה והסכם עיבוד הנתונים (DPA) שהוא חלק מהם, הכולל מנגנוני הגנה להעברת מידע בין מדינות. שליחת שאלה לעוזר מהווה הסכמה להעברה זו; אם אינך מסכים לה, אל תשתמש בעוזר. שאר השירות אינו תלוי בו.</p>
 
   <h3>7. אחסון במכשיר שלך, Cookie ומדידה</h3>
   <p>באחסון המקומי של הדפדפן (localStorage), במכשירך בלבד, נשמרים: העדפות הנגישות והתצוגה שבחרת, אישור קריאת תנאי השימוש, ואסימון ההתחברות שמאפשר להישאר מחובר בין ביקורים. ניתן למחוק את כולם בכל עת בניקוי נתוני האתר בדפדפן, ומחיקת אסימון ההתחברות משמעה יציאה מהחשבון.</p>
@@ -4324,10 +4686,10 @@ html.theme-light:not(.a11y-high-contrast) audio{mix-blend-mode:multiply}
   <p>הפירוט המלא של מה שנשמר במכשירך נמצא ב<b>מדיניות העוגיות (Cookies)</b>.</p>
 
   <h3>8. משך שמירת המידע</h3>
-  <p>המידע נשמר כל עוד החשבון פעיל. עם מחיקת החשבון נמחקת איתו, אוטומטית, גם היסטוריית הניתוחים. ניתוח שלא שמרת ב“ספריית השירים” נשמר ב“היסטוריית הניתוחים” ונמחק אוטומטית כעבור 30 יום; שיר ששמרת בספרייה נשמר עד שתמחק אותו. כתובת דוא"ל ברשימת ההמתנה נשמרת עד שנשלח העדכון שביקשת או עד שתבקש הסרה, לפי המוקדם.</p>
+  <p>המידע נשמר כל עוד החשבון פעיל. עם מחיקת החשבון נמחקת איתו, אוטומטית, גם היסטוריית הניתוחים. ניתוח שלא שמרת ב“ספריית השירים” נשמר ב“היסטוריית הניתוחים” ונמחק אוטומטית כעבור 30 יום; שיר ששמרת בספרייה נשמר עד שתמחק אותו. כתובת דוא"ל ברשימת ההמתנה נשמרת עד שנשלח העדכון שביקשת או עד שתבקש הסרה, לפי המוקדם. שיחות עם העוזר המוזיקלי אינן נשמרות אצל המפעיל, ולכן אין בידינו שיחה שאפשר לעיין בה או למחוק אותה. אצל Cloudflare, הטיפול בתוכן שנשלח לעיבוד, לרבות משך שמירתו אם הוא נשמר, כפוף לתנאים ולמדיניות הפרטיות שלה; המפעיל אינו משתמש לשיחות באף שירות אחסון של Cloudflare.</p>
 
   <h3>9. אבטחת מידע</h3>
-  <p>המפעיל פועל לאבטחת המידע בהתאם לתקנות הגנת הפרטיות (אבטחת מידע), התשע"ז‑2017, ובכלל זה: התעבורה אל השרתים ומהם מוצפנת (HTTPS); הגישה למידע מוגבלת ברמת בסיס הנתונים כך שכל משתמש יכול לקרוא את הרשומות שלו בלבד; נתוני החשבון אינם ניתנים לשינוי מצד הדפדפן אלא דרך פעולות מבוקרות בשרת; והמפעיל אינו מחזיק סיסמאות משתמשים כלל, שכן האימות נעשה אצל גוגל.</p>
+  <p>המפעיל פועל לאבטחת המידע בהתאם לתקנות הגנת הפרטיות (אבטחת מידע), התשע"ז‑2017, ובכלל זה: התעבורה אל השרתים ומהם מוצפנת (HTTPS); הגישה למידע מוגבלת ברמת בסיס הנתונים כך שכל משתמש יכול לקרוא את הרשומות שלו בלבד; נתוני החשבון אינם ניתנים לשינוי מצד הדפדפן אלא דרך פעולות מבוקרות בשרת; והמפעיל אינו מחזיק סיסמאות משתמשים כלל, שכן ההתחברות נעשית דרך Google, Discord או קוד חד‑פעמי שנשלח לדוא"ל, ואין בשירות סיסמה.</p>
   <p>עם זאת, אין מערכת חסינה לחלוטין. המפעיל אינו יכול להתחייב שלא יתרחש אירוע אבטחה, ואינו אחראי לאבטחת המכשיר או הרשת שבהם אתה משתמש. בקרות אירוע אבטחה חמור יפעל המפעיל כנדרש לפי דין.</p>
 
   <h3>10. הזכויות שלך</h3>
@@ -4351,7 +4713,7 @@ html.theme-light:not(.a11y-high-contrast) audio{mix-blend-mode:multiply}
 </div>
 
 <div id="legal-accessibility" data-title="הצהרת נגישות">
-  <p class="legal-meta">עודכן לאחרונה: 19 בספטמבר 2026</p>
+  <p class="legal-meta">עודכן לאחרונה: 26 בספטמבר 2026</p>
 
   <h3>המחויבות שלנו</h3>
   <p>אנו רואים בנגישות השירות לכלל המשתמשים, לרבות אנשים עם מוגבלות, ערך מרכזי. האתר נבנה בשאיפה לעמוד בהוראות תקנות שוויון זכויות לאנשים עם מוגבלות (התאמות נגישות לשירות), התשע"ג‑2013, בתקן הישראלי ת"י 5568 ובהנחיות WCAG 2.1 ברמה AA.</p>
@@ -4364,10 +4726,11 @@ html.theme-light:not(.a11y-high-contrast) audio{mix-blend-mode:multiply}
     <li>מבנה סמנטי, תוויות ARIA לכפתורים ולחלונות, והכרזה לקוראי מסך על שינויי מצב כגון סיום ניתוח, שגיאה או החלפת אקורד.</li>
     <li>העברת מידע שאינו נשען על צבע בלבד: לצד הצבע מוצגים שם המקטע, שם האקורד והזמן, ובמצב עיוורי צבעים מתווספת תבנית ויזואלית.</li>
     <li>תצוגה מותאמת למסכים קטנים ולהגדלת תצוגה בדפדפן.</li>
+    <li>העוזר המוזיקלי: הכפתור והחלון מופעלים במלואם במקלדת (Enter שולח, Shift+Enter יורד שורה, ו‑Esc סוגר את החלון ומחזיר את המיקוד לכפתור); לשדה ההקלדה יש תווית נגישה; ההודעות מסומנות לקורא המסך לפי הדובר, ותשובה מוכרזת פעם אחת כשהיא מסתיימת ולא מילה אחר מילה; ההנפשות שלו נעצרות ב“הפחתת אנימציות” ובהעדפת המערכת; והכפתור שלו, וגם החלון במסכים רחבים, אינם מסתירים את כפתור הנגישות. בטלפון החלון הפתוח ממלא את רוב המסך, וסגירתו (בכפתור הסגירה או ב‑Esc) מחזירה את כפתור הנגישות לתצוגה.</li>
   </ul>
 
   <h3>מגבלות ידועות</h3>
-  <p>רכיבי ציר הזמן ומפת המבנה הם רכיבים גרפיים המבוססים על מיקום בזמן, ותפעולם באמצעות קורא מסך מוגבל; לצדם מוצגת תמיד תצוגת “דף אקורדים” טקסטואלית, וניתן לייצא את הדף כקובץ טקסט — שתיהן מספקות את אותו מידע בצורה נגישה. קובץ ה‑PDF שמורידים מהאתר נשמר כתמונה ואינו נגיש לקורא מסך; לגרסת PDF נגישה אפשר להשתמש ב“הדפסה” ולבחור “שמירה כ‑PDF” בדפדפן. נגן השמע הוא רכיב מובנה של הדפדפן וכפוף להתנהגות הנגישות שלו. אנו ממשיכים לשפר.</p>
+  <p>רכיבי ציר הזמן ומפת המבנה הם רכיבים גרפיים המבוססים על מיקום בזמן, ותפעולם באמצעות קורא מסך מוגבל; לצדם מוצגת תמיד תצוגת “דף אקורדים” טקסטואלית, שמספקת את אותו מידע בצורה נגישה. קובץ ה‑PDF שמורידים מהאתר נשמר כתמונה ואינו נגיש לקורא מסך; לגרסת PDF נגישה אפשר להשתמש ב“הדפסה” ולבחור “שמירה כ‑PDF” בדפדפן. נגן השמע הוא רכיב מובנה של הדפדפן וכפוף להתנהגות הנגישות שלו. תשובות העוזר המוזיקלי נוצרות אוטומטית, וקורא מסך עשוי להקריא סימני אקורדים (למשל <bdi>F#m7</bdi>) תו אחר תו. אנו ממשיכים לשפר.</p>
 
   <h3>פנייה בנושא נגישות</h3>
   <p>רכז הנגישות: מפעיל השירות · דוא"ל: <a href="mailto:chordix.business@gmail.com">chordix.business@gmail.com</a>.<br>
@@ -4375,7 +4738,7 @@ html.theme-light:not(.a11y-high-contrast) audio{mix-blend-mode:multiply}
 </div>
 
 <div id="legal-cookies" data-title="מדיניות עוגיות (Cookies)">
-  <p class="legal-meta">עודכן לאחרונה: 19 בספטמבר 2026</p>
+  <p class="legal-meta">עודכן לאחרונה: 26 בספטמבר 2026</p>
 
   <h3>1. בקצרה</h3>
   <p>Chordix <b>אינו מציב קובצי Cookie משלו</b>, אינו מפעיל כלי אנליטיקה, פיקסלים או פרסום של צד שלישי, ואינו עוקב אחריך בין אתרים. המדידה היחידה היא מונה כניסות אנונימי ומצטבר, בלי שום מזהה (ראו סעיף 4). כדי שהאתר יעבוד נשמרים במכשירך כמה פריטים בלבד, באחסון המקומי של הדפדפן. הם אינם נשלחים אלינו, למעט אסימון ההתחברות שנשלח לשרת ההתחברות כדי לזהות אותך.</p>
@@ -4389,6 +4752,7 @@ html.theme-light:not(.a11y-high-contrast) audio{mix-blend-mode:multiply}
     <li><b>התאריך האחרון שנספר במונה הכניסות</b> (<bdi>cx_vday</bdi>) — תאריך בלבד, בלי שום מזהה; מונע ספירה כפולה של אותו דפדפן באותו יום.</li>
     <li><b>מטמון האפליקציה</b> (Service Worker / Cache Storage) — קובצי האתר ומודל הזיהוי, כדי שהאתר ייטען מהר ויעבוד גם בלי חיבור.</li>
   </ul>
+  <p><b>העוזר המוזיקלי</b> אינו שומר במכשירך דבר מהשיחה ואינו מציב עוגייה: השיחה קיימת רק בזיכרון הדף הפתוח, אינה נכתבת לאחסון המקומי או למטמון האפליקציה, ונמחקת כשמרעננים או סוגרים את הדף.</p>
 
   <h3>3. צדדים שלישיים</h3>
   <ul>
@@ -4435,7 +4799,7 @@ html.theme-light:not(.a11y-high-contrast) audio{mix-blend-mode:multiply}
 </div>
 
 <div id="legal-licenses" data-title="רישיונות צד שלישי">
-  <p class="legal-meta">עודכן לאחרונה: 22 בספטמבר 2026</p>
+  <p class="legal-meta">עודכן לאחרונה: 26 בספטמבר 2026</p>
   <p>השירות עושה שימוש ברכיבי קוד פתוח הבאים. השימוש בהם כפוף לתנאי הרישיון המצוינים, והודעות זכויות היוצרים מובאות כאן כנדרש.</p>
 
   <h3>1. מודל זיהוי אקורדים — BTC (Bi‑directional Transformer for Chord Recognition)</h3>
@@ -4499,13 +4863,16 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.</pre>
 
+  <h3>7. מודלי הבינה המלאכותית של העוזר המוזיקלי</h3>
+  <p>תשובות העוזר המוזיקלי לשאלות חופשיות, שהמאגר המובנה אינו עונה עליהן, עשויות להיווצר במודלי בינה מלאכותית פתוחים ש‑Cloudflare מריצה בשירות Workers AI. המודלים רצים אצל Cloudflare, אינם מופצים על ידי האתר ואינם נטענים למכשירך: <b>Google Gemma 4</b>, מופץ ברישיון <span dir="ltr">Apache License 2.0</span>, וכגיבוי <b>GLM-4.7-Flash</b> של Zhipu AI, מופץ ברישיון MIT.</p>
+
 </div>
 
 
 <!-- ===== English versions of the legal documents ===== -->
 
 <div id="legal-terms-en" data-title="Terms of Use">
-  <p class="legal-meta">Last updated: 19 September 2026</p>
+  <p class="legal-meta">Last updated: 26 September 2026</p>
 
   <h3>1. General</h3>
   <p>The “Chordix” website and service (the <b>“Service”</b>) are operated by <span class="fill">Chordix</span> (the <b>“Operator”</b>). These terms constitute a binding agreement between you and the Operator. Entering and using the Service constitutes full acceptance of these terms. If you do not agree to any of them, you may not use the Service.</p>
@@ -4518,8 +4885,8 @@ THE SOFTWARE.</pre>
   <p>Use is permitted for those aged 18 or over, or for a minor with the approval of their guardian. Using the Service constitutes a declaration that you meet this condition.</p>
 
   <h3>3a. User account and sign-in</h3>
-  <p>Some of the Service's capabilities — credit management, analysing a song and saving history — require an account. <b>Signing in is possible only via a Google account</b>, and the Service has no separate password. Use of this sign-in is also subject to Google's terms of service.</p>
-  <p>You are responsible for safeguarding your Google account and for every action taken in the Service through it. One account is intended for one person; accounts may not be transferred, sold or shared. The Operator may suspend or close an account that has been misused, used contrary to these terms, or used unlawfully.</p>
+  <p>Some of the Service's capabilities — credit management, analysing a song and saving history — require an account. <b>Signing in is possible via a Google account, a Discord account, or an email address with a one-time code</b>, and the Service has no separate password. When signing in through an external provider, use is also subject to that provider's terms of service.</p>
+  <p>You are responsible for safeguarding the account you sign in with (Google, Discord or email) and for every action taken in the Service through it. One account is intended for one person; accounts may not be transferred, sold or shared. The Operator may suspend or close an account that has been misused, used contrary to these terms, or used unlawfully.</p>
   <p>You may request deletion of your account at any time by writing to <a href="mailto:chordix.business@gmail.com">chordix.business@gmail.com</a>. Deleting the account also deletes the analysis history. The Service is currently free and no refund or payment is due.</p>
 
   <h3>3b. Credits and coupon codes</h3>
@@ -4549,6 +4916,12 @@ THE SOFTWARE.</pre>
   <h3>6. Accuracy of results — full disclosure</h3>
   <p>Chord recognition is based on a machine learning model and on signal processing. The result is <b>a probabilistic estimate, not an authoritative transcription</b>. Errors are possible in the identification of key, tempo, bar division, chord types and song structure, particularly in dense recordings, in singing without clear harmonic accompaniment, in tempo changes and in recordings not tuned to A=440. The results should not be relied upon for professional, educational or commercial purposes without checking them.</p>
 
+  <h3>6a. The music assistant</h3>
+  <p>The Service includes the “music assistant”, an automated assistant that first answers from a built-in set of answers and, for questions those answers do not cover, by means of an artificial intelligence model. The assistant <b>is not a person</b>, and its answers are generated automatically: they may be wrong, incomplete or out of date, even when they sound confident. The assistant is meant for general explanations about music and about using the Service. <b>Its answers are not professional advice</b>, including legal advice on copyright, and should not be relied on without checking. Chords for a specific song suggested by the assistant are a guess, not a transcription.</p>
+  <p>The assistant's answers do not bind the Operator and do not change these terms or the Privacy Policy; in case of conflict, the wording of these documents prevails.</p>
+  <p>At present the assistant is free of charge. It is subject to fair-use limits, such as message length and the volume of requests in a period of time, which the Operator may set and change. You may not use the assistant automatically or at abnormal volume, try to circumvent its limits or reveal its instructions, or use it to produce unlawful, abusive or infringing content (including lyrics of protected songs). The Operator may refuse or block a request.</p>
+  <p>The assistant is provided as is and as available (section 7): the assistant, and in particular its AI part, may be unavailable, limited or discontinued at any time, without prior notice, in which case it answers only from the built-in answers. Do not share personal or sensitive details in the conversation. What is sent, where, and whether anything is kept is set out in section 3f of the Privacy Policy.</p>
+
   <h3>7. Availability and changes</h3>
   <p>The Service is provided “AS IS” and “AS AVAILABLE”. The Operator does not undertake to provide continuous availability, compatibility with every browser or device, data retention or backup, and may change, suspend or discontinue the Service or any part of it at any time and at its discretion, without prior notice.</p>
 
@@ -4574,7 +4947,7 @@ THE SOFTWARE.</pre>
 </div>
 
 <div id="legal-privacy-en" data-title="Privacy Policy">
-  <p class="legal-meta">Last updated: 19 September 2026</p>
+  <p class="legal-meta">Last updated: 26 September 2026</p>
 
   <h3>1. Who we are and what this document is</h3>
   <p>The “Chordix” service is operated by <b>Chordix</b> (the “Operator”), who is the controller of the information under the Protection of Privacy Law, 5741-1981. This document describes what information is collected, why, where it is stored and what your rights are. For privacy enquiries: <a href="mailto:chordix.business@gmail.com">chordix.business@gmail.com</a>.</p>
@@ -4584,18 +4957,20 @@ THE SOFTWARE.</pre>
   <p><b>The account and optional result are stored on a server.</b> In order to save optional analysis history, the Operator maintains a database. An earlier version of this policy stated that there was no database at all — that was true of a version which did not include accounts, and is no longer true. Full details are in section 3.</p>
 
   <h3>3. What information is actually collected</h3>
-  <p><b>a. Identity details from Google.</b> Entry to the Service is possible only via a Google account. On sign-in, Google provides us with <b>your name, email address, profile picture URL and Google account identifier</b>. We have no access to your password, your inbox or any other information in your Google account. Your name and picture are displayed to you in the interface and are read from the sign-in token; they are not stored in our tables.</p>
+  <p><b>a. Identity details from sign-in.</b> Entry to the Service is possible via a Google account, a Discord account, or an email address with a one-time code. When signing in via Google or Discord, the provider gives us <b>your name, email address, profile picture URL and your account identifier with that provider</b>; when signing in with email, only <b>your email address</b> is provided. We have no access to your password, your inbox or any other information in your account. Your name and picture are displayed to you in the interface and are read from the sign-in token; they are not stored in our tables.</p>
   <p><b>b. Account details.</b> The user identifier, email address and joining date may be stored to support the account and optional history.</p>
   <p><b>c. Analysis history.</b> On completion of a successful analysis, and when you are signed in, the following are saved to your account: <b>the name of the file you chose, the key, the tempo, the number of bars, the length of the song, the section division and the chord sequence produced</b>. That is: the result of the analysis is saved, the recording itself is not.</p>
   <p><b>d. Payments and coupons.</b> The Service currently has no active payments, paid plans or coupon programme.</p>
   <p><b>e. Waiting list.</b> If you chose to leave an email address to be notified when payments open, the address and the pack you indicated are stored for that purpose only.</p>
+  <p><b>f. The music assistant.</b> The assistant in the corner of the screen first answers from a built-in set of answers that runs <b>in your browser only</b>, and as long as those answers are enough, nothing from the conversation is sent. Only when they are not enough, the following are sent to the Operator's server component on Cloudflare for processing by an artificial intelligence model (see section 5): <b>the text of the current conversation</b> (the messages you wrote in it and the assistant's replies), the interface language and which page of the site is open (for example “tuner” or “chord sheet”). If you expressly click “Attach the open sheet”, <b>a summary of the open chord sheet (key, tempo, time signature, section names and chords)</b> is sent as well. The recording, the file name, your name, email address and account identifier are never sent to the assistant, and the server component does not read or store your IP address or any other identifier. The first time a question is sent for such processing, the assistant window says so. <b>The Operator does not save the conversation</b>: it is not written to the database or to storage on your device, the server component does not record its content in logs, and it disappears when you reload or close the page, or when you click “Clear the chat”. To prevent overload, the server limits the total number of requests without identifying who sent them. Please do not include identifying or sensitive details in the conversation. Using the assistant is optional; without it, the rest of the Service works as usual.</p>
   <p>Provision of this information is voluntary. You are not legally obliged to provide it, but without it an account cannot be opened and history cannot be saved.</p>
 
   <h3>4. What the information is used for</h3>
   <ul>
     <li>to identify you and enable entry to your account;</li>
     <li>to show you your analysis history and allow you to reopen past analyses;</li>
-    <li>to provide the free analysis service and optional analysis history.</li>
+    <li>to provide the free analysis service and optional analysis history;</li>
+    <li>to answer questions you send to the music assistant (section 3f).</li>
   </ul>
   <p>The information is not sold, not rented and not transferred to third parties for marketing purposes. There is no advertising on the site and no sharing of information with advertisers.</p>
 
@@ -4603,7 +4978,7 @@ THE SOFTWARE.</pre>
   <p>The Operator does not hold its own servers and relies on established infrastructure providers. Each of them has its own privacy and security policy, and these apply to the information held with it:</p>
   <ul>
     <li><b>Supabase, Inc.</b> — the database and the sign-in system. The account and analysis history are stored here. The legacy credit-system tables are inactive. The Service's project is located in a <b>region within the European Union</b>. <a href="https://supabase.com/privacy" target="_blank" rel="noopener noreferrer">Supabase's privacy policy</a>.</li>
-    <li><b>Cloudflare, Inc.</b> — hosting and serving the site (Cloudflare Pages), including protection against malicious traffic. Your network requests pass through this provider, including your IP address and basic browser details, as is standard for any website. <a href="https://www.cloudflare.com/privacypolicy/" target="_blank" rel="noopener noreferrer">Cloudflare's privacy policy</a>.</li>
+    <li><b>Cloudflare, Inc.</b> — hosting and serving the site (Cloudflare Pages), including protection against malicious traffic. Your network requests pass through this provider, including your IP address and basic browser details, as is standard for any website. In addition, a server component of the Operator at this provider (Pages Functions) receives the music assistant's questions that the built-in answers do not cover (section 3f) and passes them for processing by an artificial intelligence model that runs on Cloudflare's Workers AI service. According to Cloudflare's terms, it processes this content as a processor on the Operator's behalf and does not use it to train artificial intelligence models. <a href="https://www.cloudflare.com/privacypolicy/" target="_blank" rel="noopener noreferrer">Cloudflare's privacy policy</a>.</li>
     <li><b>Google</b> — only if you choose to sign in with Google: the sign-in service (“Sign in with Google”) and your profile picture, which is loaded from Google's servers. When signing in, your IP address and basic browser details are exposed to Google. The site's fonts are served from the site itself, not from Google. <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer">Google's privacy policy</a>.</li>
     <li><b>Discord Inc.</b> — only if you choose to sign in with Discord: the sign-in service, and your profile picture, which is loaded from Discord's servers. Your IP address and basic browser details are exposed to this provider. <a href="https://discord.com/privacy" target="_blank" rel="noopener noreferrer">Discord's privacy policy</a>.</li>
     <li>The code libraries (the model's runtime engine and the sign-in library) are served from the site itself, not from a third-party distribution network.</li>
@@ -4619,16 +4994,17 @@ THE SOFTWARE.</pre>
 
   <h3>6. Transfer of information outside Israel</h3>
   <p>The infrastructure providers listed above are foreign companies, and therefore the information is stored and processed outside Israel's borders. The database, in which all personal information is stored, is located in a <b>region within the European Union</b> — that is, in countries whose data protection laws provide a level of protection recognised as adequate, in accordance with the Protection of Privacy Regulations (Transfer of Information to Databases Abroad), 5761-2001. Use of the Service constitutes consent to this transfer.</p>
+  <p><b>The music assistant.</b> Questions sent for artificial intelligence processing (section 3f) are processed on Cloudflare's global network, and this processing cannot be limited to a particular country or region. It may therefore take place outside Israel and outside the European Union, including in the United States; at the time of this update, the sub-processors Cloudflare lists for this service are located in the United States and England. Cloudflare processes the information as a processor on the Operator's behalf, under its terms and the data processing addendum (DPA) that forms part of them, which includes safeguards for transfers of information between countries. Sending a question to the assistant constitutes consent to this transfer; if you do not agree to it, do not use the assistant. The rest of the Service does not depend on it.</p>
 
   <h3>7. Storage on your device, cookies and measurement</h3>
   <p>The following are stored in your browser's local storage (localStorage), on your device only: the accessibility and display preferences you selected, confirmation that you have read the terms of use, and the sign-in token that allows you to stay signed in between visits. All of these can be deleted at any time by clearing the site's data in your browser, and deleting the sign-in token means signing out of your account.</p>
   <p>The Operator <b>does not place tracking cookies, does not run any third-party analytics or advertising tools and does not build a behavioural profile</b>. The only measurement on the site is an <b>anonymous, aggregate visit counter</b>: once a day, from each browser, a single call increments a daily counter. No identifier is sent or stored — no account, no IP address and no cookie — so the count cannot be linked to you. Only the last counted date is kept on your device, so that you are not counted twice. In addition, the number of song analyses performed each day is counted, again as an aggregate number only. The infrastructure providers may place technical cookies and maintain server logs for security, fault diagnosis and abuse prevention — a mechanism that exists on every site, is outside the Operator's control, and is not used by the Operator to identify you personally.</p>
 
   <h3>8. Retention period</h3>
-  <p>The information is kept for as long as the account is active. When the account is deleted, the account data and analysis history are automatically deleted with it. Analysing a song requires a signed-in account. An analysis that you did not save to “My song library” is kept in the “Analysis history” and is deleted automatically after 30 days; a song you saved to the library is kept until you delete it. The Service currently has no paid plans, payment records or active coupon programme.</p>
+  <p>The information is kept for as long as the account is active. When the account is deleted, the account data and analysis history are automatically deleted with it. Analysing a song requires a signed-in account. An analysis that you did not save to “My song library” is kept in the “Analysis history” and is deleted automatically after 30 days; a song you saved to the library is kept until you delete it. The Service currently has no paid plans, payment records or active coupon programme. Conversations with the music assistant are not stored by the Operator, so we hold no conversation that could be accessed or deleted. At Cloudflare, the handling of content sent for processing, including how long it is kept if it is kept at all, is governed by Cloudflare's terms and privacy policy; the Operator does not use any Cloudflare storage service for conversations.</p>
 
   <h3>9. Information security</h3>
-  <p>The Operator acts to secure the information in accordance with the Protection of Privacy Regulations (Information Security), 5777-2017, including: traffic to and from the servers is encrypted (HTTPS); access to information is restricted at the database level such that each user can read only their own records; the Service does not currently maintain a customer wallet or process payments; and the Operator holds no user passwords at all, since authentication is performed by Google.</p>
+  <p>The Operator acts to secure the information in accordance with the Protection of Privacy Regulations (Information Security), 5777-2017, including: traffic to and from the servers is encrypted (HTTPS); access to information is restricted at the database level such that each user can read only their own records; the Service does not currently maintain a customer wallet or process payments; and the Operator holds no user passwords at all, since sign-in is done through Google, Discord or a one-time code sent by email, and the Service has no password.</p>
   <p>That said, no system is entirely immune. The Operator cannot undertake that no security incident will occur, and is not responsible for the security of the device or network you use. In the event of a serious security incident, the Operator will act as required by law.</p>
 
   <h3>10. Your rights</h3>
@@ -4652,7 +5028,7 @@ THE SOFTWARE.</pre>
 </div>
 
 <div id="legal-accessibility-en" data-title="Accessibility Statement">
-  <p class="legal-meta">Last updated: 19 September 2026</p>
+  <p class="legal-meta">Last updated: 26 September 2026</p>
 
   <h3>Our commitment</h3>
   <p>We regard accessibility of the Service to all users, including people with disabilities, as a core value. The site was built with the aim of meeting the Equal Rights for Persons with Disabilities Regulations (Service Accessibility Adjustments), 5773-2013, Israeli Standard SI 5568, and the WCAG 2.1 Level AA guidelines.</p>
@@ -4665,10 +5041,11 @@ THE SOFTWARE.</pre>
     <li>Semantic structure, ARIA labels for buttons and dialogs, and screen-reader announcements of state changes such as analysis completion, errors or a change of the playing chord.</li>
     <li>Information is never conveyed by colour alone: alongside colour, the section name, chord name and time are displayed, and in colour-blind mode a visual pattern is added.</li>
     <li>A display adapted to small screens and to browser zoom.</li>
+    <li>The music assistant: the button and the window are fully keyboard-operable (Enter sends, Shift+Enter adds a new line, and Esc closes the window and returns focus to the button); the message field has an accessible label; messages are labelled by speaker for screen readers, and an answer is announced once when it is complete rather than word by word; its animations stop under “reduced animation” and the system preference; and its button, as well as its window on larger screens, does not cover the accessibility button. On phones the open window fills most of the screen, and closing it (with the close button or Esc) brings the accessibility button back into view.</li>
   </ul>
 
   <h3>Known limitations</h3>
-  <p>The timeline and structure-map components are graphical components based on position in time, and their operation with a screen reader is limited; alongside them, a textual “chord sheet” view is always available, and the sheet can be exported as a text file — both provide the same information in an accessible form. The PDF file downloaded from the site is stored as an image and is not accessible to screen readers; for an accessible PDF, use “Print” and choose “Save as PDF” in your browser. The audio player is a built-in browser component and is subject to its accessibility behaviour. We are continuing to improve.</p>
+  <p>The timeline and structure-map components are graphical components based on position in time, and their operation with a screen reader is limited; alongside them, a textual “chord sheet” view is always available, which provides the same information in an accessible form. The PDF file downloaded from the site is stored as an image and is not accessible to screen readers; for an accessible PDF, use “Print” and choose “Save as PDF” in your browser. The audio player is a built-in browser component and is subject to its accessibility behaviour. The music assistant's answers are generated automatically, and a screen reader may read chord symbols (for example <bdi>F#m7</bdi>) character by character. We are continuing to improve.</p>
 
   <h3>Accessibility contact</h3>
   <p>Accessibility coordinator: the operator of the Service · Email: <a href="mailto:chordix.business@gmail.com">chordix.business@gmail.com</a>.<br>
@@ -4676,7 +5053,7 @@ THE SOFTWARE.</pre>
 </div>
 
 <div id="legal-cookies-en" data-title="Cookie Policy">
-  <p class="legal-meta">Last updated: 19 September 2026</p>
+  <p class="legal-meta">Last updated: 26 September 2026</p>
 
   <h3>1. In short</h3>
   <p>Chordix <b>does not set cookies of its own</b>, runs no third-party analytics, pixels or advertising tools, and does not track you across sites. The only measurement is an anonymous, aggregate visit counter with no identifier at all (see section 4). For the site to work, only a few items are kept on your device, in the browser's local storage. They are not sent to us, except for the sign-in token, which is sent to the sign-in server in order to identify you.</p>
@@ -4690,6 +5067,7 @@ THE SOFTWARE.</pre>
     <li><b>Last date counted by the visit counter</b> (<bdi>cx_vday</bdi>) — a date only, with no identifier; prevents the same browser from being counted twice on the same day.</li>
     <li><b>Application cache</b> (Service Worker / Cache Storage) — the site's files and the recognition model, so that the site loads quickly and works offline.</li>
   </ul>
+  <p>The <b>music assistant</b> keeps nothing from the conversation on your device and sets no cookie: the conversation exists only in the memory of the open page, is not written to local storage or to the application cache, and disappears when you reload or close the page.</p>
 
   <h3>3. Third parties</h3>
   <ul>
@@ -4736,7 +5114,7 @@ THE SOFTWARE.</pre>
 </div>
 
 <div id="legal-licenses-en" data-title="Third-party licences">
-  <p class="legal-meta">Last updated: 22 September 2026</p>
+  <p class="legal-meta">Last updated: 26 September 2026</p>
   <p>The Service makes use of the following open-source components. Their use is subject to the licence terms indicated, and the copyright notices are reproduced here as required.</p>
 
   <h3>1. Chord recognition model — BTC (Bi-directional Transformer for Chord Recognition)</h3>
@@ -4799,6 +5177,9 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.</pre>
 
+  <h3>7. The music assistant's AI models</h3>
+  <p>The music assistant's answers to free-form questions that its built-in answers do not cover may be generated by open artificial intelligence models that Cloudflare runs on its Workers AI service. The models run at Cloudflare; they are not distributed by this site and are not downloaded to your device: <b>Google Gemma 4</b>, distributed under the <span dir="ltr">Apache License 2.0</span>, and, as a fallback, Zhipu AI's <b>GLM-4.7-Flash</b>, distributed under the MIT licence.</p>
+
 </div>
 
 </div>
@@ -4825,6 +5206,8 @@ THE SOFTWARE.</pre>
    של Cloudflare) + localhost / 127.0.0.1 (בדיקה מקומית).
    ⚠ דומיין מותאם חדש (למשל chordix.co.il) — להוסיף כאן וגם בתגי
      canonical/og:url למעלה, אחרת מבקרים בו יופנו ל-pages.dev.
+     וגם ב-ORIGIN_RE שב-functions/api/chat.js (רשימת המקורות של העוזר
+     המוזיקלי), אחרת כל שאלה ל-AI מהדומיין החדש תקבל 403.
    מגבלה ידועה: זו הרתעה מפני העתקה עצלה; מי שמפרק את הקוד יכול
    להסיר את הבדיקה. ההגנה האמיתית היא הערפול עצמו. ============= */
 (function(){
@@ -15024,5 +15407,1867 @@ const SUPABASE_ANON_KEY = 'sb_publishable_o_OZ0MF9F3eN-7727-cQkA_oihPH1pH';
     });
 })();
 </script>
+<!-- cx-chat:script:start -->
+<script>
+/* ============================================================
+   העוזר המוזיקלי (צ'אט) — בלוק עצמאי
+   ------------------------------------------------------------
+   מוח מקומי תמיד (מאגר ידע + כלי מוזיקה, התשובות מחושבות בדפדפן).
+   רק כשאין תשובה מקומית בטוחה: POST ל-/api/chat (בינה מלאכותית של
+   Cloudflare) עם השיחה עד כה מהזיכרון, כולל שאלות ותשובות מקומיות
+   קודמות. אם השרת לא זמין: הצעות מהמאגר + הפניה לטיפים/תגובה/מייל.
+   שום דבר לא נשמר: השיחה חיה במשתנה בתוך הבלוק הזה ונעלמת ברענון.
+   אין localStorage/sessionStorage/IndexedDB/עוגיות.
+   כל טקסט של משתמש/מאגר/מודל נבנה כצמתי DOM עם textContent, אף פעם
+   לא כ-HTML גולמי.
+   ============================================================ */
+(function(){
+  'use strict';
+  const $ = id => document.getElementById(id);
+  const fab = $('cxChatFab'), panel = $('cxChat');
+  if(!fab || !panel || !window.fetch) return;
+  const log = $('cxChatLog'), input = $('cxChatInput'), form = $('cxChatForm');
+  const sendBtn = $('cxChatSend'), stopBtn = $('cxChatStop');
+  const attachRow = $('cxAttachRow'), attachBtn = $('cxAttach');
+  const root = document.documentElement;
+
+  /* המוח המקומי (מאגר + מנוע) נטען רק כשצריך אותו: בשאלה הראשונה, או ברגע שקט אחרי שמתקרבים
+     לכפתור/פותחים את החלון. מאגר הידע הוא קובץ נתונים נפרד (/assistant-kb.json) ולא חלק מהקוד,
+     כך שמי שלא נוגע בעוזר לא מוריד אותו בכלל, והוא לא מנפח את חבילת הקוד המעורפלת. */
+  let ENGINE_ = null, ENGINE0_ = null, kbLoad = null;
+  const KB_TIMEOUT = 8000;        /* רשת תקועה לא מקפיאה את העוזר */
+  function buildEngine(KB){
+/* cx-chat-engine:start */
+/* המוח המקומי של העוזר: כלי-מוזיקה דטרמיניסטיים + התאמה למאגר הידע (KB).
+   רץ כולו בדפדפן; לא ניגש ל-DOM, לרשת או לאחסון. נבדק ב-Node: בדיקה מחלצת את הקוד שבין הסמנים ומריצה אותו מול מאגר הבדיקות. */
+const ENGINE = (function (KB) {
+  'use strict';
+  const mod = (n, m) => ((n % m) + m) % m;
+  const LETTERS = 'CDEFGAB';
+  const NAT = { C: 0, D: 2, E: 4, F: 5, G: 7, A: 9, B: 11 };
+  const SHARP = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+  const FLAT = ['C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab', 'A', 'Bb', 'B'];
+  const MAJ_NAME = ['C', 'Db', 'D', 'Eb', 'E', 'F', 'F#', 'G', 'Ab', 'A', 'Bb', 'B'];
+  const MIN_NAME = ['C', 'C#', 'D', 'Eb', 'E', 'F', 'F#', 'G', 'G#', 'A', 'Bb', 'B'];
+
+  /* ---------- איכויות אקורד: סיומת → מרווחים, דרגות, משפחה ---------- */
+  const QDEF = [
+    ['', '0 4 7', '1 3 5', 'M'], ['m', '0 3 7', '1 b3 5', 'm'],
+    ['7', '0 4 7 10', '1 3 5 b7', '7'], ['m7', '0 3 7 10', '1 b3 5 b7', 'm'],
+    ['maj7', '0 4 7 11', '1 3 5 7', 'M'], ['mmaj7', '0 3 7 11', '1 b3 5 7', 'm'],
+    ['dim', '0 3 6', '1 b3 b5', 'd'], ['dim7', '0 3 6 9', '1 b3 b5 bb7', 'd'],
+    ['m7b5', '0 3 6 10', '1 b3 b5 b7', 'd'], ['aug', '0 4 8', '1 3 #5', 'a'],
+    ['aug7', '0 4 8 10', '1 3 #5 b7', 'a'], ['sus2', '0 2 7', '1 2 5', 's'],
+    ['sus4', '0 5 7', '1 4 5', 's'], ['7sus4', '0 5 7 10', '1 4 5 b7', 's'],
+    ['6', '0 4 7 9', '1 3 5 6', 'M'], ['m6', '0 3 7 9', '1 b3 5 6', 'm'],
+    ['9', '0 4 7 10 14', '1 3 5 b7 9', '7'], ['m9', '0 3 7 10 14', '1 b3 5 b7 9', 'm'],
+    ['maj9', '0 4 7 11 14', '1 3 5 7 9', 'M'], ['add9', '0 4 7 14', '1 3 5 9', 'M'],
+    ['madd9', '0 3 7 14', '1 b3 5 9', 'm'], ['5', '0 7', '1 5', '5'],
+    ['11', '0 4 7 10 14 17', '1 3 5 b7 9 11', '7'], ['m11', '0 3 7 10 14 17', '1 b3 5 b7 9 11', 'm'],
+    ['13', '0 4 7 10 14 21', '1 3 5 b7 9 13', '7'], ['7b9', '0 4 7 10 13', '1 3 5 b7 b9', '7'],
+    ['7#9', '0 4 7 10 15', '1 3 5 b7 #9', '7'], ['7b5', '0 4 6 10', '1 3 b5 b7', '7'],
+    ['69', '0 4 7 9 14', '1 3 5 6 9', 'M'], ['m69', '0 3 7 9 14', '1 b3 5 6 9', 'm'],
+    ['7#11', '0 4 7 10 18', '1 3 5 b7 #11', '7'], ['maj7#11', '0 4 7 11 18', '1 3 5 7 #11', 'M']
+  ];
+  const QMAP = {};
+  QDEF.forEach(q => { QMAP[q[0]] = { iv: q[1].split(' ').map(Number), deg: q[2].split(' '), cls: q[3] }; });
+  const ALIAS = {
+    maj: '', M: '', major: '', min: 'm', mi: 'm', '-': 'm', minor: 'm',
+    M7: 'maj7', Maj7: 'maj7', MAJ7: 'maj7', ma7: 'maj7', 'Δ': 'maj7', 'Δ7': 'maj7', j7: 'maj7',
+    min7: 'm7', mi7: 'm7', '-7': 'm7', mM7: 'mmaj7', mMaj7: 'mmaj7', minmaj7: 'mmaj7', mmaj: 'mmaj7',
+    '°': 'dim', o: 'dim', '°7': 'dim7', o7: 'dim7',
+    'ø': 'm7b5', 'ø7': 'm7b5', 'm7-5': 'm7b5', min7b5: 'm7b5', mi7b5: 'm7b5',
+    '+': 'aug', '+5': 'aug', '#5': 'aug', aug5: 'aug', '+7': 'aug7', '7+': 'aug7', '7#5': 'aug7', '7aug': 'aug7',
+    sus: 'sus4', '7sus': '7sus4', sus7: '7sus4', M9: 'maj9', Maj9: 'maj9', add2: 'add9', madd2: 'madd9',
+    '7-9': '7b9', '7+9': '7#9', '7-5': '7b5',
+    '6/9': '69', '6add9': '69', 'm6/9': 'm69', 'min6/9': 'm69', '-6/9': 'm69', 'M7#11': 'maj7#11'
+  };
+  const DEG_STEP = { '1': 0, '2': 1, '9': 1, 'b9': 1, '#9': 1, 'b3': 2, '3': 2, '4': 3, '11': 3, '#11': 3, 'b5': 4, '5': 4, '#5': 4, '6': 5, '13': 5, 'bb7': 6, 'b7': 6, '7': 6 };
+  const DEG_NAME = {
+    he: { '1': 'שורש', '2': 'סקונדה', 'b3': 'טרצה קטנה', '3': 'טרצה גדולה', '4': 'קוורטה', 'b5': 'קווינטה מוקטנת', '5': 'קווינטה', '#5': 'קווינטה מוגדלת', '6': 'סקסטה', 'bb7': 'ספטימה מוקטנת', 'b7': 'ספטימה קטנה', '7': 'ספטימה גדולה', '9': 'נונה', 'b9': 'נונה קטנה', '#9': 'נונה מוגדלת', '11': 'אונדצימה', '#11': 'אונדצימה מוגדלת', '13': 'טרצדצימה' },
+    en: { '1': 'root', '2': '2nd', 'b3': 'minor 3rd', '3': 'major 3rd', '4': '4th', 'b5': 'flat 5th', '5': '5th', '#5': 'sharp 5th', '6': '6th', 'bb7': 'diminished 7th', 'b7': 'minor 7th', '7': 'major 7th', '9': '9th', 'b9': 'flat 9th', '#9': 'sharp 9th', '11': '11th', '#11': 'sharp 11th', '13': '13th' }
+  };
+  /* שם תו לפי אות (כתיב תיאורטי), ובלי דאבל-דיאז/במול: אז נופלים לשם הפשוט */
+  function spellAt(letter, rootPc, iv, step, preferFlat) {
+    const L = LETTERS[(LETTERS.indexOf(letter) + step) % 7];
+    const pc = mod(rootPc + iv, 12);
+    const d = mod(pc - NAT[L] + 6, 12) - 6;
+    if (d === 0) return L;
+    if (d === 1) return L + '#';
+    if (d === -1) return L + 'b';
+    return (preferFlat ? FLAT : SHARP)[pc];
+  }
+  /* האם הצליל צריך דאבל-דיאז/במול בכתיב התיאורטי */
+  function needsDouble(letter, rootPc, iv, step) {
+    const L = LETTERS[(LETTERS.indexOf(letter) + step) % 7];
+    return Math.abs(mod(mod(rootPc + iv, 12) - NAT[L] + 6, 12) - 6) > 1;
+  }
+  const STEP_OF_IV = [0, 1, 1, 2, 2, 3, 3, 4, 5, 5, 6, 6];
+  function spellInKey(tonic, tonicPc, pc) {
+    const iv = mod(pc - tonicPc, 12);
+    return spellAt(tonic[0], tonicPc, iv, STEP_OF_IV[iv], /b/.test(tonic) || tonic === 'F');
+  }
+  function cleanSym(s) {
+    return String(s).trim().replace(/♯/g, '#').replace(/♭/g, 'b').replace(/[−–]/g, '-')
+      .replace(/º/g, '°').replace(/[()]/g, '').replace(/\s+/g, '');
+  }
+  /* הסיומת 6/9 כוללת "/" ולכן נבדקת לפני סיומת רגילה */
+  const RX_CHORD = /^([A-Ga-g])([#b]?)((?:m|min|-)?6\/9|[^/]*)(?:\/([A-Ga-g])([#b]?))?$/;
+  function parseChord(sym) {
+    if (typeof sym !== 'string') return null;
+    const s = cleanSym(sym);
+    const m = RX_CHORD.exec(s);
+    if (!m) return null;
+    const suf = m[3];
+    const q = Object.prototype.hasOwnProperty.call(QMAP, suf) ? suf
+      : (Object.prototype.hasOwnProperty.call(ALIAS, suf) ? ALIAS[suf] : null);
+    if (q === null) return null;
+    const letter = m[1].toUpperCase();
+    const root = mod(NAT[letter] + (m[2] === '#' ? 1 : m[2] === 'b' ? -1 : 0), 12);
+    let bass = null, bassName = null;
+    if (m[4]) {
+      const bl = m[4].toUpperCase();
+      bass = mod(NAT[bl] + (m[5] === '#' ? 1 : m[5] === 'b' ? -1 : 0), 12);
+      bassName = bl + m[5];
+    }
+    const Q = QMAP[q];
+    return {
+      root, letter, acc: m[2], quality: q, suffix: suf, bass, bassName,
+      name: letter + m[2] + suf + (bassName ? '/' + bassName : ''),
+      iv: Q.iv, deg: Q.deg, cls: Q.cls
+    };
+  }
+  function chordNotes(sym) {
+    const c = typeof sym === 'string' ? parseChord(sym) : sym;
+    if (!c) return null;
+    let letter = c.letter, flat = c.acc === 'b' || c.letter === 'F', spelledAs = null;
+    const dbl = l => c.iv.some((iv, i) => needsDouble(l, c.root, iv, DEG_STEP[c.deg[i]]));
+    /* E#, B#, D#, Bbdim7...: אם צליל צריך דאבל-דיאז/במול, כותבים את כל האקורד לפי השורש האנהרמוני
+       (E# → F, Bbdim7 → A#dim7) במקום לערבב כתיבים. שורש טבעי (Cdim7) נשאר עם הכתיב המעשי. */
+    if (c.acc && dbl(letter)) {
+      const alt = (c.acc === '#' ? FLAT : SHARP)[c.root];
+      if (!dbl(alt[0])) { letter = alt[0]; flat = alt[1] === 'b' || alt === 'F'; spelledAs = alt + c.suffix + (c.bassName ? '/' + c.bassName : ''); }
+    }
+    const notes = c.iv.map((iv, i) => spellAt(letter, c.root, iv, DEG_STEP[c.deg[i]], flat));
+    const inChord = c.bass === null || c.iv.some(iv => mod(c.root + iv, 12) === c.bass);
+    return { name: c.name, notes, degrees: c.deg.slice(), bass: c.bassName, bassInChord: inChord, spelledAs };
+  }
+
+  /* ---------- סולמות ---------- */
+  const MAJ_IV = [0, 2, 4, 5, 7, 9, 11], MAJ_Q = ['M', 'm', 'm', 'M', 'M', 'm', 'd'];
+  const MIN_IV = [0, 2, 3, 5, 7, 8, 10], MIN_Q = ['m', 'd', 'M', 'm', 'm', 'M', 'M'];
+  const ROMAN_MAJ = ['I', 'ii', 'iii', 'IV', 'V', 'vi', 'vii°'];
+  const ROMAN_MIN = ['i', 'ii°', 'III', 'iv', 'v', 'VI', 'VII'];
+  const SUF_OF = { M: '', m: 'm', d: 'dim' };
+  const tri = c => (c.cls === '7' ? 'M' : c.cls);
+  function keyName(k) { return k.name || ((k.minor ? MIN_NAME : MAJ_NAME)[k.root] + (k.minor ? 'm' : '')); }
+  function tonicOf(k) { return k.tonic || (k.minor ? MIN_NAME : MAJ_NAME)[k.root]; }
+  function scaleNotes(tonic, pc, minor) {
+    const ivs = minor ? MIN_IV : MAJ_IV;
+    return ivs.map((iv, i) => spellAt(tonic[0], pc, iv, i, /b/.test(tonic) || tonic === 'F'));
+  }
+  function toKey(k) {
+    if (!k) return null;
+    if (typeof k === 'string') {
+      const c = parseChord(k);
+      if (!c || !(c.cls === 'M' || c.cls === 'm') || c.bass !== null) return null;
+      return { root: c.root, minor: c.cls === 'm', tonic: c.letter + c.acc };
+    }
+    return { root: mod(k.root, 12), minor: !!k.minor, tonic: k.tonic || null };
+  }
+  /* סולם "תיאורטי" (דאבל-דיאז) → השם האנהרמוני המקובל */
+  function tidyKey(k) {
+    let tonic = k.tonic || (k.minor ? MIN_NAME : MAJ_NAME)[k.root];
+    const notes = scaleNotes(tonic, k.root, k.minor);
+    let renamed = false;
+    if (notes.some(n => n.length > 1 && n[0] !== tonic[0] && !/^[A-G][#b]?$/.test(n))) renamed = true;
+    const bad = notes.some((n, i) => n[0] !== LETTERS[(LETTERS.indexOf(tonic[0]) + i) % 7]);
+    if (bad) { tonic = (k.minor ? MIN_NAME : MAJ_NAME)[k.root]; renamed = true; }
+    return { root: k.root, minor: k.minor, tonic, renamed: renamed && tonic !== k.tonic, typed: k.tonic };
+  }
+  function scaleChords(key) {
+    const k0 = toKey(key);
+    if (!k0) return null;
+    const k = tidyKey(k0);
+    const ivs = k.minor ? MIN_IV : MAJ_IV, qs = k.minor ? MIN_Q : MAJ_Q, rom = k.minor ? ROMAN_MIN : ROMAN_MAJ;
+    const notes = scaleNotes(k.tonic, k.root, k.minor);
+    const chords = ivs.map((iv, i) => ({ roman: rom[i], name: notes[i] + SUF_OF[qs[i]] }));
+    const out = { key: k.tonic + (k.minor ? 'm' : ''), tonic: k.tonic, minor: k.minor, notes, chords, renamedFrom: k.renamed ? k.typed : null };
+    if (k.minor) {
+      const v = spellAt(k.tonic[0], k.root, 7, 4, /b/.test(k.tonic));
+      const lead = spellAt(k.tonic[0], k.root, 11, 6, /b/.test(k.tonic));
+      out.harmonic = { V: v, V7: v + '7', leading: lead };
+    }
+    return out;
+  }
+  function relativeKey(key) {
+    const k0 = toKey(key);
+    if (!k0) return null;
+    const k = tidyKey(k0);
+    if (k.minor) {
+      const t = spellAt(k.tonic[0], k.root, 3, 2, /b/.test(k.tonic));
+      return { from: k.tonic + 'm', fromMinor: true, to: t, toMinor: false };
+    }
+    const t = spellAt(k.tonic[0], k.root, 9, 5, /b/.test(k.tonic) || k.tonic === 'F');
+    return { from: k.tonic, fromMinor: false, to: t + 'm', toMinor: true };
+  }
+  /* הערכת סולם לפי רשימת אקורדים (24 מועמדים, מז'ור/מינור) */
+  function estimateKey(list) {
+    const cs = list.filter(Boolean);
+    if (!cs.length) return null;
+    let best = null;
+    for (let r = 0; r < 12; r++) for (const minor of [false, true]) {
+      const ivs = minor ? MIN_IV : MAJ_IV, qs = minor ? MIN_Q : MAJ_Q;
+      let s = 0;
+      for (const c of cs) {
+        const k = ivs.indexOf(mod(c.root - r, 12)), t = tri(c);
+        if (k < 0) continue;
+        if (t === qs[k]) s += 1;
+        else if (t === 's' || t === '5') s += 0.8;
+        else if (minor && k === 4 && t === 'M') s += 0.9;
+        else s += 0.2;
+      }
+      const tonic = c => c.root === r && tri(c) === (minor ? 'm' : 'M');
+      if (tonic(cs[0])) s += 0.5;
+      if (tonic(cs[cs.length - 1])) s += 0.3;
+      if (!minor) s += 0.01;
+      if (!best || s > best.s) best = { root: r, minor, s };
+    }
+    return { root: best.root, minor: best.minor, fit: best.s };
+  }
+  function toList(input) {
+    const arr = Array.isArray(input) ? input : String(input || '').split(/[\s,|]+/);
+    return arr.filter(Boolean).map(x => (typeof x === 'string' ? parseChord(x) : x));
+  }
+  /* טרנספוזיציה: semis חצאי טונים; opts.from / opts.to = סולמות (מחרוזת כמו 'C' / 'Am' או אובייקט) */
+  function transpose(input, semis, opts) {
+    opts = opts || {};
+    const list = toList(input);
+    if (!list.length || list.some(c => !c)) return null;
+    let src = opts.from ? toKey(opts.from) : null;
+    if (!src) src = estimateKey(list);
+    let n = Number(semis) || 0;
+    let tgt = null;
+    if (opts.to) {
+      tgt = toKey(opts.to);
+      if (tgt) {
+        if (!opts.from && tgt.minor !== src.minor) src = src.minor ? { root: mod(src.root + 3, 12), minor: false } : { root: mod(src.root + 9, 12), minor: true };
+        n = mod(tgt.root - src.root, 12);
+        if (n > 6) n -= 12;
+      }
+    }
+    /* כמות מפורשת נשארת עם הכיוון שהמשתמש ביקש (7 למעלה לא הופך ל-5 למטה); סולם יעד כבר קופל לכיוון הקרוב */
+    n = n % 12;
+    const tk = { root: mod(src.root + n, 12), minor: src.minor };
+    const typed = (tgt && tgt.tonic && tgt.minor === src.minor) ? tgt.tonic : (tk.minor ? MIN_NAME : MAJ_NAME)[tk.root];
+    /* סולם תיאורטי (G#, D# מז'ור) נכתב בשם המקובל, כמו בכלי הסולמות */
+    const tonic = tidyKey({ root: tk.root, minor: tk.minor, tonic: typed }).tonic;
+    const out = list.map(c => spellInKey(tonic, tk.root, mod(c.root + n, 12)) + c.suffix +
+      (c.bass !== null ? '/' + spellInKey(tonic, tk.root, mod(c.bass + n, 12)) : ''));
+    return { from: list.map(c => c.name), chords: out, semis: n, key: tonic + (tk.minor ? 'm' : ''), keyMinor: tk.minor, renamedFrom: tonic !== typed ? typed : null };
+  }
+
+  /* ---------- קאפו: אילו צורות פתוחות נוחות ---------- */
+  const EASE = {
+    M: { 0: 1, 2: 1, 4: 1, 7: 1, 9: 1, 5: 0.45, 11: 0.15, 10: 0.15 },
+    m: { 9: 1, 4: 1, 2: 1, 11: 0.45, 6: 0.25, 0: 0.15, 7: 0.15 },
+    '7': { 0: 1, 2: 1, 4: 1, 7: 1, 9: 1, 11: 1, 5: 0.4 },
+    s: { 2: 1, 4: 1, 9: 1, 7: 0.7, 0: 0.5 }
+  };
+  function ease(pc, c) {
+    const t = c.cls;
+    if (t === '5') return 0.9;
+    if (t === 'd' || t === 'a') return 0.3;
+    if (c.quality === 'maj7' && (pc === 5 || pc === 0 || pc === 2 || pc === 9)) return 1;
+    const tab = EASE[t] || EASE.M;
+    return tab[pc] || 0;
+  }
+  function keyChords(k) {
+    const idx = k.minor ? [0, 3, 4, 5, 6] : [0, 3, 4, 5];
+    const ivs = k.minor ? MIN_IV : MAJ_IV, qs = k.minor ? MIN_Q : MAJ_Q;
+    return idx.map(i => ({ root: mod(k.root + ivs[i], 12), cls: qs[i], quality: SUF_OF[qs[i]] === 'dim' ? 'dim' : SUF_OF[qs[i]], suffix: SUF_OF[qs[i]], bass: null, name: '' }));
+  }
+  function capoSuggest(input) {
+    let list, key, fromKey = false;
+    if (input && !Array.isArray(input) && typeof input === 'object' && 'root' in input) { key = toKey(input); fromKey = true; }
+    else if (typeof input === 'string' && /^\s*\S+\s*$/.test(input) && toKey(input.trim())) { key = toKey(input.trim()); fromKey = true; }
+    else {
+      list = toList(input);
+      if (!list.length || list.some(c => !c)) return null;
+      if (list.length === 1 && (list[0].cls === 'M' || list[0].cls === 'm')) { key = { root: list[0].root, minor: list[0].cls === 'm', tonic: list[0].letter + list[0].acc }; fromKey = true; list = null; }
+    }
+    if (fromKey) list = keyChords(key);
+    else key = estimateKey(list);
+    const sounds = key.tonic ? key.tonic + (key.minor ? 'm' : '') : keyName(key);
+    const opts = [];
+    for (let capo = 0; capo <= 7; capo++) {
+      const sk = { root: mod(key.root - capo, 12), minor: key.minor };
+      const tonic = (sk.minor ? MIN_NAME : MAJ_NAME)[sk.root];
+      let sum = 0;
+      const shapes = list.map(c => {
+        const pc = mod(c.root - capo, 12);
+        sum += ease(pc, c);
+        return spellInKey(tonic, sk.root, pc) + c.suffix;
+      });
+      const avg = sum / list.length;
+      opts.push({ capo, shapeKey: tonic + (sk.minor ? 'm' : ''), shapes, score: Math.round((avg - 0.03 * capo) * 1000) / 1000, ease: avg });
+    }
+    const base = opts[0];
+    const noCapoNeeded = base.ease >= 0.8;
+    /* בלי קאפו כבר נוח: מציעים רק צורות נוחות באותה מידה (לצליל אחר). אחרת: רק מה שבאמת נוח יותר מבלי קאפו */
+    const ranked = opts.slice(1).sort((a, b) => b.score - a.score)
+      .filter(o => (noCapoNeeded ? o.ease >= Math.min(base.ease, 0.85) : o.ease > base.ease + 0.05));
+    return { sounds, fromKey, chords: fromKey ? null : list.map(c => c.name), noCapoNeeded, options: ranked.slice(0, 2), all: opts };
+  }
+
+  /* ---------- נרמול טקסט עברי/אנגלי ---------- */
+  const FINALS = { 'ך': 'כ', 'ם': 'מ', 'ן': 'נ', 'ף': 'פ', 'ץ': 'צ' };
+  const CONTR = [[/\bwon['’]t\b/g, 'will not'], [/\bcan['’]t\b/g, 'cannot'], [/n['’]t\b/g, ' not'],
+    [/\b(it|what|that|there|where|who|how)['’]s\b/g, '$1 is'], [/['’]re\b/g, ' are'], [/['’]ve\b/g, ' have'],
+    [/['’]ll\b/g, ' will'], [/\bi['’]m\b/g, 'i am'], [/['’]d\b/g, ' would']];
+  function lite(s) {
+    /* M7/M9 (אות גדולה) = maj7/maj9; אחרי הורדת האותיות הן היו מתבלבלות עם m7/m9 */
+    s = String(s || '').replace(/(^|[^A-Za-z])M(7|9)(?![0-9])/g, '$1maj$2').toLowerCase();
+    for (const c of CONTR) s = s.replace(c[0], c[1]);
+    return s
+      .replace(/[\u0591-\u05BD\u05BF-\u05C7]/g, '')
+      .replace(/[׳״'"`´‘’“”]/g, '')
+      .replace(/[ךםןףץ]/g, ch => FINALS[ch]);
+  }
+  function normalize(s) {
+    return lite(s)
+      .replace(/([א-ת])(?=[a-z0-9])/g, '$1 ').replace(/([a-z0-9])(?=[א-ת])/g, '$1 ')
+      .replace(/(\d)\s*\/\s*(\d)/g, '$1\u0001$2')
+      .replace(/[^א-תa-z0-9#+\u0001]+/g, ' ')
+      .replace(/\u0001/g, '/')
+      .replace(/\s+/g, ' ').trim();
+  }
+  const PFX1 = 'והבלמשכ';
+  const PFX2 = ['וה', 'וב', 'ול', 'ומ', 'וש', 'וכ', 'שה', 'שב', 'של', 'שמ', 'כש', 'לה', 'מה', 'בה', 'כה', 'מש', 'ות'];
+  const isHe = t => /^[א-ת]+$/.test(t);
+  function stem(t) {
+    if (t.length >= 5 && /(ימ|ות)$/.test(t)) return t.slice(0, -2);
+    if (t.length >= 4 && /(ה|ת)$/.test(t)) return t.slice(0, -1);
+    return null;
+  }
+  /* כל הצורות של מילה: עם/בלי אות-שימוש אחת או שתיים, ועם/בלי ים/ות */
+  function variants(t) {
+    const out = [t];
+    if (!isHe(t)) {
+      if (t.length >= 4 && /s$/.test(t) && !/ss$/.test(t)) out.push(t.slice(0, -1));
+      return out;
+    }
+    const bases = [t];
+    if (t.length >= 4 && PFX1.indexOf(t[0]) >= 0) bases.push(t.slice(1));
+    if (t.length >= 5 && PFX2.indexOf(t.slice(0, 2)) >= 0) bases.push(t.slice(2));
+    for (const b of bases) {
+      if (out.indexOf(b) < 0) out.push(b);
+      const s = stem(b);
+      if (s && out.indexOf(s) < 0) out.push(s);
+    }
+    return out;
+  }
+  /* מילות מילוי: משקל נמוך קבוע, כי הן לא מעידות על נושא */
+  const STOP = new Set(('של את זה זו זאת אני הוא היא אנחנו לי לך לו לנו שלי שלך שלו אם או גם רק עוד כבר ' +
+    'בבקשה רציתי רוצה רוצים תגיד תגידו תגידי תסביר תסבירו תן תני לדעת יודע פשוט ממש בעצמ כזה כזאת בכלל ' +
+    'the a an to of in on for and or am be i my me it this that please tell know want wanted just about with some').split(' '));
+  /* מספרים במילים: לא נספרים כמילה לא-מוכרת (בלי שש/שבע/תשע, שהם גם שמות של אקורדים) */
+  const NUMW = new Set('אחת שתיימ שניימ שלוש ארבע חמש שמונה עשר עשרה עשרימ שלושימ ארבעימ חמישימ מאה'.split(' '));
+
+  /* ---------- אינדקס המאגר ---------- */
+  const N = KB.length;
+  const docs = KB.map(e => {
+    const phr = [];
+    for (const L of ['he', 'en']) for (const q of e[L].q) phr.push({ L, toks: normalize(q).split(' ').filter(Boolean) });
+    const kw = [];
+    for (const k of (e.kw || [])) for (const t of normalize(k).split(' ')) if (t) kw.push(t);
+    const keys = new Set();
+    const add = t => { for (const v of variants(t)) keys.add(v); };
+    phr.forEach(p => p.toks.forEach(add));
+    kw.forEach(add);
+    const phrKeys = phr.map(p => ({ L: p.L, toks: p.toks, keys: p.toks.map(t => new Set(variants(t))), norm: p.toks.join(' ') }));
+    const kwKeys = new Set(); kw.forEach(t => variants(t).forEach(v => kwKeys.add(v)));
+    return { e, keys, kwKeys, phr: phrKeys };
+  });
+  const VOCAB = new Set();
+  docs.forEach(d => d.keys.forEach(k => VOCAB.add(k)));
+  const VOCAB_ARR = [...VOCAB];
+  function lev1(a, b) {
+    if (a === b) return true;
+    const la = a.length, lb = b.length;
+    if (Math.abs(la - lb) > 1) return false;
+    let i = 0, j = 0, e = 0;
+    while (i < la && j < lb) {
+      if (a[i] === b[j]) { i++; j++; continue; }
+      if (++e > 1) return false;
+      if (la > lb) i++; else if (lb > la) j++; else { i++; j++; }
+    }
+    return e + (la - i) + (lb - j) <= 1;
+  }
+  const known = t => variants(t).some(v => VOCAB.has(v));
+  /* פירוק מילים שנדבקו ("איךמעלים") לשתי מילים מוכרות */
+  function segment(t) {
+    if (!isHe(t) || t.length < 5 || known(t)) return [t];
+    for (let i = 2; i <= t.length - 2; i++) {
+      const a = t.slice(0, i), b = t.slice(i);
+      if ((VOCAB.has(a) || STOP.has(a)) && known(b)) return [a, b];
+    }
+    return [t];
+  }
+  const fuzzyCache = new Map();
+  function fuzzyKeys(t) {
+    if (fuzzyCache.has(t)) return fuzzyCache.get(t);
+    const out = [];
+    if (t.length >= 4) for (const v of variants(t)) {
+      if (v.length < 4) continue;
+      /* במילה עברית של 4 אותיות רק אות חסרה/עודפת (כתיב מלא/חסר); החלפת אות יוצרת שם יותר מדי מילים אחרות */
+      const subOk = v.length >= 5 || !isHe(v);
+      for (const k of VOCAB_ARR) if (k.length >= 3 && Math.abs(k.length - v.length) <= 1 && (subOk || k.length !== v.length) && lev1(v, k)) out.push(k);
+    }
+    fuzzyCache.set(t, out);
+    return out;
+  }
+  function queryTokens(text) {
+    const raw = normalize(text).split(' ').filter(Boolean);
+    const toks = [];
+    for (const t of raw) for (const s of segment(t)) {
+      if (isHe(s) && s.length < 2) continue;
+      toks.push(s);
+    }
+    return toks;
+  }
+  const idfOf = df => Math.log(1 + (N - df + 0.5) / (df + 0.5));
+  const W_UNKNOWN = 3.2, KW_CREDIT = 0.5, FUZZ = 0.7;
+  function prepQuery(text) {
+    const toks = queryTokens(text);
+    const seen = new Set();
+    const q = [];
+    for (const t of toks) {
+      if (seen.has(t)) continue;
+      seen.add(t);
+      if ((STOP.has(t) || NUMW.has(t) || /^\d+$/.test(t)) && !variants(t).some(v => VOCAB.has(v))) continue;
+      const vs = variants(t);
+      let fz = null;
+      let hit = vs.some(v => VOCAB.has(v));
+      if (!hit) { fz = fuzzyKeys(t); }
+      let df = 0;
+      const match = d => {
+        for (const v of vs) if (d.keys.has(v)) return 1;
+        if (fz) for (const k of fz) if (d.keys.has(k)) return FUZZ;
+        return 0;
+      };
+      for (const d of docs) if (match(d)) df++;
+      const w = df ? (STOP.has(t) ? Math.min(idfOf(df), 0.5) : idfOf(df)) : W_UNKNOWN;
+      q.push({ t, vs, fz, match, w, df });
+    }
+    return q;
+  }
+  function phraseSim(q, p, kwKeys) {
+    let hit = 0, tot = 0, ptot = 0;
+    for (const x of q) {
+      tot += x.w;
+      let m = 0;
+      for (const ks of p.keys) {
+        if (x.vs.some(v => ks.has(v))) { m = 1; break; }
+        if (!m && x.fz && x.fz.some(k => ks.has(k))) m = FUZZ;
+      }
+      if (!m && kwKeys && x.vs.some(v => kwKeys.has(v))) m = KW_CREDIT;
+      hit += x.w * m;
+    }
+    for (let i = 0; i < p.toks.length; i++) {
+      const t = p.toks[i];
+      const hitTok = q.some(x => x.vs.some(v => p.keys[i].has(v)) || (x.fz && x.fz.some(k => p.keys[i].has(k))));
+      ptot += hitTok ? 0 : (STOP.has(t) ? 0.1 : 0.55);
+    }
+    const qcov = tot ? hit / tot : 0;
+    return { qcov, pfit: 1 - ptot / Math.max(1, p.toks.length) };
+  }
+  function rankKB(text, lang) {
+    const q = prepQuery(text);
+    const qn = ' ' + normalize(text) + ' ';
+    const totW = q.reduce((a, x) => a + x.w, 0);
+    if (!q.length || totW <= 0) return { q, list: [] };
+    const list = [];
+    for (const d of docs) {
+      let hit = 0;
+      for (const x of q) hit += x.w * x.match(d);
+      const cov = hit / totW;
+      if (cov <= 0) continue;
+      let best = 0, exact = 0;
+      for (const p of d.phr) {
+        const s = phraseSim(q, p, d.kwKeys);
+        const v = 0.62 * s.qcov + 0.38 * Math.max(0, s.pfit);
+        const bonus = (p.L === lang ? 0.02 : 0);
+        if (v + bonus > best) best = v + bonus;
+        if (p.norm.length >= 3 && qn.indexOf(' ' + p.norm + ' ') >= 0) exact = Math.max(exact, Math.min(1, p.norm.length / Math.max(8, qn.length - 2)));
+      }
+      const score = 0.45 * cov + 0.55 * best + 0.25 * exact;
+      list.push({ d, cov, best, exact, score });
+    }
+    list.sort((a, b) => b.score - a.score);
+    return { q, list };
+  }
+
+  /* ---------- זיהוי אקורדים וסולמות בטקסט חופשי ---------- */
+  /* מילים באנגלית שנראות כמו אקורד: A (המילית, בתחילת משפט), a (מילית), Do / Go (הסיומת o = dim), "Am I".
+     prev = המילה שלפני (עם הפיסוק, '' בתחילת שורה); rest = הטקסט שאחרי המילה; quoted = המילה נפתחת במירכאות;
+     prose = טקסט של תשובה (לרינדור). בשאלה של משתמש "A chord notes" / "A sharp minor" הם עדיין הצליל A */
+  const NOTE_NEXT = /^(minor|major|min|maj|is|are|and|or|to|then|shapes?|string)(?![a-z])/;
+  const NOTE_NEXT_USER = /^(chords?|notes?|triad|fingering|voicing|sharp|flat)(?![a-z])/;
+  const MODE_NOUN = /^(major|minor)\s+(keys?|scales?|chords?|thirds?|seconds?|sixths?|sevenths?|triads?|intervals?|progressions?|songs?|pentatonic)(?![a-z])/;
+  function englishWord(tok, prev, rest, quoted, prose) {
+    prev = String(prev || ''); rest = String(rest || '').trim();
+    if (/^[DGdg]o$/.test(tok)) return true;
+    const start = !!quoted || !prev || /[.!?:]["')\]]*$/.test(prev) || /^[-*]$/.test(prev);
+    if ((tok === 'A' && start) || tok === 'a') {
+      /* "A few checks", "A friend told me", "A sharp (#) raises", "A major key has"; אבל "A minor", "A is the fifth of D", "A and E" הם צלילים */
+      if (/^[a-z]/.test(rest) && !NOTE_NEXT.test(rest) && (prose || !NOTE_NEXT_USER.test(rest))) return true;
+      if (prose && MODE_NOUN.test(rest)) return true;
+      if (prose && tok === 'A' && /^\d+(?:-[a-z]|\s+[(a-z])/.test(rest)) return true;   /* "A 12-bar blues", "A 7 (dominant) chord" */
+    }
+    if (tok === 'Am' && start && /^I(?![A-Za-z])/.test(rest)) return true;
+    return false;
+  }
+  /* לשימוש הרינדור (עטיפת אקורדים ב-bdi): האם מילה בטקסט היא אקורד.
+     word = המילה כמו שהיא בטקסט (אפשר עם פיסוק ומירכאות); ctx = { prev: המילה שלפני, כמו שהיא ('' בתחילת שורה או אחרי "- "),
+     next: הטקסט שאחרי המילה (עדיף שאר השורה; לפחות המילה הבאה) }.
+     "A few checks" / "A normal-length song" / "A 12-bar blues" → false; "A, C, E" / "A minor" / "play A and D" / "ב-A" → true */
+  function isChordToken(word, ctx) {
+    const raw = String(word || '');
+    const w = raw.replace(/^[("'\[“”]+|[)"'\].,:;!?“”]+$/g, '');
+    if (!w || !parseChord(w)) return false;
+    ctx = ctx || {};
+    return !englishWord(w, ctx.prev, ctx.next, /^["“]/.test(raw), true);
+  }
+  function chordToks(raw) {
+    const s = String(raw || '').replace(/([א-ת])[-־]?(?=[A-Ga-g])/g, '$1 ').replace(/([A-Za-z0-9#])(?=[א-ת])/g, '$1 ');
+    return s.split(/[\s,;|]+|(?:\s[-־–]\s)/).filter(Boolean);
+  }
+  const trimTok = t => t.replace(/^[("'״׳“”\[]+|[)"'״׳“”\].,:;!?]+$/g, '');
+  function extractChords(raw, allowLower) {
+    const toks = chordToks(raw);
+    const out = [];
+    for (let i = 0; i < toks.length; i++) {
+      const t = trimTok(toks[i]);
+      if (!t || !/^[A-Ga-g]/.test(t)) continue;
+      if (!allowLower && /^[a-g]/.test(t)) continue;
+      if (englishWord(t, i ? toks[i - 1] : '', toks.slice(i + 1, i + 3).join(' '), /^["“]/.test(toks[i]))) continue;
+      const c = parseChord(t);
+      if (c) out.push({ tok: t, c });
+    }
+    return out;
+  }
+  /* מילה שנראית כמו סימן אקורד (יש בה ספרה או סימן) אבל לא מזוהה, כמו C2 או Cmaj13#11 */
+  function badChordTok(raw) {
+    for (const x of chordToks(raw)) {
+      const t = trimTok(x);
+      if (/^[A-G][#b♯♭]?[A-Za-z0-9#+°ø♯♭()\/]*$/.test(t) && /[0-9#+°ø♯♭\/]/.test(t.slice(1)) && !parseChord(t)) return t;
+    }
+    return null;
+  }
+  const SOL = { 'דו': 0, 'רה': 2, 'מי': 4, 'פה': 5, 'סול': 7, 'לה': 9, 'סי': 11 };
+  const SOL_LETTER = { 'דו': 'C', 'רה': 'D', 'מי': 'E', 'פה': 'F', 'סול': 'G', 'לה': 'A', 'סי': 'B' };
+  /* סי-במול / פה-דיאז מינור (עם מקף) וגם ♯/♭; מקף שאחריו מילה עברית אחרת ("דו-צדדי") הוא לא שם של סולם */
+  const RX_SOL = /(^|[\s\-־(])([ובלמשכה]{0,2}?)(דו|רה|מי|פה|סול|לה|סי)(?:\s*[-־]?\s*(דיאז|במול|#|b|♯|♭))?(?:(?:\s*[-־]\s*|\s+)(מז'ור|מז׳ור|מזור|מינור))?(?=$|[\s?.,!:;)]|[-־](?![א-ת]))/g;
+  const RX_LAT = /(^|[^A-Za-z0-9#])([A-G])([#b♯♭]?)(m(?![A-Za-z0-9#])|min(?:or)?\b|maj(?:or)?\b|\s+(?:minor|major|מינור|מז'ור|מז׳ור|מזור)|\s*(?:-|־)?\s*(?:מינור|מז'ור|מז׳ור|מזור))?(?![A-Za-z0-9#♯♭])/g;
+  /* הברה בלי דיאז/במול/מז'ור/מינור היא סולם רק כשמילת סולם באה ממש לפניה (לפני אות השימוש), ורק בלי אות שימוש או עם ל/ב:
+     "קאפו לסולם פה", "המקביל של מי", "קאפו ללה", "המקביל לרה"; אבל לא "תסביר לי פה", "המקביל פה", "מי יודע", "שלה", "שרה", "בשפה".
+     אחרי "קאפו", "מקביל", "לנגן" ו"נשמע" צריך גם ל/ב צמודה ("לנגן בלה"), כי "קאפו פה" ו"קאפו לה" הם "קאפו כאן" ו"קאפו בשבילה" */
+  const SOL_CTX = /(סולם|של|טון|מ-|ל-)\s*$/;
+  const SOL_CTX_PFX = /(קאפו|מקביל|לנגן|מנגן|מנגנים|מנגנת|נשמע)\s*$/;
+  function keysInText(raw) {
+    const s = String(raw || '').replace(/[\u0591-\u05C7]/g, '');
+    const found = [];
+    let m;
+    RX_LAT.lastIndex = 0;
+    while ((m = RX_LAT.exec(s))) {
+      const acc = m[3] === '♯' ? '#' : m[3] === '♭' ? 'b' : m[3];
+      const md = (m[4] || '').trim();
+      const at = m.index + m[1].length;
+      /* "A friend told me..." / "A quick question": המילית A בתחילת משפט אינה סולם */
+      if (m[2] === 'A' && !acc && !md) {
+        const prev = s.slice(0, at).trim().split(/\s+/).pop() || '';
+        const after = s.slice(at + 1);
+        if (/^\s/.test(after) && englishWord('A', prev, after, /["“]$/.test(s.slice(0, at)))) continue;
+      }
+      const minor = /^m$|^min|minor|מינור/.test(md);
+      found.push({ root: mod(NAT[m[2]] + (acc === '#' ? 1 : acc === 'b' ? -1 : 0), 12), minor, tonic: m[2] + acc, explicit: !!md, idx: at, len: m[0].length - m[1].length, lat: true, prio: 3 });
+    }
+    RX_SOL.lastIndex = 0;
+    while ((m = RX_SOL.exec(s))) {
+      const acc = /^(דיאז|#|♯)$/.test(m[4] || '') ? '#' : (/^(במול|b|♭)$/.test(m[4] || '') ? 'b' : '');
+      const md = m[5] || '';
+      const letter = SOL_LETTER[m[3]];
+      const before = s.slice(Math.max(0, m.index - 10), m.index + m[1].length);
+      let prio = -1;
+      if (acc || md) prio = 2;
+      else if (!m[2] && SOL_CTX.test(before)) prio = 1;
+      else if (/^[לב]$/.test(m[2]) && (SOL_CTX.test(before) || SOL_CTX_PFX.test(before))) prio = 1;
+      found.push({ root: mod(SOL[m[3]] + (acc === '#' ? 1 : acc === 'b' ? -1 : 0), 12), minor: /מינור/.test(md), tonic: letter + acc, explicit: !!md, idx: m.index + m[1].length, len: m[0].length - m[1].length, lat: false, prio });
+    }
+    return found;
+  }
+  function bestKey(raw) {
+    const ks = keysInText(raw).filter(k => k.prio >= 0);
+    if (!ks.length) return null;
+    ks.sort((a, b) => b.prio - a.prio || a.idx - b.idx);
+    return ks[0];
+  }
+
+  /* ---------- טקסטים של הכלים ---------- */
+  const T = {
+    he: {
+      builtFrom: '**{0}** בנוי מהצלילים: {1}', formula: 'מבנה: {0} ({1}).',
+      slashIn: 'עם {0} בבס (היפוך).', slashOut: 'ועוד {0} בבס.',
+      respelled: '{0} נשמע כמו {1}, ולכן הצלילים כתובים כמו ב-{1}.',
+      unknown: 'לא זיהיתי את האקורד {0}. אפשר לנסות סימון מקובל, כמו Cmaj7, Am7 או F#m7b5.',
+      trBefore: 'לפני: {0}', trAfter: 'אחרי: {0}', trHead: 'העברה של {0} {1} ({2}):', trKey: 'הסולם החדש: {0}.',
+      trHow: 'כדי להעביר אקורדים כותבים אותם ואת הכיוון, למשל: "תעביר G C D Em טון למעלה" או "תעביר Am F C G ל-Bm".',
+      up: 'למעלה', down: 'למטה', none0: 'האקורדים כבר בסולם הזה.',
+      capoKey: 'לסולם {0}:', capoChords: 'לאקורדים {0}:',
+      capoOptKey: 'קאפו {0}: מנגנים בצורות של {1} ({2}), והשיר נשמע ב-{3}.',
+      capoOptCh: 'קאפו {0}: מנגנים {1}, ונשמע {2}.',
+      capoNone: 'בלי קאפו האקורדים כבר פתוחים ונוחים. אם רוצים צליל אחר:',
+      capoNoneOnly: 'בלי קאפו האקורדים כבר פתוחים ונוחים, ואין צורך בקאפו.',
+      capoNoHelp: 'אף מיקום קאפו לא הופך את האקורדים האלה לנוחים יותר מבלי קאפו.',
+      capoWeak: 'אין כאן קאפו שהופך את כל האקורדים לפתוחים. האפשרויות הקרובות:',
+      capoTip: 'הצורות הן האקורדים שהיד מנגנת; הקאפו מעלה את הצליל.',
+      capoSound1: 'עם קאפו {0}, צורת {1} נשמעת כמו **{2}**.',
+      capoSoundN: 'עם קאפו {0}, הצורות {1} נשמעות כמו **{2}**, בסולם {3}.',
+      capoRaise: 'כל סריג מעלה את הגובה בחצי טון, אז קאפו {0} מעלה {1}.',
+      scHead: '**סולם {0} {1}**', scNotes: 'צלילי הסולם: {0}', scCommon: 'הנפוצים ביותר: {0}.',
+      scHarm: 'במינור משתמשים הרבה גם ב-{0} או {1} (מינור הרמוני) במקום {2}.', scRenamed: '({0} נכתב בדרך כלל כ-{1}.)',
+      major: "מז'ור", minor: 'מינור',
+      relMaj: 'המינור המקביל של {0} מז\'ור הוא **{1}**.', relMin: 'המז\'ור המקביל של {0} הוא **{1}**.',
+      relAlsoMin: '{0} הוא כבר מינור, והמז\'ור המקביל שלו הוא **{1}**.', relAlsoMaj: '{0} הוא מז\'ור, והמינור המקביל שלו הוא **{1}**.',
+      relNote: 'לשני הסולמות אותם צלילים ואותם אקורדים; ההבדל הוא איזה אקורד מרגיש כמו הבית.',
+      keyGuess: 'האקורדים {0} מתאימים הכי טוב לסולם **{1}** (או למקביל שלו, {2}).', keyNote: 'זו הערכה לפי האקורדים בלבד; האוזן מכריעה איזה אקורד מרגיש כמו הבית.',
+      toGuitar: 'לאקורדים לגיטרה', toPiano: 'לאקורדים לפסנתר'
+    },
+    en: {
+      builtFrom: '**{0}** is made of: {1}', formula: 'Formula: {0} ({1}).',
+      slashIn: 'with {0} in the bass (an inversion).', slashOut: 'plus {0} in the bass.',
+      respelled: '{0} sounds the same as {1}, so the notes are spelled as in {1}.',
+      unknown: "I didn't recognise the chord {0}. Try a common symbol, like Cmaj7, Am7 or F#m7b5.",
+      trBefore: 'Before: {0}', trAfter: 'After: {0}', trHead: 'Moved {0} {1} ({2}):', trKey: 'New key: {0}.',
+      trHow: 'To transpose, write the chords and the direction, for example "transpose G C D Em up 2" or "transpose Am F C G to Bm".',
+      up: 'up', down: 'down', none0: 'The chords are already in that key.',
+      capoKey: 'For the key of {0}:', capoChords: 'For {0}:',
+      capoOptKey: 'Capo {0}: play {1} shapes ({2}); it sounds in {3}.',
+      capoOptCh: 'Capo {0}: play {1}; it sounds as {2}.',
+      capoNone: 'Without a capo these are already easy open chords. For a different sound:',
+      capoNoneOnly: 'Without a capo these are already easy open chords, so no capo is needed.',
+      capoNoHelp: 'No capo position makes these chords easier than playing without one.',
+      capoWeak: 'No capo position turns every chord into an open shape here. The closest options:',
+      capoTip: 'Shapes are what your hand plays; the capo raises the pitch.',
+      capoSound1: 'With capo {0}, the {1} shape sounds as **{2}**.',
+      capoSoundN: 'With capo {0}, the shapes {1} sound as **{2}**, in the key of {3}.',
+      capoRaise: 'Each capo fret raises the pitch by a semitone, so capo {0} raises it by {1}.',
+      scHead: '**{0} {1}**', scNotes: 'Scale notes: {0}', scCommon: 'The most common: {0}.',
+      scHarm: 'In minor, {0} or {1} (harmonic minor) is often used instead of {2}.', scRenamed: '({0} is usually written as {1}.)',
+      major: 'major', minor: 'minor',
+      relMaj: 'The relative minor of {0} major is **{1}**.', relMin: 'The relative major of {0} is **{1}**.',
+      relAlsoMin: '{0} is already minor; its relative major is **{1}**.', relAlsoMaj: '{0} is major; its relative minor is **{1}**.',
+      relNote: 'Both keys share the same notes and chords; what changes is which chord feels like home.',
+      keyGuess: 'The chords {0} fit best in **{1}** (or its relative, {2}).', keyNote: 'This is a guess from the chords alone; your ear decides which chord feels like home.',
+      toGuitar: 'Guitar chords', toPiano: 'Piano chords'
+    }
+  };
+  const fmt = (s, ...a) => s.replace(/\{(\d)\}/g, (m, i) => (a[i] === undefined ? m : String(a[i])));
+  function amountText(n, L) {
+    const a = Math.abs(n);
+    if (L === 'he') return ['', 'חצי טון', 'טון', 'טון וחצי', 'שני טונים', 'שני טונים וחצי', 'שלושה טונים'][a] || (a + ' חצאי טונים');
+    return a === 1 ? 'a semitone' : a === 2 ? 'a whole tone' : a + ' semitones';
+  }
+  const kname = (tonic, minor, L) => tonic + ' ' + (minor ? T[L].minor : T[L].major);
+
+  /* ---------- זיהוי כוונה לכלי ---------- */
+  const RX = {
+    rel: /(מקביל|relative)/,
+    capo: /(קאפו|קפו|capo)/,
+    tr: /(תעביר|להעביר|העבר |העבירו|תעבירו|תוריד|להוריד|תורידו|תעלה|להעלות|תעלו|טרנספוז|transpos|shift)/,
+    trUp: /(למעלה|תעלה|להעלות|תעלו|up|higher|raise)/, trDown: /(למטה|תוריד|להוריד|תורידו|down|lower)/,
+    chord: /(תווימ|תווי |צלילימ|צלילי |בנוי|מורכב|הרכב|מרכיב|notes|spell|made of|made up|consist|tones|built|formula)/,
+    scaleCh: /(אקורד|chord|הרמוני|diatonic|דיאטוני|צלילי|תווי|notes)/, scaleCtx: /(סולמ|key|scale|מזור|מינור|major|minor)/,
+    whichKey: /(איזה סולמ|באיזה סולמ|איזה טונליות|what key|which key)/
+  };
+  const NUM_EN = 'one|two|three|four|five|six|seven|eight|nine|ten|eleven';
+  function parseAmount(txt) {
+    const t = ' ' + lite(txt).replace(/(\d),(5)(?![0-9])/g, '$1.$2').replace(/[,;!?():]/g, ' ').replace(/semi[\s-]tone/g, 'semitone') + ' ';
+    const HN = { 'אחד': 1, 'אחת': 1, 'שני': 2, 'שתי': 2, 'שניימ': 2, 'שתיימ': 2, 'שלוש': 3, 'שלושה': 3, 'ארבע': 4, 'ארבעה': 4, 'חמש': 5, 'חמישה': 5, 'שש': 6, 'שישה': 6,
+      one: 1, two: 2, three: 3, four: 4, five: 5, six: 6, seven: 7, eight: 8, nine: 9, ten: 10, eleven: 11 };
+    const num = x => (/^\d+$/.test(x) ? Number(x) : HN[x]);
+    let m;
+    if ((m = /(?:^|\s)([+-])\s?(\d{1,2})(?=\s)/.exec(t))) return (m[1] === '-' ? -1 : 1) * Number(m[2]);
+    /* 1.5 / 2.5 טונים = 2X+1 חצאי טון; לפני כללי המספרים השלמים, כדי ש-"1.5" לא ייקרא "5" */
+    /* המספר עומד לבד או אחרי ב ("בשני טונים", "ב-3 חצאי טונים") */
+    if ((m = /(?:^|\s)(?:ב[-־]?)?(\d{1,2})\.5\s+(?:טונימ|טונ|whole[\s-]?(?:steps?|tones?)|tones?|steps?)/.exec(t))) return 2 * Number(m[1]) + 1;
+    /* "two and a half steps" / "שני טונים וחצי" */
+    if ((m = /(?:^|\s)(?:ב[-־]?)?(\d{1,2}|one|two|three|four|five|שני|שתי|שלוש|שלושה|ארבע|ארבעה|חמש|חמישה)\s+(?:and a half\s+(?:whole[\s-]?)?(?:steps?|tones?)|(?:טונימ|טונ|(?:whole[\s-]?)?(?:steps?|tones?))\s+(?:and a half|וחצי))/.exec(t))) return 2 * num(m[1]) + 1;
+    if ((m = new RegExp('(?:^|\\s)(?:ב[-־]?)?(\\d{1,2}|אחד|אחת|שני|שתי|שלוש|שלושה|ארבע|ארבעה|חמש|חמישה|שש|שישה|' + NUM_EN + ')\\s+(?:חצאי\\s*טונ(?:ימ)?|חצאי|semitones?|half[\\s-]?steps?|half[\\s-]?tones?)').exec(t))) return num(m[1]);
+    if (/טונ וחצי|טונ אחד וחצי|tone and a half|step and a half/.test(t)) return 3;
+    if (/חצי\s*טונ|half[\s-]?step|half[\s-]?tone|half an? (?:step|tone)|semitone/.test(t)) return 1;
+    if ((m = /(?:^|\s)(?:ב[-־]?)?(\d{1,2}|שני|שתי|שניימ|שתיימ|שלוש|שלושה|ארבע|ארבעה|two|three|four|five|six)\s+(?:טונימ|טונ|whole[\s-]?steps?|whole[\s-]?tones?|tones|steps)/.exec(t))) return 2 * num(m[1]);
+    if (/(?:^|\s)(?:ב|ה)?טונ(?:\s|$)|whole[\s-]?(?:step|tone)|(?:a|one)\s+(?:tone|step)/.test(t)) return 2;
+    if ((m = new RegExp('(?:up|down|למעלה|למטה|by)\\s+(\\d{1,2}|' + NUM_EN + ')(?=\\s)').exec(t)) || (m = /(?:^|\s)(\d{1,2})\s+(?:up|down|למעלה|למטה)/.exec(t))) return num(m[1]);
+    if ((m = /(?:^|\s)(\d{1,2})(?=\s)/.exec(t))) return Number(m[1]);
+    return null;
+  }
+  function keyTok(s) {
+    s = s.replace(/♯/g, '#').replace(/♭/g, 'b');
+    const sol = /^[ובלמשכה]{0,2}?(דו|רה|מי|פה|סול|לה|סי)\s*[-־]?\s*(דיאז|במול)?\s*[-־]?\s*(מינור|minor)?$/.exec(s.trim());
+    if (sol) return { root: mod(SOL[sol[1]] + (sol[2] === 'דיאז' ? 1 : sol[2] === 'במול' ? -1 : 0), 12), minor: !!sol[3], tonic: SOL_LETTER[sol[1]] + (sol[2] === 'דיאז' ? '#' : sol[2] === 'במול' ? 'b' : '') };
+    const lat = /^([A-G])([#b]?)(m|\s*minor|\s*מינור)?$/.exec(s.trim());
+    if (lat) return { root: mod(NAT[lat[1]] + (lat[2] === '#' ? 1 : lat[2] === 'b' ? -1 : 0), 12), minor: !!lat[3], tonic: lat[1] + lat[2] };
+    return null;
+  }
+  const KEYPAT = "([A-G][#b♯♭]?m?(?:\\s*[-־]?\\s*(?:minor|major|מינור|מז'ור|מז׳ור))?|(?:דו|רה|מי|פה|סול|לה|סי)(?:\\s*[-־]?\\s*(?:דיאז|במול))?(?:\\s*[-־]?\\s*(?:מינור|מז'ור|מז׳ור))?)";
+  const RX_FROMTO = [
+    new RegExp('(?:^|\\s)מ[-־–]?\\s*' + KEYPAT + '\\s+ל[-־–]?\\s*(?:סולמ?\\s+(?:של\\s+)?)?' + KEYPAT + '(?=$|[\\s?.!,])'),
+    new RegExp('\\bfrom\\s+(?:the\\s+key\\s+of\\s+)?' + KEYPAT + '\\s+to\\s+(?:the\\s+key\\s+of\\s+)?' + KEYPAT + '(?=$|[\\s?.!,])', 'i')
+  ];
+  const RX_TO = [
+    new RegExp("(?:לסולם\\s+של|לסולם|לטונליות\\s+של|לטונליות|לטון\\s+של|(?:^|\\s)ל[-־–])\\s*" + KEYPAT + '(?=$|[\\s?.!,])'),
+    new RegExp('\\b(?:to|into|in)\\s+(?:the\\s+)?(?:key\\s+of\\s+)?' + KEYPAT + '(?=$|[\\s?.!,])')
+  ];
+  /* ל צמודה להברה בלי מקף ("לרה", "ללה מינור", "לסי במול"). "למי" ו"לפה" הן גם מילים רגילות,
+     ולכן הברה בלי דיאז/במול/מינור/מז'ור נחשבת רק בסוף ההודעה, ומי/פה לבד אף פעם */
+  const RX_TO_BARE = /(?:^|\s)ל((דו|רה|מי|פה|סול|לה|סי)(\s*[-־]?\s*(?:דיאז|במול))?(\s*[-־]?\s*(?:מינור|מז'ור|מז׳ור))?)(?=$|[\s?.!,])/;
+  function toBare(rest) {
+    const m = RX_TO_BARE.exec(rest);
+    if (!m) return null;
+    if (!m[3] && !m[4] && (m[2] === 'מי' || m[2] === 'פה' || !/^[\s?.!,]*$/.test(rest.slice(m.index + m[0].length)))) return null;
+    return m;
+  }
+  const stripMode = s => s.replace(/[\s\-־]*(major|מז'ור|מז׳ור)$/i, '').replace(/[\s\-־]*(minor|מינור)$/i, ' minor');
+
+  /* מספר קאפו מפורש בטקסט המנורמל: "קאפו 2", "קאפו על 3", "קאפו בסריג השני", "capo on the 4th fret", "capo on the second fret", "2nd fret capo".
+     שאלה על איזה קאפו לבחור ("איזה קאפו", "לסולם", "for the key", "capo 3 for G") או שני מספרים שונים → null */
+  const RX_CAPO_N = /(?:capo|קאפו|קפו)\s+(?:(?:on|at|in|is|set|to|the|fret|ב|על|בשריג|שריג|בסריג|סריג|מספר|number)\s+){0,3}(?:(\d{1,2})(?:st|nd|rd|th)?|ה?(ראשונ|שני|שלישי|רביעי|חמישי|שישי|שביעי)|(first|second|third|fourth|fifth|sixth|seventh))(?![0-9a-zא-ת])|(?:^|\s)(\d{1,2})(?:st|nd|rd|th)?\s+(?:fret\s+)?(?:capo|קאפו|קפו)/g;
+  const ORD = { 'ראשונ': 1, 'שני': 2, 'שלישי': 3, 'רביעי': 4, 'חמישי': 5, 'שישי': 6, 'שביעי': 7, first: 1, second: 2, third: 3, fourth: 4, fifth: 5, sixth: 6, seventh: 7 };
+  const RX_CAPO_WHICH = /(?:איזה|באיזה|אילו|which|what)\s+(?:קאפו|capo)(?!\s+\d)|לסולמ|for\s+(?:the\s+)?(?:key\s+(?:of\s+)?)?[a-g](?:#|b)?m?(?=\s|$)(?!\s+shapes?)|(?:best|right|good)\s+capo|capo\s+should/;
+  function capoNumber(n) {
+    if (RX_CAPO_WHICH.test(n)) return null;
+    const nums = new Set();
+    let m;
+    RX_CAPO_N.lastIndex = 0;
+    while ((m = RX_CAPO_N.exec(n))) nums.add(m[1] || m[4] ? Number(m[1] || m[4]) : ORD[m[2] || m[3]]);
+    if (nums.size !== 1) return null;
+    const v = [...nums][0];
+    return v >= 1 && v <= 11 ? v : null;
+  }
+
+  function toolAnswer(id, text, extra) {
+    return Object.assign({ kind: 'tool', id: 'tool:' + id, text, links: [], chips: [], score: 1 }, extra || {});
+  }
+  function chipsFor(ids, L) { return ids.map(id => byId[id] ? { id, label: chipLabel(byId[id], L) } : null).filter(Boolean); }
+
+  function toolChord(list, L) {
+    const lines = [];
+    let follow = ['chord-symbols', 'inversions'];
+    for (const x of list.slice(0, 4)) {
+      const n = chordNotes(x.c);
+      lines.push(fmt(T[L].builtFrom, n.name, n.notes.join(', ')) + (n.bass ? ' ' + fmt(n.bassInChord ? T[L].slashIn : T[L].slashOut, n.bass) : ''));
+      if (n.spelledAs) lines.push(fmt(T[L].respelled, n.name, n.spelledAs));
+      if (list.length === 1) lines.push(fmt(T[L].formula, n.degrees.join(', '), n.degrees.map(d => DEG_NAME[L][d]).join(', ')));
+      const q = x.c.quality;
+      const f = x.c.bass !== null ? 'slash-chords' : /^(7|9|11|13|7b9|7#9|7b5|7#11)$/.test(q) ? 'seventh-chords' : q === 'maj7' || q === 'maj9' || q === 'maj7#11' ? 'maj7' : q === 'm7' || q === 'm9' ? 'm7'
+        : /sus/.test(q) ? 'sus-chords' : /dim|m7b5/.test(q) ? 'dim' : /aug/.test(q) ? 'aug' : /add9/.test(q) ? 'add9' : /6/.test(q) ? 'sixth-chords' : q === 'm' || q === '' ? 'major-minor' : q === '5' ? 'power-chords' : 'chord-symbols';
+      follow = [f, 'inversions', 'chord-diagrams'].filter((v, i, a) => a.indexOf(v) === i);
+    }
+    return toolAnswer('chord', lines.join('\n'), {
+      links: [{ type: 'route', value: '/guitar-chords', label: T[L].toGuitar }, { type: 'route', value: '/piano-chords', label: T[L].toPiano }],
+      chips: chipsFor(follow, L)
+    });
+  }
+  function detectTool(raw, L) {
+    const n = ' ' + normalize(raw) + ' ';
+    const hasHe = /[א-ת]/.test(raw);
+    const all = extractChords(raw, hasHe);
+    const has = re => re.test(n);
+    /* 1. מינור/מז'ור מקביל */
+    if (has(RX.rel)) {
+      const k = bestKey(raw);
+      if (k) {
+        const wantsMajor = /(מזור|major)/.test(n) && !/(מינור|minor)/.test(n);
+        const minor = k.explicit || (k.lat && /m$/.test(raw.slice(k.idx, k.idx + k.len).trim())) ? k.minor : wantsMajor;
+        const r = relativeKey({ root: k.root, minor, tonic: k.tonic });
+        const askedMinor = /(מינור|minor)/.test(n) && !/(מזור|major)/.test(n.replace(/relative major|המזור|מזור המקביל/, ''));
+        let line;
+        if (r.fromMinor) line = (askedMinor && !wantsMajor) ? fmt(T[L].relAlsoMin, r.from, r.to) : fmt(T[L].relMin, r.from, r.to);
+        else line = (wantsMajor) ? fmt(T[L].relAlsoMaj, r.from, r.to) : fmt(T[L].relMaj, r.from, r.to);
+        return toolAnswer('relative', line + '\n' + T[L].relNote, { chips: chipsFor(['relative-minor', 'major-minor', 'circle-fifths'], L) });
+      }
+    }
+    /* 2. קאפו */
+    if (has(RX.capo)) {
+      const bad = badChordTok(raw);
+      if (bad) return toolAnswer('capo', fmt(T[L].unknown, bad), { chips: chipsFor(['chord-symbols', 'capo-what'], L) });
+      const list = all.map(x => x.c);
+      /* "קאפו 2 ואני מנגן G": מה נשמע (הצורה + מספר הקאפו), לא "איזה קאפו לסולם G" */
+      const cn = capoNumber(n);
+      let shapes = list;
+      if (cn && !shapes.length) { const k = bestKey(raw); const c = k && parseChord(k.tonic + (k.minor ? 'm' : '')); if (c) shapes = [c]; }
+      if (cn && shapes.length) {
+        const r = transpose(shapes, cn);
+        if (r) {
+          const lines = [shapes.length === 1 ? fmt(T[L].capoSound1, cn, r.from[0], r.chords[0]) : fmt(T[L].capoSoundN, cn, r.from.join(' '), r.chords.join(' '), kname(r.key.replace(/m$/, ''), r.keyMinor, L))];
+          lines.push(fmt(T[L].capoRaise, cn, amountText(cn, L)));
+          lines.push(T[L].capoTip);
+          return toolAnswer('capo', lines.join('\n'), { chips: chipsFor(['capo-what', 'capo-site', 'singer-key'], L), capo: { capo: cn, shapes: r.from, sounds: r.chords, key: r.key } });
+        }
+      }
+      /* מספר קאפו בלי צורה שאפשר לזהות: לא עונים על שאלה אחרת; ממשיכים למאגר או לבינה המלאכותית */
+      let res = null;
+      if (!cn) {
+        if (list.length >= 2) res = capoSuggest(list);
+        else { const k = bestKey(raw); if (k) res = capoSuggest({ root: k.root, minor: k.minor, tonic: k.tonic }); }
+      }
+      if (res) {
+        const lines = [res.fromKey ? fmt(T[L].capoKey, res.sounds) : fmt(T[L].capoChords, res.chords.join(' '))];
+        const good = res.options.filter(o => o.ease >= 0.6);
+        if (res.noCapoNeeded) lines.push(res.options.length ? T[L].capoNone : T[L].capoNoneOnly);
+        else if (!res.options.length) lines.push(T[L].capoNoHelp);
+        else if (!good.length) lines.push(T[L].capoWeak);
+        for (const o of res.options) {
+          lines.push('- ' + (res.fromKey ? fmt(T[L].capoOptKey, o.capo, o.shapeKey, o.shapes.join(', '), res.sounds) : fmt(T[L].capoOptCh, o.capo, o.shapes.join(' '), res.chords.join(' '))));
+        }
+        lines.push(T[L].capoTip);
+        return toolAnswer('capo', lines.join('\n'), { chips: chipsFor(['capo-what', 'singer-key', 'capo-site'], L), capo: res });
+      }
+    }
+    /* 3. טרנספוזיציה */
+    if (has(RX.tr)) {
+      /* אקורד לא מזוהה ברשימה: לא מעבירים את השאר בשקט (זה היה משנה את התוצאה ואת הסולם) */
+      const bad = badChordTok(raw);
+      if (bad) return toolAnswer('transpose', fmt(T[L].unknown, bad), { chips: chipsFor(['chord-symbols', 'transpose-what'], L) });
+      let rest = raw, from = null, to = null, m;
+      for (const re of RX_FROMTO) if ((m = re.exec(rest))) { from = keyTok(stripMode(m[1])); to = keyTok(stripMode(m[2])); rest = rest.replace(m[0], ' '); break; }
+      if (!to) for (const re of RX_TO) if ((m = re.exec(rest))) { const k = keyTok(stripMode(m[1])); if (k) { to = k; rest = rest.replace(m[0], ' '); break; } }
+      if (!to && (m = toBare(rest))) { const k = keyTok(stripMode(m[1])); if (k) { to = k; rest = rest.replace(m[0], ' '); } }
+      const list = extractChords(rest, hasHe).map(x => x.c);
+      if (list.length) {
+        let amt = null;
+        if (!to) {
+          let cleaned = rest;
+          extractChords(rest, hasHe).forEach(x => { cleaned = cleaned.replace(x.tok, ' '); });
+          amt = parseAmount(cleaned);
+          if (amt !== null && amt > 0 && RX.trDown.test(' ' + lite(cleaned) + ' ') && !RX.trUp.test(' ' + lite(cleaned) + ' ')) amt = -amt;
+        }
+        if (to || amt !== null) {
+          const r = transpose(list, amt || 0, { from: from || undefined, to: to || undefined });
+          if (r) {
+            const lines = [];
+            if (r.semis === 0) lines.push(T[L].none0);
+            else lines.push(fmt(T[L].trHead, amountText(r.semis, L), r.semis > 0 ? T[L].up : T[L].down, (r.semis > 0 ? '+' : '') + r.semis));
+            lines.push('- ' + fmt(T[L].trBefore, r.from.join(' ')));
+            lines.push('- ' + fmt(T[L].trAfter, r.chords.join(' ')));
+            lines.push(fmt(T[L].trKey, kname(r.key.replace(/m$/, ''), r.keyMinor, L)));
+            if (r.renamedFrom) lines.push(fmt(T[L].scRenamed, r.renamedFrom, r.key.replace(/m$/, '')));
+            return toolAnswer('transpose', lines.join('\n'), { chips: chipsFor(['transpose-site', 'capo-what', 'singer-key'], L), result: r });
+          }
+        }
+        return toolAnswer('transpose', T[L].trHow, { chips: chipsFor(['transpose-what', 'transpose-site'], L) });
+      }
+    }
+    /* 4. איזה סולם מתאים לרשימת אקורדים */
+    if (has(RX.whichKey) && all.length >= 2) {
+      const k = estimateKey(all.map(x => x.c));
+      const name = (k.minor ? MIN_NAME : MAJ_NAME)[k.root];
+      const rel = relativeKey({ root: k.root, minor: k.minor, tonic: name });
+      return toolAnswer('key', fmt(T[L].keyGuess, all.map(x => x.c.name).join(' '), kname(name, k.minor, L), rel.to) + '\n' + T[L].keyNote, { chips: chipsFor(['find-key', 'relative-minor'], L) });
+    }
+    /* 4ב. "מה התווים של אקורד לה מינור" / "notes of a C major chord": אקורד אחד (ביחיד), בלי סולם → התווים של האקורד, לא הסולם.
+       "האקורדים של לה מינור" / "chords in A minor" (ברבים) ממשיכים לכלי הסולמות */
+    if (has(RX.chord) && /(?:^|\s)(?:chord|[ובלמשה]{0,2}אקורד)(?=\s|$)/.test(n) && !/(סולמ|key|scale|progression|מהלכ)/.test(n) &&
+      (!all.length || (all.length === 1 && (all[0].c.quality === '' || all[0].c.quality === 'm') && all[0].c.bass === null))) {
+      const k = bestKey(raw);
+      if (k && (!all.length || k.root === all[0].c.root)) {
+        const c = parseChord(k.tonic + (k.minor ? 'm' : ''));
+        if (c) return toolChord([{ tok: c.name, c }], L);
+      }
+    }
+    /* 5. אקורדים של סולם */
+    if (has(RX.scaleCh) && has(RX.scaleCtx) && all.length <= 1) {
+      const k = bestKey(raw);
+      if (k && !(all.length === 1 && has(RX.chord) && !/(סולמ|key|scale)/.test(n) && all[0].c.cls !== 'M' && all[0].c.cls !== 'm')) {
+        const sc = scaleChords({ root: k.root, minor: k.minor, tonic: k.tonic });
+        const lines = [fmt(T[L].scHead, sc.tonic, sc.minor ? T[L].minor : T[L].major)];
+        if (sc.renamedFrom) lines.push(fmt(T[L].scRenamed, sc.renamedFrom, sc.tonic));
+        lines.push(fmt(T[L].scNotes, sc.notes.join(' ')));
+        sc.chords.forEach(c => lines.push('- ' + c.roman + ': ' + c.name));
+        if (sc.minor) lines.push(fmt(T[L].scHarm, sc.harmonic.V, sc.harmonic.V7, sc.chords[4].name));
+        else lines.push(fmt(T[L].scCommon, [0, 3, 4, 5].map(i => sc.chords[i].name).join(', ')));
+        return toolAnswer('scale', lines.join('\n'), { chips: chipsFor(['progressions', 'relative-minor', 'diatonic-chords'], L), scale: sc });
+      }
+    }
+    /* 6. מה התווים של אקורד */
+    const FILL = ['מה', 'זה', 'אקורד', 'האקורד', 'what', 'is', 'a', 'the', 'chord', 'about'];
+    const onlyChord = all.length === 1 && normalize(raw.replace(all[0].tok, ' ')).split(' ').every(w => !w || FILL.indexOf(w) >= 0);
+    if ((has(RX.chord) || onlyChord) && all.length) return toolChord(all, L);
+    if (has(RX.chord) || /(אקורד|chord)/.test(n)) {
+      const bad = String(raw).match(/(?:^|[\sא-ת-])([A-G][#b]?(?:m|M|maj|min|dim|aug|sus|add|\d|#|°|ø|\+)[A-Za-z0-9#+°ø()]*(?:\/[A-Za-z0-9#]+)?)(?=$|[\s?.!,])/);
+      if (bad && !parseChord(bad[1])) return toolAnswer('chord', fmt(T[L].unknown, bad[1]), { chips: chipsFor(['chord-symbols'], L) });
+    }
+    return null;
+  }
+
+  /* ---------- תשובות מהמאגר ---------- */
+  const byId = {};
+  KB.forEach(e => { byId[e.id] = e; });
+  const QW = /^(מה|איך|למה|מי|איפה|כמה|אילו|איזה|איזו|האמ|האם|יש|אפשר|מתי|באיזה|what|how|why|who|where|can|is|are|do|does|which|when|should)(?=\s|$)/i;   /* \b לא עובד אחרי אותיות עבריות */
+  function chipLabel(e, L) {
+    const qs = e[L].q;
+    const pick = qs.find(q => q.length <= 42 && QW.test(q.trim())) || null;
+    if (pick) return pick.replace(/\s*\?*$/, '') + '?';
+    return qs[0];
+  }
+  function mapLinks(e, L) {
+    return (e.links || []).map(l => ({
+      type: l.route ? 'route' : l.legal ? 'legal' : 'action',
+      value: l.route || l.legal || l.action,
+      label: l[L]
+    }));
+  }
+  const TH = { score: 0.68, cov: 0.5, margin: 0.035, strong: 0.9 };
+  function answer(text, lang, ctx) {
+    const L = lang === 'en' ? 'en' : 'he';
+    const raw = String(text || '').slice(0, 600);
+    if (ctx && ctx.id && byId[ctx.id]) return kbAnswer(byId[ctx.id], L, 1);
+    const tool = detectTool(raw, L);
+    if (tool) return tool;
+    const r = rankKB(raw, L);
+    const top = r.list[0], second = r.list[1];
+    if (!top) return { kind: 'none', text: '', chips: [], score: 0 };
+    const margin = second ? top.score - second.score : top.score;
+    const ok = top.cov >= TH.cov && (top.score >= TH.strong || (top.score >= TH.score && margin >= TH.margin));
+    if (ok) return kbAnswer(top.d.e, L, top.score, r.list);
+    return {
+      kind: 'none', text: '', score: round(top.score), best: top.d.e.id,
+      chips: r.list.slice(0, 3).filter(x => x.score >= 0.25).map(x => ({ id: x.d.e.id, label: chipLabel(x.d.e, L) }))
+    };
+  }
+  const round = x => Math.round(x * 1000) / 1000;
+  function kbAnswer(e, L, score, list) {
+    return {
+      kind: 'kb', id: e.id, text: e[L].a, links: mapLinks(e, L),
+      chips: chipsFor(e.follow || [], L), score: round(score),
+      alts: list ? list.slice(1, 4).map(x => x.d.e.id) : []
+    };
+  }
+  function debugRank(text, lang) {
+    const r = rankKB(text, lang === 'en' ? 'en' : 'he');
+    return r.list.slice(0, 4).map(x => ({ id: x.d.e.id, score: round(x.score), cov: round(x.cov), best: round(x.best), exact: round(x.exact) }));
+  }
+  return { answer, normalize, parseChord, chordNotes, transpose, capoSuggest, scaleChords, relativeKey, estimateKey, detectTool, debugRank, isChordToken, TH };
+})(KB);
+/* cx-chat-engine:end */
+    return ENGINE;
+  }
+  function loadKB(){
+    if(!kbLoad){
+      const ac = ('AbortController' in window) ? new AbortController() : null;
+      let to = 0;
+      const timeout = new Promise((res, rej) => {
+        to = setTimeout(() => { if(ac) try{ ac.abort(); }catch(e){} rej(new Error('kb-timeout')); }, KB_TIMEOUT);
+      });
+      const load = fetch('/assistant-kb.json', { credentials:'same-origin', signal: ac ? ac.signal : undefined })
+        .then(res => {
+          const ct = res.headers.get('content-type') || '';
+          if(!res.ok || ct.indexOf('json') < 0) throw new Error('kb');
+          return res.json();
+        })
+        .then(kb => { if(!Array.isArray(kb) || !kb.length) throw new Error('kb'); return kb; });
+      /* הזמן נמדד עד סוף קריאת הגוף, לא רק עד הכותרות */
+      kbLoad = Promise.race([load, timeout])
+        .then(kb => { clearTimeout(to); return kb; },
+              err => { clearTimeout(to); kbLoad = null; throw err; });   /* כישלון לא ננעל: ננסה שוב בשאלה הבאה */
+    }
+    return kbLoad;
+  }
+  /* אם המאגר לא נטען, הכלים המוזיקליים (אקורדים, טרנספוזיציה, קאפו, סולמות) עדיין עונים מקומית
+     ממנוע עם מאגר ריק; שאר השאלות עוברות לבינה המלאכותית או לתשובת הגיבוי. */
+  function engineReady(){
+    if(ENGINE_) return Promise.resolve(ENGINE_);
+    return loadKB().then(kb => (ENGINE_ = ENGINE_ || buildEngine(kb)),
+      () => (ENGINE0_ = ENGINE0_ || buildEngine([])));
+  }
+  let warmed = false;
+  function prewarm(delay){
+    if(warmed) return;
+    warmed = true;
+    const run = () => { loadKB().then(kb => { ENGINE_ = ENGINE_ || buildEngine(kb); }, () => { warmed = false; }); };
+    setTimeout(() => (window.requestIdleCallback ? requestIdleCallback(run, { timeout:1500 }) : run()), delay || 0);
+  }
+
+  /* ---------- מצב (בזיכרון בלבד) ---------- */
+  let convo = [];                 /* [{role:'user'|'assistant', content}] */
+  let isOpen = false, started = false, busy = false;
+  let ctrl = null;                /* AbortController של בקשה פעילה */
+  let aiState = 'unknown';        /* 'unknown' | 'ok' | 'off' | 'quota' */
+  let aiRetryAt = 0;
+  let aiNoticeShown = false;
+  let attachOn = false;
+  let fabShown = false;
+  let streaming = false;          /* תשובת AI זורמת כרגע */
+  let gen = 0;                    /* דור השיחה: הניקוי מקדם אותו, ותשובה ששייכת לדור קודם נזרקת */
+
+  const still = () => root.classList.contains('a11y-reduced-motion') ||
+    !!(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches);
+  const lang = () => ((window.CX_getLang && window.CX_getLang()) === 'en' ? 'en' : 'he');
+  const small = q => !!(window.matchMedia && matchMedia(q).matches);
+  const SVGNS = 'http://www.w3.org/2000/svg';
+  function svg(parts, cls){
+    const s = document.createElementNS(SVGNS, 'svg');
+    s.setAttribute('viewBox', '0 0 24 24'); s.setAttribute('fill', 'none'); s.setAttribute('aria-hidden', 'true');
+    if(cls) s.setAttribute('class', cls);
+    parts.forEach(p => {
+      const el = document.createElementNS(SVGNS, p[0]);
+      Object.keys(p[1]).forEach(k => el.setAttribute(k, p[1][k]));
+      s.appendChild(el);
+    });
+    return s;
+  }
+  const ARROW = [['path', { d:'M9.5 6l6 6-6 6', stroke:'currentColor', 'stroke-width':'2', 'stroke-linecap':'round', 'stroke-linejoin':'round' }]];
+  const NOTE = [['path', { d:'M9 17.5V5.5l10-2.2v11.9', stroke:'currentColor', 'stroke-width':'2', 'stroke-linecap':'round', 'stroke-linejoin':'round' }],
+                ['circle', { cx:'6.6', cy:'17.6', r:'2.6', fill:'currentColor' }], ['circle', { cx:'16.6', cy:'15.3', r:'2.6', fill:'currentColor' }]];
+  function el(tag, cls, text){
+    const e = document.createElement(tag);
+    if(cls) e.className = cls;
+    if(text !== undefined && text !== null) e.textContent = text;
+    return e;
+  }
+
+  /* ---------- הצגת הכפתור אחרי אישור התנאים ---------- */
+  function consentDone(){
+    const g = $('consentGate');
+    if(!g) return true;
+    let ok = false;
+    try{ ok = localStorage.getItem('cx_consent_v1') === '1'; }catch(e){ ok = false; }
+    return ok && g.classList.contains('hidden');
+  }
+  function showFab(){
+    if(fabShown) return;
+    fabShown = true;
+    fab.hidden = false;
+    if(!still()){
+      fab.classList.add('cx-enter');
+      setTimeout(() => fab.classList.remove('cx-enter'), 600);
+    }
+  }
+  function scheduleFab(){ setTimeout(showFab, still() ? 0 : 1200); }
+  if(consentDone()) scheduleFab();
+  else if(window.MutationObserver){
+    const mo = new MutationObserver(() => { if(consentDone()){ mo.disconnect(); scheduleFab(); } });
+    mo.observe(document.body, { childList:true, subtree:true });
+  }
+
+  /* ---------- פתיחה / סגירה ---------- */
+  function setFabLabel(){
+    fab.setAttribute('aria-label', isOpen ? cxT("סגירת העוזר המוזיקלי") : cxT("פתיחת העוזר המוזיקלי"));
+  }
+  function openChat(){
+    if(isOpen) return;
+    isOpen = true;
+    panel.classList.remove('cx-closing');
+    panel.hidden = false;
+    if(!still()){
+      panel.classList.remove('cx-opening'); void panel.offsetWidth; panel.classList.add('cx-opening');
+      setTimeout(() => panel.classList.remove('cx-opening'), 420);
+    }
+    fab.classList.add('cx-open');
+    fab.setAttribute('aria-expanded', 'true');
+    setFabLabel();
+    root.classList.add('cx-chat-open');
+    closeHeadNav();
+    applyModal();
+    refreshAttach();
+    if(!log.firstChild) renderWelcome();
+    scrollDown(false);            /* החלון היה מוסתר: חוזרים לתחתית אם היינו שם */
+    prewarm(450);                 /* אחרי אנימציית הפתיחה */
+    trackKeyboard(true);
+    setTimeout(() => { if(isOpen) try{ input.focus({ preventScroll:true }); }catch(e){ input.focus(); } }, still() ? 0 : 60);
+  }
+  function closeChat(returnFocus){
+    if(!isOpen) return;
+    isOpen = false;
+    fab.classList.remove('cx-open');
+    fab.setAttribute('aria-expanded', 'false');
+    setFabLabel();
+    root.classList.remove('cx-chat-open');
+    applyModal();
+    trackKeyboard(false);
+    const done = () => { if(!isOpen){ panel.hidden = true; panel.classList.remove('cx-closing', 'cx-opening'); } };
+    if(still()) done();
+    else { panel.classList.remove('cx-opening'); panel.classList.add('cx-closing'); setTimeout(done, 170); }
+    if(returnFocus) try{ fab.focus(); }catch(e){}
+  }
+  fab.addEventListener('click', () => (isOpen ? closeChat(false) : openChat()));
+  ['pointerenter', 'focus', 'touchstart'].forEach(ev => fab.addEventListener(ev, () => prewarm(0), { passive:true }));
+  $('cxChatClose').addEventListener('click', () => closeChat(true));
+  $('cxChatClear').addEventListener('click', clearChat);
+  /* עזרה/נגישות תופסים את אותה פינה במסכים צרים, ולכן פתיחתם סוגרת את הצ'אט */
+  ['helpToggle', 'a11yToggle'].forEach(id => { const b = $(id); if(b) b.addEventListener('click', () => closeChat(false)); });
+
+  /* תפריט ההמבורגר (עד 860px) ומגירת הצד נפתחים באותו אזור כמו החלון: פתיחתם סוגרת את הצ'אט,
+     ופתיחת הצ'אט סוגרת תפריט המבורגר פתוח */
+  const headNav = $('headNav'), burger = $('navToggle');
+  function closeHeadNav(){
+    if(!headNav || !burger || !headNav.classList.contains('open')) return;
+    headNav.classList.remove('open');
+    burger.setAttribute('aria-expanded', 'false');
+    burger.setAttribute('aria-label', cxT("פתיחת תפריט"));
+  }
+  if(burger) burger.addEventListener('click', () => setTimeout(() => { if(!headNav || headNav.classList.contains('open')) closeChat(false); }, 0));
+  { const sideBtn = $('sideOpen'); if(sideBtn) sideBtn.addEventListener('click', () => closeChat(false)); }
+
+  /* גיליון מסך מלא (עד 640px): החלון מתנהג כמודאלי, כדי שהמיקוד לא יגיע לכפתורים שמוסתרים מאחוריו.
+     Tab מסתובב בתוך החלון; מיקוד שבורח לדף המכוסה חוזר לחלון. הכותרת העליונה נשארת גלויה ונגישה במגע. */
+  const sheetMQ = window.matchMedia ? matchMedia('(max-width: 640px)') : null;
+  const sheetMode = () => !!(sheetMQ && sheetMQ.matches);
+  function applyModal(){ panel.setAttribute('aria-modal', isOpen && sheetMode() ? 'true' : 'false'); }
+  if(sheetMQ){
+    if(sheetMQ.addEventListener) sheetMQ.addEventListener('change', applyModal);
+    else if(sheetMQ.addListener) sheetMQ.addListener(applyModal);
+  }
+  function focusables(){
+    return [...panel.querySelectorAll('button, a[href], textarea, input, select, [tabindex]:not([tabindex="-1"])')]
+      .filter(n => !n.disabled && !n.closest('[hidden]') && !n.closest('[aria-hidden="true"]'));
+  }
+  panel.addEventListener('keydown', e => {
+    if(e.key !== 'Tab' || !isOpen || !sheetMode()) return;
+    const f = focusables();
+    if(!f.length) return;
+    const a = document.activeElement, first = f[0], last = f[f.length - 1];
+    if(e.shiftKey && (a === first || !panel.contains(a))){ e.preventDefault(); try{ last.focus(); }catch(err){} }
+    else if(!e.shiftKey && a === last){ e.preventDefault(); try{ first.focus(); }catch(err){} }
+  });
+  document.addEventListener('focusin', e => {
+    if(!isOpen || !sheetMode()) return;
+    const t = e.target;
+    if(!t || t === document.body || !t.closest || panel.contains(t)) return;
+    if(t.closest('.site-head, .modal-backdrop, #sideMenu, #consentGate, .float-window')) return;
+    const f = focusables();
+    if(f.length) try{ f[0].focus({ preventScroll:true }); }catch(err){}
+  });
+  /* Esc: רק כשאין מודאל פתוח (אז הוא שלו) וכשהמיקוד בצ'אט או על הדף עצמו */
+  window.addEventListener('keydown', e => {
+    if(e.key !== 'Escape' || !isOpen) return;
+    if(document.querySelector('.modal-backdrop:not(.hidden)') || $('consentGate')) return;
+    const a = document.activeElement;
+    if(a && a !== document.body && a !== fab && !panel.contains(a)) return;
+    closeChat(true);
+  }, true);
+
+  /* מקלדת וירטואלית בטלפון: החלון (גיליון) עולה מעליה */
+  let vvOn = false;
+  function onVV(){
+    const vv = window.visualViewport;
+    if(!vv) return;
+    const kb = Math.max(0, Math.round(window.innerHeight - vv.height - vv.offsetTop));
+    root.style.setProperty('--cx-kb', (kb > 60 ? kb : 0) + 'px');
+    if(window.requestAnimationFrame) requestAnimationFrame(showInput);
+  }
+  /* מסך נמוך מאוד (החלון נגלל): כששדה הכתיבה בפוקוס, גוללים את החלון כך שהשדה גלוי */
+  function showInput(){
+    if(isOpen && document.activeElement === input && panel.scrollHeight > panel.clientHeight + 1) panel.scrollTop = panel.scrollHeight;
+  }
+  input.addEventListener('focus', () => setTimeout(showInput, 0));
+  function trackKeyboard(on){
+    const vv = window.visualViewport;
+    if(!vv || on === vvOn) return;
+    vvOn = on;
+    if(on){ vv.addEventListener('resize', onVV); vv.addEventListener('scroll', onVV); onVV(); }
+    else { vv.removeEventListener('resize', onVV); vv.removeEventListener('scroll', onVV); root.style.removeProperty('--cx-kb'); }
+  }
+
+  /* ---------- רינדור טקסט בטוח: שורות, תבליטים, **הדגשה**, אקורדים ב-<bdi> ---------- */
+  const RX_CHORD = /^[A-G](?:#|b)?(?:maj7|maj9|maj|mmaj7|m7b5|m11|m9|m7|m6|madd9|m|dim7|dim|aug7|aug|7sus4|sus2|sus4|sus|add9|7b9|7#9|7b5|°7|°|ø7|ø|\+|6|7|9|11|13|5)?(?:\/[A-G](?:#|b)?)?$/;
+  const RX_DEG = /^(?:[#b]{1,2}\d{1,2}|[+-]\d{1,2})$/;      /* b3, #5, +2, -1 */
+  const RX_NUM = /^\d{1,2}$/;
+  const ROUTES = ['/how', '/features', '/faq', '/tips', '/library', '/metronome', '/guitar-chords', '/piano-chords', '/tuner'];
+  const MAIL = 'chordix.business@gmail.com';
+  function tokClass(core){
+    if(RX_CHORD.test(core)) return 'c';
+    if(RX_DEG.test(core)) return 'd';
+    if(RX_NUM.test(core)) return 'n';
+    return '';
+  }
+  /* טקסט רגיל → צמתים: רצפי אקורדים/דרגות מבודדים ב-bdi (נשארים משמאל לימין), המייל של האתר
+     ונתיבים פנימיים מוכרים הופכים לקישורים. שום URL חיצוני לא הופך לקישור. */
+  /* מילה באנגלית שנראית כמו אקורד: "A" בתחילת משפט ואחריה מילה באותיות קטנות ("A capo is...", "A few checks")
+     היא מילית, לא אקורד; "A minor", "A and E" וכל A באמצע משפט נשארים אקורד. ההחלטה של המנוע
+     (isChordToken) כשהוא כבר נטען, וכלל מקומי זהה בעיקרו לפני כן (למשל בהודעת הפתיחה). */
+  function englishWordAt(parts, i){
+    let j = i - 1; while(j >= 0 && (!parts[j] || /^\s+$/.test(parts[j]))) j--;
+    let k = i + 1; while(k < parts.length && (!parts[k] || /^\s+$/.test(parts[k]))) k++;
+    const prev = j >= 0 ? parts[j] : '', next = k < parts.length ? parts[k] : '';
+    const E = ENGINE_ || ENGINE0_;
+    if(E && typeof E.isChordToken === 'function') return !E.isChordToken(parts[i], { prev, next });
+    return parts[i] === 'A' && (!prev || /[.!?:;]["')\]]*$/.test(prev)) && /^[a-z]/.test(next) && !/^(?:major|minor|and|or)\b/.test(next);
+  }
+  function appendInline(parent, text, words){
+    const parts = text.split(/(\s+)/);
+    let run = [], runHasLtr = false;
+    const flushRun = () => {
+      if(!run.length) return;
+      const s = run.join('');
+      const trail = s.match(/\s+$/);
+      const core = trail ? s.slice(0, -trail[0].length) : s;
+      if(runHasLtr){
+        const b = el('bdi', 'cx-ch', core);
+        pushNode(parent, b, words);
+      } else pushText(parent, core, words);
+      if(trail) parent.appendChild(document.createTextNode(trail[0]));
+      run = []; runHasLtr = false;
+    };
+    for(let i = 0; i < parts.length; i++){
+      const p = parts[i];
+      if(!p) continue;
+      if(/^\s+$/.test(p)){ if(run.length) run.push(p); else parent.appendChild(document.createTextNode(p)); continue; }
+      const m = /^([("[]*)(.*?)([)\]"'.,:;!?]*)$/.exec(p);
+      const lead = m[1], core = m[2], trail = m[3];
+      /* קידומת עברית צמודה לאקורד: "ב-Eb", "ל-G" */
+      const hp = /^([א-ת]{1,3}[-־])(.+)$/.exec(core);
+      const cls = ((p === 'A' || p === 'Am') && englishWordAt(parts, i)) ? '' : tokClass(hp ? hp[2] : core);
+      if(cls && cls !== 'n' && lead && !hp){         /* "(+2):", "(Am)" */
+        flushRun();
+        pushText(parent, lead, words);
+        pushNode(parent, el('bdi', 'cx-ch', core), words);
+        pushText(parent, trail, words);
+        continue;
+      }
+      if(cls && !lead && !hp){
+        if(trail === '' || trail === ','){           /* הרצף ממשיך (גם אחרי פסיק) */
+          run.push(p);
+          if(cls !== 'n') runHasLtr = true;
+          continue;
+        }
+        run.push(core);                              /* פיסוק סוגר את הרצף */
+        if(cls !== 'n') runHasLtr = true;
+        flushRun();
+        pushText(parent, trail, words);
+        continue;
+      }
+      flushRun();
+      if(hp && cls && cls !== 'n'){
+        pushText(parent, lead + hp[1], words);
+        pushNode(parent, el('bdi', 'cx-ch', hp[2]), words);
+        pushText(parent, trail, words);
+        continue;
+      }
+      const bare = hp ? hp[2] : core;              /* גם "ל-chordix.business@gmail.com" */
+      if(bare === MAIL || ROUTES.indexOf(bare) >= 0){
+        pushText(parent, lead + (hp ? hp[1] : ''), words);
+        const a = el('a', null, bare);
+        a.dir = 'ltr';
+        if(bare === MAIL) a.href = 'mailto:' + MAIL;
+        else { a.href = bare; a.setAttribute('data-route', ''); }
+        pushNode(parent, a, words);
+        pushText(parent, trail, words);
+        continue;
+      }
+      pushText(parent, p, words);
+    }
+    flushRun();
+  }
+  function pushText(parent, s, words){
+    if(!s) return;
+    if(!words){ parent.appendChild(document.createTextNode(s)); return; }
+    const w = el('span', 'cx-w', s); words.push(w); parent.appendChild(w);
+  }
+  function pushNode(parent, node, words){
+    if(words){ node.classList.add('cx-w'); words.push(node); }
+    parent.appendChild(node);
+  }
+  function appendRich(parent, line, words){
+    const segs = line.split(/\*\*(.+?)\*\*/);
+    segs.forEach((s, i) => {
+      if(!s) return;
+      if(i % 2){ const b = el('strong'); appendInline(b, s, words); parent.appendChild(b); }
+      else appendInline(parent, s, words);
+    });
+  }
+  function renderText(box, text, reveal){
+    const words = reveal ? [] : null;
+    const lines = String(text || '').replace(/\r/g, '').split('\n');
+    let ul = null;
+    for(const raw of lines){
+      const line = raw.replace(/\s+$/, '');
+      if(!line.trim()){ ul = null; continue; }
+      const bm = /^\s*(?:[-•*])\s+(.*)$/.exec(line);
+      if(bm){
+        if(!ul){ ul = el('ul'); box.appendChild(ul); }
+        const li = el('li'); appendRich(li, bm[1], words); ul.appendChild(li);
+      } else {
+        ul = null;
+        const p = el('p'); appendRich(p, line, words); box.appendChild(p);
+      }
+    }
+    /* גל החשיפה כולו (השהיה אחרונה 300ms + 200ms למילה) נגמר תוך כחצי שנייה */
+    if(words && words.length){
+      const step = Math.min(34, 300 / Math.max(1, words.length - 1));
+      words.forEach((w, i) => w.style.setProperty('--d', Math.round(i * step) + 'ms'));
+    }
+    return words ? Math.min(300, words.length * 34) + 200 : 0;
+  }
+
+  /* ---------- בועות ---------- */
+  /* נצמד לתחתית: כל עוד המשתמש בתחתית השיחה (או שלח עכשיו הודעה), כל תוכן חדש (בועה, זרם, צ'יפים,
+     שינוי גובה) מושך את השיחה למטה. גלילה למעלה כדי לקרוא משחררת את ההצמדה, וחזרה לתחתית מחזירה אותה. */
+  let pinned = true, autoTop = -1;
+  function pin(){
+    const top = Math.max(0, log.scrollHeight - log.clientHeight);
+    if(Math.abs(log.scrollTop - top) > 1) log.scrollTop = top;
+    autoTop = log.scrollTop;
+  }
+  function scrollDown(force){
+    if(force) pinned = true;
+    if(pinned) pin();
+  }
+  log.addEventListener('scroll', () => {
+    if(pinned && Math.abs(log.scrollTop - autoTop) <= 1) return;   /* הגלילה שלנו (גם אם התוכן גדל מאז) */
+    pinned = log.scrollHeight - log.scrollTop - log.clientHeight < 48;
+  }, { passive:true });
+  if(window.MutationObserver) new MutationObserver(() => { if(pinned) pin(); }).observe(log, { childList:true, subtree:true, characterData:true });
+  if(window.ResizeObserver) new ResizeObserver(() => { if(pinned) pin(); }).observe(log);
+  /* כיוון וטקסט לפי תוכן ההודעה (ולא לפי תווית הקורא המוסתרת): רוב עברי = rtl/he, רוב לטיני = ltr/en */
+  function dirOf(text){
+    const s = String(text || '');
+    const he = (s.match(/[\u0590-\u05FF]/g) || []).length, la = (s.match(/[A-Za-z]/g) || []).length;
+    if(!he && !la) return null;
+    return he >= la ? { dir:'rtl', lang:'he' } : { dir:'ltr', lang:'en' };
+  }
+  function setDir(m, text){
+    const d = dirOf(text);
+    if(d){ m.dir = d.dir; m.lang = d.lang; } else { m.dir = 'auto'; m.removeAttribute('lang'); }
+  }
+  function speaker(who){
+    const s = el('span', 'sr-only', who === 'user' ? cxT("אני:") + ' ' : cxT("העוזר:") + ' ');
+    s.dir = lang() === 'en' ? 'ltr' : 'rtl';
+    s.lang = lang();
+    return s;
+  }
+  function addUser(text){
+    const m = el('div', 'cx-msg cx-user');
+    setDir(m, text);
+    m.appendChild(speaker('user'));
+    m.appendChild(document.createTextNode(text));
+    log.appendChild(m);
+    scrollDown(true);
+    return m;
+  }
+  function botBubble(extraCls, text){
+    const m = el('div', 'cx-msg cx-bot' + (extraCls ? ' ' + extraCls : ''));
+    setDir(m, text);
+    m.appendChild(speaker('bot'));
+    return m;
+  }
+  function addSystem(text){
+    const p = el('p', 'cx-sys', text);
+    p.dir = 'auto';
+    log.appendChild(p);
+    scrollDown(true);
+    return p;
+  }
+  function removeChips(){ log.querySelectorAll('.cx-chips').forEach(c => c.remove()); }
+  const cap = s => String(s || '').replace(/^[a-z]/, c => c.toUpperCase());   /* "what is a capo?" → "What is a capo?" */
+  function addChips(items, cls){
+    if(!items || !items.length) return null;
+    const g = el('div', 'cx-chips' + (cls ? ' ' + cls : ''));
+    g.setAttribute('role', 'group');
+    g.setAttribute('aria-label', cxT("הצעות לשאלות"));
+    g.cxLang = lang();
+    items.forEach((it, i) => {
+      const label = cap(it.label);
+      const b = el('button', 'cx-chip', label);
+      b.type = 'button'; b.dir = 'auto';
+      b.style.setProperty('--i', i);
+      b.addEventListener('click', () => ask(label, it.id));
+      g.appendChild(b);
+    });
+    log.appendChild(g);
+    return g;
+  }
+  function addLinks(box, links){
+    if(!links || !links.length) return;
+    const wrap = el('div', 'cx-links');
+    links.forEach(l => {
+      let n;
+      if(l.type === 'route'){
+        n = el('a', 'cx-lnk'); n.href = l.value; n.setAttribute('data-route', '');
+      } else if(l.type === 'legal'){
+        n = el('button', 'cx-lnk'); n.type = 'button'; n.setAttribute('data-legal', l.value);
+      } else {
+        n = el('button', 'cx-lnk'); n.type = 'button'; n.setAttribute('data-cx-action', l.value);
+      }
+      n.appendChild(el('span', null, l.label));
+      n.appendChild(svg(ARROW));
+      wrap.appendChild(n);
+    });
+    box.appendChild(wrap);
+  }
+  /* תשובה מקומית: נכנסת בבת אחת ל-DOM (מוכרזת פעם אחת), והמילים נחשפות בגל קצר ב-CSS */
+  function addBotAnswer(r){
+    const m = botBubble('', r.text);
+    const body = el('div');
+    m.appendChild(body);
+    const dur = renderText(body, r.text, !still());
+    addLinks(m, r.links);
+    log.appendChild(m);
+    if(r.chips && r.chips.length) addChips(r.chips);
+    scrollDown(true);
+    setAnswering(true);
+    setTimeout(() => { if(!streaming) setAnswering(false); }, still() ? 0 : dur);
+    return m;
+  }
+
+  /* ---------- מסך הפתיחה ---------- */
+  const STARTERS = [
+    { he:"איך מעלים שיר?", id:'upload-how' },
+    { he:"האקורדים לא מדויקים", id:'wrong-chords' },
+    { he:"מה זה קאפו?", id:'capo-what' },
+    { he:"העברת אקורדים לסולם אחר", id:'transpose-what' },
+    { he:"איך מכוונים גיטרה?", id:'guitar-tuning' }
+  ];
+  function renderWelcome(){
+    log.querySelectorAll('.cx-welcome').forEach(n => n.remove());
+    const hello = cxT("שלום, כאן העוזר המוזיקלי של Chordix.") + '\n' +
+      cxT("אפשר לשאול על אקורדים, סולמות, קאפו, קצב ותרגול, או על השימוש באתר.");
+    const m = botBubble('cx-welcome', hello);
+    const body = el('div');
+    renderText(body, hello, false);
+    m.appendChild(body);
+    log.insertBefore(m, log.firstChild);
+    const chips = addChips(STARTERS.map(s => ({ label: cxT(s.he), id: s.id })), 'cx-welcome');
+    if(chips) log.insertBefore(chips, m.nextSibling);
+  }
+
+  /* ---------- כתיבה ושליחה ---------- */
+  function autoGrow(){
+    input.style.height = 'auto';
+    input.style.height = Math.min(input.scrollHeight + 2, 128) + 'px';
+  }
+  function updateSend(){ sendBtn.disabled = busy || !input.value.trim(); }
+  input.addEventListener('input', () => { autoGrow(); updateSend(); showInput(); });
+  input.addEventListener('keydown', e => {
+    if(e.key === 'Enter' && !e.shiftKey && !e.isComposing){
+      e.preventDefault();
+      if(!sendBtn.disabled) submit();
+    }
+  });
+  form.addEventListener('submit', e => { e.preventDefault(); submit(); });
+  /* עצירה: מבטלים את הבקשה וגם את קורא-הזרם (כך שהממשק משתחרר מיד גם אם הביטול מתעכב) */
+  function haltStream(flag){
+    if(!ctrl) return;
+    ctrl[flag] = true;
+    try{ ctrl.abort(); }catch(e){}
+    if(ctrl.cxReader) try{ ctrl.cxReader.cancel().catch(() => {}); }catch(e){}
+  }
+  stopBtn.addEventListener('click', () => haltStream('cxStopped'));
+  function submit(){
+    const t = input.value.trim();
+    if(!t || busy) return;
+    input.value = ''; autoGrow();
+    flyNote();
+    ask(t, null);
+    /* כפתור השליחה מתחלף ב"עצירה" בזמן תשובה; המיקוד לא נופל ל-body */
+    if(document.activeElement === sendBtn || document.activeElement === document.body) try{ input.focus({ preventScroll:true }); }catch(e){}
+  }
+  function flyNote(){
+    if(still()) return;
+    const n = svg(NOTE, 'cx-fly');
+    form.appendChild(n);
+    setTimeout(() => n.remove(), 450);
+  }
+  function setAnswering(on){
+    fab.classList.toggle('cx-busy', on);
+    panel.classList.toggle('cx-answering', on);
+  }
+  function focusInput(){ try{ input.focus({ preventScroll:true }); }catch(e){} }
+  /* המיקוד לא נופל ל-body: כפתור ממוקד שמוסתר (עצירה/שליחה) מעביר את המיקוד לשדה הכתיבה */
+  function setBusy(on){
+    busy = on;
+    const a = document.activeElement;
+    sendBtn.hidden = on && !!ctrl;
+    stopBtn.hidden = !(on && ctrl);
+    updateSend();
+    if(isOpen && ((a === stopBtn && stopBtn.hidden) || (a === sendBtn && sendBtn.hidden))) focusInput();
+  }
+  function rescueFocus(){
+    const a = document.activeElement;
+    if(isOpen && (!a || a === document.body || !a.isConnected)) focusInput();
+  }
+  /* מחוון "העוזר מקליד": חמישה פסים + טקסט לקוראי מסך */
+  function addTyping(){
+    const typing = el('div', 'cx-msg cx-bot cx-typing');
+    typing.setAttribute('role', 'status');
+    const eq = el('span', 'cx-eq5'); eq.setAttribute('aria-hidden', 'true');
+    for(let i = 0; i < 5; i++){ const b = el('i'); b.style.setProperty('--i', i); eq.appendChild(b); }
+    typing.appendChild(eq);
+    typing.appendChild(el('span', 'sr-only', cxT("העוזר מקליד…")));
+    log.appendChild(typing);
+    scrollDown(true);
+    return typing;
+  }
+  function ask(text, id){
+    text = String(text || '').slice(0, 500).trim();
+    if(!text || busy) return;
+    started = true;
+    const a = document.activeElement;
+    const fromChip = !!(a && a.closest && a.closest('.cx-chips'));
+    removeChips();
+    /* הצ'יפ שנלחץ נמחק: המיקוד עובר לשיחה עצמה (לא לשדה הכתיבה, כדי לא להקפיץ מקלדת בטלפון) */
+    if(fromChip) try{ log.focus({ preventScroll:true }); }catch(e){}
+    addUser(text);
+    convo.push({ role:'user', content:text });
+    const L = lang();
+    const g = gen, hadFocus = panel.contains(document.activeElement);
+    setBusy(true);   /* עד שהמאגר נטען (בדרך כלל כבר נטען מראש): חוסם שליחה כפולה */
+    /* המאגר עוד נטען (חיבור איטי): מחוון הקלדה, כדי שלא ייראה שלא קורה כלום */
+    const wait = ENGINE_ ? null : addTyping();
+    if(wait) setAnswering(true);
+    engineReady()
+      .then(E => E.answer(text, L, id ? { id } : {}))
+      .catch(() => ({ kind:'none', chips:[], score:0 }))
+      .then(r => {
+        if(g !== gen) return;                     /* השיחה נוקתה בינתיים */
+        if(wait){ wait.remove(); setAnswering(false); }
+        setBusy(false);
+        route(r);
+        if(hadFocus) rescueFocus();
+      });
+  }
+  function route(r){
+    if(r.kind === 'kb' || r.kind === 'tool'){
+      addBotAnswer(r);
+      convo.push({ role:'assistant', content:r.text });
+      return;
+    }
+    if(aiUsable()) aiReply(r);
+    else fallback(r, '');
+  }
+  function fallback(r, reason){
+    const lines = [];
+    if(reason) lines.push(reason);
+    lines.push(r.chips && r.chips.length ? cxT("על זה אין לי כרגע תשובה בטוחה. אולי אחת מההצעות האלה עוזרת:") : cxT("על זה אין לי כרגע תשובה בטוחה."));
+    /* עמוד הטיפים ולא חלון העזרה: חלון העזרה עוד מזכיר פקדים שהוסתרו מהמשתמשים */
+    lines.push(cxT("אפשר גם לעיין בעמוד הטיפים, להשאיר תגובה או לכתוב ל-{0}.", MAIL));
+    const m = botBubble('', lines.join('\n'));
+    const body = el('div');
+    renderText(body, lines.join('\n'), false);
+    m.appendChild(body);
+    addLinks(m, [{ type:'route', value:'/tips', label:cxT("לעמוד הטיפים") }, { type:'action', value:'comment', label:cxT("להשארת תגובה") }]);
+    log.appendChild(m);
+    if(r.chips && r.chips.length) addChips(r.chips);
+    scrollDown(true);
+    convo.push({ role:'assistant', content:lines.join('\n') });
+  }
+
+  /* ---------- קישורי פעולה בתוך התשובות ---------- */
+  log.addEventListener('click', e => {
+    const act = e.target.closest('[data-cx-action]');
+    if(act){ e.preventDefault(); doAction(act.getAttribute('data-cx-action')); return; }
+    const route = e.target.closest('a[data-route]');
+    /* בגיליון: נסגרים לפני שהנתב מעביר את המיקוד לכותרת העמוד החדש (אחרת מלכודת המיקוד מחזירה אותו לכאן) */
+    if(route && sheetMode()) closeChat(false);
+  });
+  function openFloat(winId, btnId){
+    /* setTimeout: אחרי שהלחיצה הנוכחית מסיימת לבעבע, אחרת "לחיצה בחוץ" סוגרת את החלון מיד */
+    setTimeout(() => {
+      const w = $(winId);
+      if(w && typeof w.__open === 'function') w.__open();
+      else { const b = $(btnId); if(b) b.click(); }
+    }, 0);
+    if(small('(max-width: 760px)')) closeChat(false);
+  }
+  function doAction(a){
+    if(a === 'help') openFloat('helpWindow', 'helpToggle');
+    else if(a === 'a11y') openFloat('a11yWindow', 'a11yToggle');
+    else if(a === 'comment'){ if(window.__openComment) window.__openComment('footer'); }
+    else if(a === 'upload'){
+      /* ספרייה/היסטוריה (doc-mode) מסתירה את אזור ההעלאה: יוצאים מהדף כמו "שיר חדש" בתפריט הצד */
+      if(root.classList.contains('doc-mode') && window.__exitSheet) try{ window.__exitSheet('app'); }catch(e){}
+      if(window.cxRoute) window.cxRoute('/', true);
+      if(small('(max-width: 640px)')) closeChat(false);
+      setTimeout(() => {
+        const d = $('drop');
+        if(d && d.offsetParent){
+          try{ d.scrollIntoView({ block:'center', behavior: still() ? 'auto' : 'smooth' }); }catch(e){}
+          try{ d.focus({ preventScroll:true }); }catch(e){}
+        }
+      }, 80);
+    }
+  }
+
+  /* ---------- צירוף דף האקורדים הפתוח (רק בלחיצה מפורשת) ---------- */
+  /* "פתוח" = גלוי במסלול הנוכחי: דף שנותח קודם נשאר ב-DOM גם כשעוברים ל-/tuner או /tips,
+     אבל אז העטיפה שלו (data-rv) מוסתרת */
+  const sheetOpen = () => {
+    if(!(window.__sheetOpen && window.__sheetOpen())) return false;
+    const res = $('result');
+    return !(res && res.closest('[hidden]'));
+  };
+  function refreshAttach(){
+    const show = sheetOpen() && aiState !== 'off';
+    attachRow.hidden = !show;
+    if(!show && attachOn){ attachOn = false; attachBtn.setAttribute('aria-pressed', 'false'); }
+  }
+  attachBtn.addEventListener('click', () => {
+    attachOn = !attachOn;
+    attachBtn.setAttribute('aria-pressed', attachOn ? 'true' : 'false');
+  });
+  (function watchSheet(){
+    const res = $('result');
+    if(!res || !window.MutationObserver) return;
+    const mo = new MutationObserver(refreshAttach);
+    /* הדף עצמו וכל עטיפה של מסלול מעליו (מעבר מסלול מסתיר את העטיפה, לא את הדף) */
+    for(let n = res; n && n !== document.body; n = n.parentElement)
+      if(n === res || n.hasAttribute('data-rv')) mo.observe(n, { attributes:true, attributeFilter:['hidden'] });
+  })();
+  /* סיכום הדף בלי שורת הכותרת (שם הקובץ עלול להיות אישי) ובלי שורת הקרדיט */
+  function sheetSummary(){
+    let txt = '';
+    try{ if(typeof sheetAsText === 'function') txt = sheetAsText(); }catch(e){ txt = ''; }
+    if(txt){
+      const lines = txt.split('\n');
+      lines.shift();
+      while(lines.length && !lines[lines.length - 1].trim()) lines.pop();
+      if(lines.length && /Chordix/.test(lines[lines.length - 1]) && lines[lines.length - 1].indexOf('|') < 0) lines.pop();
+      txt = lines.map(l => l.replace(/[\u200E\u200F]/g, '').replace(/[ \t]+/g, ' ').trim())
+        .filter((l, i, a) => l || (i > 0 && a[i - 1])).join('\n');
+    } else txt = summaryFromState();
+    return txt.slice(0, 3000);
+  }
+  function summaryFromState(){
+    const st = window.__cxState;
+    if(!st || !st.bars || !st.bars.length) return '';
+    const N = ['C', 'C#', 'D', 'Eb', 'E', 'F', 'F#', 'G', 'Ab', 'A', 'Bb', 'B'];
+    const nm = c => (c && typeof c.root === 'number') ? N[c.root] + (c.suf || '') + (typeof c.bass === 'number' && c.bass !== c.root ? '/' + N[c.bass] : '') : '';
+    const bar = b => (b && b.chords ? b.chords.map(nm).filter(Boolean).join(' ') : '') || '-';
+    const out = [];
+    const meta = [];
+    if(st.key && typeof st.key.root === 'number') meta.push('Key ' + N[st.key.root] + (st.key.minor ? 'm' : ''));
+    if(st.bpm) meta.push(Math.round(st.bpm) + ' BPM');
+    meta.push(st.meter && st.meter.label ? st.meter.label : '4/4');
+    out.push(meta.join(' · '));
+    (st.secs && st.secs.length ? st.secs : [{ name:'', from:0, to:st.bars.length }]).forEach(s => {
+      const bars = [];
+      for(let i = s.from; i < s.to && i < st.bars.length; i++) bars.push(bar(st.bars[i]));
+      out.push('[' + String(s.name || '').slice(0, 20) + '] | ' + bars.join(' | ') + ' |');
+    });
+    return out.join('\n');
+  }
+
+  /* ---------- הבינה המלאכותית (אופציונלית) ---------- */
+  function aiUsable(){
+    if(aiState === 'off' || aiState === 'quota' || aiState === 'busy'){
+      if(Date.now() < aiRetryAt) return false;
+      aiState = 'unknown';
+      refreshAttach();
+    }
+    if(navigator.onLine === false) return false;
+    return true;
+  }
+  function pageId(){
+    const lm = $('legalModal');
+    if(lm && !lm.classList.contains('hidden')) return 'legal';
+    if(sheetOpen()) return 'sheet';
+    const p = (location.pathname.replace(/\/+$/, '') || '/');
+    const M = { '/':'home', '/how':'how', '/features':'features', '/faq':'faq', '/tips':'tips', '/metronome':'metronome', '/tools':'metronome',
+      '/guitar-chords':'guitar', '/piano-chords':'piano', '/tuner':'tuner', '/library':'library',
+      '/terms':'legal', '/privacy':'legal', '/cookies':'legal', '/refunds':'legal', '/accessibility':'legal', '/licenses':'legal' };
+    return M[p] || 'home';
+  }
+  const enc = window.TextEncoder ? new TextEncoder() : null;
+  const bytes = s => (enc ? enc.encode(s).length : s.length * 3);
+  function buildBody(){
+    const msgs = [];
+    for(const m of convo){
+      const c = String(m.content || '').slice(0, 1000);
+      if(!c) continue;
+      const last = msgs[msgs.length - 1];
+      if(last && last.role === m.role){
+        last.content = m.role === 'user' ? (last.content + '\n' + c).slice(-1000) : c;
+      } else msgs.push({ role:m.role, content:c });
+    }
+    let list = msgs.slice(-12);
+    while(list.length && list[0].role !== 'user') list.shift();
+    const body = { lang:lang(), page:pageId(), messages:list };
+    refreshAttach();
+    if(attachOn && !attachRow.hidden){ const s = sheetSummary(); if(s) body.sheet = s; }
+    while(bytes(JSON.stringify(body)) > 16000 && body.messages.length > 1){
+      body.messages.splice(0, 2);
+      while(body.messages.length && body.messages[0].role !== 'user') body.messages.shift();
+    }
+    if(body.sheet && bytes(JSON.stringify(body)) > 16000) body.sheet = body.sheet.slice(0, 1200);
+    return body;
+  }
+  function noteFailure(status, code, ct){
+    /* רק 'quota' (המכסה היומית נגמרה) עוצר לחצי שעה ומדווח על מכסה */
+    if(status === 503 && code === 'quota'){ aiState = 'quota'; aiRetryAt = Date.now() + 30 * 60e3; return 'quota'; }
+    if((status === 503 && code === 'no_ai') || status === 404 || status === 405 || (status === 200 && ct.indexOf('text/html') >= 0)){
+      aiState = 'off'; aiRetryAt = Date.now() + 10 * 60e3; refreshAttach(); return 'off';
+    }
+    /* עומס רגעי (הגבלת קצב או קיבולת זמנית אצל Cloudflare): הפסקה קצרה בלבד */
+    if(status === 429 || code === 'busy' || code === 'capacity'){ aiState = 'busy'; aiRetryAt = Date.now() + 20e3; return 'busy'; }
+    return 'error';
+  }
+  async function aiReply(local){
+    const g = gen;
+    const reqBody = buildBody();
+    /* לא שולחים שיחה ריקה (למשל אחרי ניקוי); השרת היה דוחה אותה ממילא */
+    if(!reqBody.messages.length || reqBody.messages[reqBody.messages.length - 1].role !== 'user'){ fallback(local, ''); return; }
+    if(!aiNoticeShown){
+      aiNoticeShown = true;
+      addSystem(cxT("השאלה הזו, יחד עם השיחה עד כה, נשלחת לעיבוד בבינה מלאכותית של Cloudflare. בלי פרטים אישיים, בבקשה."));
+    }
+    const myCtrl = ('AbortController' in window) ? new AbortController() : null;
+    ctrl = myCtrl;
+    setBusy(true);
+    setAnswering(true);
+    const typing = addTyping();
+
+    let acc = '', done = false, why = '', live = null, liveBody = null, raf = 0;
+    const firstByte = setTimeout(() => { if(!acc && myCtrl) myCtrl.abort(); }, 25000);   /* אין תשובה ראשונה */
+    const hardStop = setTimeout(() => { if(myCtrl) myCtrl.abort(); }, 90000);           /* תקרה לתשובה אחת */
+    const paint = () => {
+      raf = 0;
+      if(!liveBody) return;
+      liveBody.textContent = '';
+      renderText(liveBody, acc, false);
+      const last = liveBody.lastElementChild;
+      const host = last ? (last.tagName === 'UL' ? (last.lastElementChild || last) : last) : liveBody;
+      host.appendChild(el('span', 'cx-caret'));
+      scrollDown(false);
+    };
+    const onText = t => {
+      if(!live){
+        typing.remove();
+        streaming = true;
+        log.setAttribute('aria-busy', 'true');
+        live = botBubble();
+        live.setAttribute('aria-hidden', 'true');      /* מוכרז פעם אחת בסוף, לא מילה-מילה */
+        liveBody = el('div');
+        live.appendChild(liveBody);
+        log.appendChild(live);
+      }
+      acc += t;
+      if(acc.length > 8000){ acc = acc.slice(0, 8000); done = true; }
+      if(!raf) raf = requestAnimationFrame(paint);
+    };
+    const handleLine = line => {
+      if(line.slice(0, 5) !== 'data:') return;
+      const data = line.slice(5).trim();
+      if(!data) return;
+      let ev = null;
+      try{ ev = JSON.parse(data); }catch(e){ return; }
+      if(!ev || typeof ev !== 'object') return;
+      if(typeof ev.t === 'string' && ev.t) onText(ev.t);
+      else if(ev.done) done = true;
+      else if(ev.error){ why = 'cut'; done = true; }
+    };
+    try{
+      const res = await fetch('/api/chat', {
+        method:'POST', headers:{ 'Content-Type':'application/json' }, body:JSON.stringify(reqBody),
+        signal: myCtrl ? myCtrl.signal : undefined, cache:'no-store', credentials:'same-origin'
+      });
+      const ct = (res.headers.get('content-type') || '').toLowerCase();
+      if(res.status !== 200 || ct.indexOf('text/event-stream') < 0 || !res.body || !res.body.getReader){
+        let code = '';
+        if(ct.indexOf('application/json') >= 0){ try{ code = String((await res.json()).code || ''); }catch(e){} }
+        else { try{ if(res.body) res.body.cancel(); }catch(e){} }
+        why = noteFailure(res.status, code, ct);
+      } else {
+        aiState = 'ok';
+        const reader = res.body.getReader();
+        if(myCtrl) myCtrl.cxReader = reader;
+        const dec = new TextDecoder();
+        let buf = '';
+        while(!done){
+          const chunk = await reader.read();
+          if(chunk.done) break;
+          buf += dec.decode(chunk.value, { stream:true });
+          let i;
+          while(!done && (i = buf.indexOf('\n')) >= 0){
+            handleLine(buf.slice(0, i).replace(/\r$/, ''));
+            buf = buf.slice(i + 1);
+          }
+        }
+        buf += dec.decode();
+        if(!done && buf.trim()) handleLine(buf.trim());
+        if(done) try{ reader.cancel().catch(() => {}); }catch(e){}
+        if(myCtrl && myCtrl.cxCleared) why = 'cleared';
+        else if(myCtrl && myCtrl.cxStopped) why = 'stopped';
+        else if(!done && !why) why = 'cut';
+      }
+    }catch(err){
+      if(myCtrl && myCtrl.cxCleared) why = 'cleared';
+      else if(myCtrl && myCtrl.cxStopped) why = 'stopped';
+      else why = acc ? 'cut' : 'error';          /* רשת, פסק-זמן או זרם שנשבר */
+    }
+    clearTimeout(firstByte); clearTimeout(hardStop);
+    if(raf){ cancelAnimationFrame(raf); raf = 0; }
+    if(why === 'cleared' || g !== gen) return;    /* הניקוי כבר איפס הכול (גם בלי AbortController) */
+    if(ctrl === myCtrl) ctrl = null;
+    streaming = false;
+    typing.remove();
+    log.removeAttribute('aria-busy');
+    setBusy(false);
+    setAnswering(false);
+    if(acc.trim()){
+      const text = acc.replace(/<think>[\s\S]*?<\/think>/gi, '').trim();
+      const fin = botBubble('cx-still', text);
+      const body = el('div');
+      renderText(body, text, false);
+      fin.appendChild(body);
+      if(live) live.replaceWith(fin); else log.appendChild(fin);
+      convo.push({ role:'assistant', content:text });
+      if(why === 'stopped') addSystem(cxT("התשובה נעצרה."));
+      else if(why === 'cut') addSystem(cxT("התשובה נקטעה באמצע. אפשר לנסות לשאול שוב."));
+      scrollDown(false);
+    } else {
+      if(live) live.remove();
+      if(why === 'stopped') addSystem(cxT("התשובה נעצרה."));
+      else {
+        const reason = why === 'quota' ? cxT("המכסה היומית של הבינה המלאכותית נגמרה, אז כרגע עונות רק התשובות המובנות.")
+          : why === 'busy' ? cxT("יש כרגע עומס. אפשר לנסות שוב בעוד רגע.")
+          : (why === 'error' || why === 'cut') ? cxT("לא הצלחתי לקבל תשובה מהשרת כרגע.") : '';
+        fallback(local, reason);
+      }
+    }
+    rescueFocus();
+  }
+
+  /* ---------- ניקוי ---------- */
+  function clearChat(){
+    gen++;
+    haltStream('cxCleared');
+    ctrl = null;
+    streaming = false;
+    convo = [];
+    started = false;
+    log.removeAttribute('aria-busy');
+    log.textContent = '';
+    setBusy(false);
+    setAnswering(false);
+    pinned = true;
+    renderWelcome();
+    input.value = ''; autoGrow(); updateSend();
+    focusInput();
+  }
+
+  /* ---------- שפה ---------- */
+  /* לפני שהשיחה התחילה: הפתיחה והצ'יפים נבנים מחדש בשפה החדשה. אחרי שהתחילה: צ'יפים שנבנו
+     בשפה הקודמת מוסרים (לחיצה עליהם הייתה שולחת שאלה בשפה הלא נכונה) */
+  document.addEventListener('cx:langchange', () => {
+    setFabLabel();
+    if(!started && log.firstChild) renderWelcome();
+    else log.querySelectorAll('.cx-chips').forEach(g => { if(g.cxLang !== lang()) g.remove(); });
+  });
+  setFabLabel();
+})();
+</script>
+<!-- cx-chat:script:end -->
 </body>
 </html>

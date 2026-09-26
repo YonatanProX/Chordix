@@ -6,5 +6,7 @@ Allow: /
 Disallow: /chordix-model.bin
 Disallow: /i18n-keys.json
 Disallow: /admin
+Disallow: /assistant-kb.json
+Disallow: /api/
 
 Sitemap: https://chordix.pages.dev/sitemap.xml

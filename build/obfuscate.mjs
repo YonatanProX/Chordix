@@ -36,10 +36,14 @@ const COPY_SKIP = new Set([
   '.gitignore', '.node-version',
   /* מסמכים פנימיים — לא נכסי-שירות. עד 2026-09-19 הם פורסמו לכולם (כולל יומן תיקוני-הבאגים). */
   'README.md', 'README.txt', 'i18n-keys.json', 'bench.html',
+  /* קוד-שרת (Pages Functions) והגדרות wrangler — Cloudflare מקמפל את functions/ מהשורש;
+     עותק ב-dist היה מוגש כקובץ סטטי (כולל ה-system prompt של הבוט). */
+  'functions', '.wrangler', 'wrangler.toml', 'wrangler.json', 'wrangler.jsonc',
 ]);
 /* כל דבר שנראה כמו תיעוד/מקור/נתונים פנימיים נשאר בחוץ, גם אם יתווסף בעתיד */
 const COPY_DENY = [
   /^CHANGELOG.*\.md$/i, /\.(sql|map|mjs|env|log)$/i, /^\.env/i,
+  /^\.dev\.vars/i,   /* סודות מקומיים של wrangler pages dev */
   /* עותקי-גיבוי של ה-HTML בשורש (index.<משהו>.html) — מקור קריא ולא-מעורפל.
      index.html עצמו לא נתפס כאן (אין לו חלק-אמצעי) והוא נכתב בנפרד אחרי הערפול. */
   /^index\..+\.html$/i,
@@ -260,6 +264,19 @@ function main() {
     .map(e => e.name);
   if (strayHtml.length)
     throw new Error(`פרסום: קובצי-HTML שאינם נכסי-שירות הגיעו ל-dist: ${strayHtml.join(', ')} — להוסיף ל-COPY_DENY/COPY_SKIP.`);
+
+  /* שומר-שרת: קוד ה-Functions וקובצי-סודות מקומיים (.dev.vars*) אסור שיגיעו ל-dist,
+     גם אם ישתנו כללי-ההעתקה. בודקים את כל העץ, לא רק את השורש. */
+  const leaked = fs.existsSync(path.join(DIST, 'functions')) ? ['functions/'] : [];
+  (function scan(dir, rel) {
+    for (const e of fs.readdirSync(dir, { withFileTypes: true })) {
+      const r = rel ? `${rel}/${e.name}` : e.name;
+      if (/^\.dev\.vars/i.test(e.name)) leaked.push(r);
+      if (e.isDirectory()) scan(path.join(dir, e.name), r);
+    }
+  })(DIST, '');
+  if (leaked.length)
+    throw new Error(`פרסום: קוד-שרת/סודות הגיעו ל-dist: ${leaked.join(', ')} — להוסיף ל-COPY_SKIP/COPY_DENY.`);
 
   /* CSP: במקום 'unsafe-inline' — hash לכל סקריפט מוטמע שנשאר ב-HTML הסופי. כך סקריפט שהוזרק
      (XSS) לא ירוץ גם אם חמק מהניטרול. סקריפטי-נתונים (ld+json וכד') לא מורצים ולא צריכים hash. */

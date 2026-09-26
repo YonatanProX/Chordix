@@ -28,6 +28,8 @@ self.addEventListener('fetch', e => {
   if (req.method !== 'GET') return;
 
   const url = new URL(req.url);
+  /* העוזר המוזיקלי: ה-API וקובץ התשובות המובנות לא עוברים דרך ה-SW ולא נשמרים במטמון שלו */
+  if (url.pathname.startsWith('/api/') || url.pathname === '/assistant-kb.json') return;
   const sameOrigin = url.origin === location.origin;
 
   /* המודל וקבצי ה-wasm: מטמון תחילה. הם גדולים, בלתי משתנים,
